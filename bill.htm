@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bill Payment Module</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #2b2b2b; color: #eee; margin: 0; padding: 10px; font-size: 13px; }
+    h2 { color: #fff; font-size: 18px; margin: 0 0 10px 0; }
+    .toolbar { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; clear: both; }
+    .toolbar input { padding: 4px; border-radius: 4px; border: 1px solid #555; width: 250px; font-size: 13px; }
+    .toolbar button { padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s ease; font-size: 13px; }
+    .toolbar button:hover { background: #218838; }
+    .spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+
+    .table-container { height: calc(100vh - 120px); overflow-y: auto; border: 1px solid #555; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border: 1px solid #555; padding: 6px; text-align: center; white-space: normal; word-wrap: break-word; overflow-wrap: break-word; }
+    thead th { position: sticky; top: 0; background: #003366; color: #fff; z-index: 2; font-size: 12px; }
+
+    td:nth-child(3), th:nth-child(3),
+    td:nth-child(4), th:nth-child(4) { width: 20px; max-width: 20px; }
+    td:nth-child(6), th:nth-child(6) { width: 140px; max-width: 140px; }
+    td:nth-child(7), th:nth-child(7) { width: 225px; max-width: 225px; }
+    td:nth-child(9), th:nth-child(9) { width: 105px; max-width: 80px; }
+    td:nth-child(10), th:nth-child(10) { width: 105px; max-width: 90px; }
+
+    td:nth-child(n+12):nth-child(-n+22),
+    th:nth-child(n+12):nth-child(-n+22) { min-width: 60px; }
+
+    button.action-btn { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    #message { margin-bottom: 8px; padding: 8px; display: none; border-radius: 5px; font-weight: bold; text-align: center; font-size: 13px; }
+    #message.success { background: #28a745; color: white; }
+    #message.error { background: #dc3545; color: white; }
+    #message.loading { background: #007bff; color: white; }
+
+    td input, td select { 
+      width: 100%; 
+      box-sizing: border-box; 
+      font-size: 12px; 
+      padding: 4px;
+      background: #fff;
+      color: #000;
+      border: 1px solid #555;
+      border-radius: 3px;
+    }
+    
+    td select {
+      cursor: pointer;
+    }
+    
+    td select option {
+      background: #fff;
+      color: #000;
+    }
+    
+    .no-data-message {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <h2>Bill Payment Module</h2>
+
+  <div id="message"></div>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="🔍 Search by UNIQUE NIT, NIT, Vendor..." oninput="filterTable()" />
+    <button id="refreshBtn" onclick="refreshData()">⟳ Refresh</button>
+  </div>
+
+  <div class="table-container">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>UNIQUE NIT</th>
+          <th>NIT</th>
+          <th>SL</th>
+          <th>NIT DATE</th>
+          <th>VENDOR</th>
+          <th>Name of the work</th>
+          <th>Source of Fund</th>
+          <th>WORK ORDER NO</th>
+          <th>WORK ORDER DATE</th>
+          <th>ESTIMATE VALUE</th>
+          <th>GROSS BILL</th>
+          <th>Completion Date</th>
+          <th>TDS</th>
+          <th>CGST</th>
+          <th>SGST</th>
+          <th>LABOUR CESS</th>
+          <th>ROYALTY</th>
+          <th>SECURITY</th>
+          <th>NET PAYMENT</th>
+          <th>PAYMENT MODE</th>
+          <th>REFERENCE</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyIEuA__A7PA7h95vy2QlFvNK5D52fK-wrdURzjz7q96mshnOO2lhvvKKlnDzzOrHw/exec";
+    let tableData = [];
+    let originalData = []; // Store original unfiltered data with indices
+    let allData = []; // Store all data including rows without work orders
+
+    async function refreshData() {
+      const btn = document.getElementById("refreshBtn");
+      const oldText = btn.innerHTML;
+      btn.innerHTML = `<span class="spinner"></span> Refreshing...`;
+      btn.disabled = true;
+      showMessage("Refreshing data...", "loading");
+      await loadData();
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+      showMessage("Data loaded successfully ✅", "success");
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(scriptURL + "?action=getBillPaymentData");
+        const data = await res.json();
+        
+        // Skip header row (first row) and store all data
+        allData = data.slice(1); // Remove header row
+        
+        // Filter rows where WORK ORDER NO (column 8) is not blank
+        const filteredData = allData.filter(row => {
+          const workOrderNo = row[8]; // WORK ORDER NO is at index 8
+          return workOrderNo && workOrderNo.toString().trim() !== '';
+        });
+        
+        tableData = filteredData;
+        
+        // Store original indices for composite key lookup
+        originalData = tableData.map((row, index) => ({
+          originalIndex: index,
+          data: row
+        }));
+        
+        if (tableData.length === 0) {
+          showMessage("No records with Work Order Number found", "loading");
+        }
+        
+        renderTable(tableData);
+      } catch (error) {
+        showMessage("Error loading data: " + error.message, "error");
+      }
+    }
+
+    function formatDateToDDMMYYYY(dateValue) {
+      if (!dateValue) return "";
+      
+      try {
+        // If it's a string in ISO format (2025-07-27T18:30:00.000Z)
+        if (typeof dateValue === 'string' && dateValue.includes('T')) {
+          const date = new Date(dateValue);
+          if (isNaN(date.getTime())) return dateValue;
+          
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+          return `${day}/${month}/${year}`;
+        }
+        
+        // If it's already a Date object
+        if (dateValue instanceof Date) {
+          const day = String(dateValue.getDate()).padStart(2, '0');
+          const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+          const year = dateValue.getFullYear();
+          return `${day}/${month}/${year}`;
+        }
+        
+        // If it's a string in YYYY-MM-DD format
+        if (typeof dateValue === 'string' && dateValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+          const parts = dateValue.split('T')[0].split('-');
+          if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+          }
+        }
+        
+        // If it's a number (Excel serial date)
+        if (typeof dateValue === 'number') {
+          const date = new Date((dateValue - 25569) * 86400 * 1000);
+          if (!isNaN(date.getTime())) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+          }
+        }
+        
+        return dateValue;
+      } catch (e) {
+        return dateValue;
+      }
+    }
+
+    function renderTable(data) {
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 23; // Updated colspan for 23 columns (20 original + 2 new + 1 action)
+        td.className = "no-data-message";
+        td.textContent = "No records with Work Order Number found";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      data.forEach((row, displayIndex) => {
+        // Find the original index in tableData using composite key (UNIQUE NIT + VENDOR)
+        const originalItem = originalData.find(item => 
+          String(item.data[1]) === String(row[1]) && // UNIQUE NIT
+          String(item.data[5]) === String(row[5])    // VENDOR
+        );
+        
+        const originalIndex = originalItem ? originalItem.originalIndex : displayIndex;
+        
+        let tr = document.createElement("tr");
+        tr.setAttribute('data-unique-nit', row[1] || '');
+        tr.setAttribute('data-vendor', row[5] || '');
+        tr.setAttribute('data-original-index', originalIndex);
+
+        // Non-editable cols (0 → 10)
+        for (let j = 0; j <= 10; j++) {
+          let td = document.createElement("td");
+          
+          // Format dates for Timestamp (col 0) and WORK ORDER DATE (col 9)
+          if (j === 0 || j === 9) {
+            td.textContent = formatDateToDDMMYYYY(row[j]) ?? "";
+          } else {
+            td.textContent = row[j] ?? "";
+          }
+          
+          tr.appendChild(td);
+        }
+
+        // Editable cols (11 → 19) - Original financial columns
+        for (let j = 11; j <= 19; j++) {
+          let td = document.createElement("td");
+          let value = row[j] || "";
+
+          // Special: Completion Date (col 12) uses date picker
+          if (j === 12) {
+            const formattedDate = formatToInputDate(value);
+            td.innerHTML = `<input type="date" value="${formattedDate}" id="col_${originalIndex}_${j}" oninput="toggleButton(${originalIndex})">`;
+          } else {
+            td.innerHTML = `<input type="text" value="${value}" id="col_${originalIndex}_${j}" oninput="toggleButton(${originalIndex})">`;
+          }
+
+          tr.appendChild(td);
+        }
+
+        // New columns: PAYMENT MODE (col 20) - Using sheet column 26 (AA)
+        let tdPaymentMode = document.createElement("td");
+        const paymentMode = row[26] || ""; // PAYMENT MODE is at index 26 (column AA)
+        tdPaymentMode.innerHTML = `
+          <select id="col_${originalIndex}_20" onchange="toggleButton(${originalIndex})">
+            <option value="" ${paymentMode === '' ? 'selected' : ''}>Select Mode</option>
+            <option value="Online" ${paymentMode === 'Online' ? 'selected' : ''}>Online</option>
+            <option value="Cheque" ${paymentMode === 'Cheque' ? 'selected' : ''}>Cheque</option>
+          </select>
+        `;
+        tr.appendChild(tdPaymentMode);
+
+        // New columns: REFERENCE (col 21) - Using sheet column 27 (AB)
+        let tdReference = document.createElement("td");
+        const reference = row[27] || ""; // REFERENCE is at index 27 (column AB)
+        tdReference.innerHTML = `<input type="text" value="${reference}" id="col_${originalIndex}_21" oninput="toggleButton(${originalIndex})">`;
+        tr.appendChild(tdReference);
+
+        // Action button
+        let tdAction = document.createElement("td");
+        tdAction.innerHTML = `<button class="action-btn" id="btn_${originalIndex}" onclick="updateRow(${originalIndex})">SAVE</button>`;
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+        toggleButton(originalIndex);
+      });
+    }
+
+    function formatToInputDate(value) {
+      if (!value) return "";
+      
+      try {
+        // Handle ISO date string
+        if (typeof value === 'string' && value.includes('T')) {
+          const date = new Date(value);
+          if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+          }
+        }
+        
+        // Handle Date object
+        if (value instanceof Date) {
+          const year = value.getFullYear();
+          const month = String(value.getMonth() + 1).padStart(2, "0");
+          const day = String(value.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        }
+        
+        // Handle YYYY-MM-DD format
+        if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+          return value.split('T')[0];
+        }
+        
+        // Handle DD/MM/YYYY format (convert to YYYY-MM-DD for input)
+        if (typeof value === 'string' && value.match(/^\d{2}\/\d{2}\/\d{4}/)) {
+          const parts = value.split('/');
+          return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        
+        const d = new Date(value);
+        if (isNaN(d.getTime())) return "";
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      } catch (e) {
+        return "";
+      }
+    }
+
+    function filterTable() {
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      
+      // First filter by work order not blank, then apply search filter
+      const workOrderFiltered = tableData.filter(row => {
+        const workOrderNo = row[8];
+        return workOrderNo && workOrderNo.toString().trim() !== '';
+      });
+      
+      const filtered = workOrderFiltered.filter(row =>
+        (row[1] && row[1].toString().toLowerCase().includes(search)) ||
+        (row[2] && row[2].toString().toLowerCase().includes(search)) ||
+        (row[5] && row[5].toString().toLowerCase().includes(search))
+      );
+      
+      renderTable(filtered);
+    }
+
+    function toggleButton(i) {
+      const btn = document.getElementById(`btn_${i}`);
+      if (btn) {
+        btn.textContent = "UPDATE";
+        btn.style.background = "blue";
+        btn.style.color = "white";
+      }
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById("message");
+      msg.textContent = text;
+      msg.className = type;
+      msg.style.display = "block";
+      setTimeout(() => { msg.style.display = "none"; }, 2500);
+    }
+
+    async function updateRow(originalIndex) {
+      const btn = document.getElementById(`btn_${originalIndex}`);
+      if (!btn) return;
+      
+      btn.disabled = true; 
+      btn.textContent = "Saving...";
+
+      try {
+        // Get the original row data using the stored index
+        const originalRow = tableData[originalIndex];
+        if (!originalRow) {
+          throw new Error("Original row not found");
+        }
+
+        // Get UNIQUE NIT (col 1) and VENDOR (col 5) from original row
+        const uniqueNit = originalRow[1];
+        const vendor = originalRow[5];
+
+        if (!uniqueNit || !vendor) {
+          throw new Error("Missing UNIQUE NIT or VENDOR");
+        }
+
+        const formData = new FormData();
+        formData.append("action", "updateBillPayment");
+        formData.append("uniqueNit", String(uniqueNit));
+        formData.append("vendor", String(vendor));
+
+        // Add original editable column values (11-19)
+        for (let j = 11; j <= 19; j++) {
+          const element = document.getElementById(`col_${originalIndex}_${j}`);
+          if (element) {
+            formData.append(`col${j}`, element.value);
+          }
+        }
+
+        // Add new PAYMENT MODE (col 20) and REFERENCE (col 21)
+        const paymentModeElement = document.getElementById(`col_${originalIndex}_20`);
+        if (paymentModeElement) {
+          formData.append(`col20`, paymentModeElement.value);
+        }
+
+        const referenceElement = document.getElementById(`col_${originalIndex}_21`);
+        if (referenceElement) {
+          formData.append(`col21`, referenceElement.value);
+        }
+
+        const res = await fetch(scriptURL, {
+          method: "POST",
+          body: formData
+        });
+        
+        const result = await res.json();
+
+        if (result.success) {
+          btn.textContent = "Saved ✔"; 
+          btn.style.background = "green";
+          showMessage(`Row updated successfully ✅`, "success");
+          
+          // Highlight the updated row
+          const rowEl = btn.closest("tr");
+          rowEl.style.backgroundColor = "#d4edda";
+          
+          // Update the local data with new values
+          for (let j = 11; j <= 19; j++) {
+            const element = document.getElementById(`col_${originalIndex}_${j}`);
+            if (element) {
+              tableData[originalIndex][j] = element.value;
+            }
+          }
+          
+          // Update new columns in local data
+          if (paymentModeElement) {
+            tableData[originalIndex][26] = paymentModeElement.value; // PAYMENT MODE at index 26
+          }
+          if (referenceElement) {
+            tableData[originalIndex][27] = referenceElement.value; // REFERENCE at index 27
+          }
+          
+          // Update originalData
+          const originalItem = originalData.find(item => item.originalIndex === originalIndex);
+          if (originalItem) {
+            originalItem.data = tableData[originalIndex];
+          }
+          
+          setTimeout(() => {
+            rowEl.style.backgroundColor = ""; 
+            toggleButton(originalIndex);
+          }, 1500);
+        } else {
+          btn.textContent = "Failed ✖"; 
+          btn.style.background = "red";
+          showMessage("Update failed: " + (result.error || "Unknown"), "error");
+        }
+      } catch (err) {
+        btn.textContent = "Error ✖"; 
+        btn.style.background = "red";
+        showMessage("Network error: " + err.message, "error");
+      } finally {
+        setTimeout(() => {
+          btn.disabled = false; 
+          toggleButton(originalIndex);
+        }, 2000);
+      }
+    }
+
+    // Load data when page loads
+    loadData();
+  </script>
+</body>
+</html>

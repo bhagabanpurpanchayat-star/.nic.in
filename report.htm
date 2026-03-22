@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NIT Report Viewer</title>
+
+<style>
+
+  /* ---------- GLOBAL UI ---------- */
+  body {
+    font-family: "Segoe UI", sans-serif;
+    background: #eef1f7;
+    padding: 30px;
+    color: #2c3e50;
+  }
+
+  /* ---------- HEADER STRIP ---------- */
+  .page-header {
+    padding: 18px;
+    background: linear-gradient(135deg,#34495e,#2c3e50);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #34495e;
+    text-align: left;
+  }
+
+  /* ---------- SELECT + BUTTONS ---------- */
+  select, button {
+    padding: 12px 18px;
+    font-size: 16px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.25s ease;
+  }
+
+  select {
+    background: white;
+    border: 1px solid #bbb;
+  }
+
+  button {
+    background: #3498db;
+    color: white;
+    margin-right: 8px;
+  }
+
+  button:hover {
+    background: #217dbb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  /* ---------- OUTPUT CARD ---------- */
+  #output {
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  /* ---------- TABLE ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  th {
+    background: #2c3e50;
+    color: white;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px dotted #000;
+  }
+
+  td {
+    padding: 9px;
+    border: 1px dotted #555;
+  }
+
+  tr:hover td {
+    background: #f1f7ff;
+  }
+
+  .total-row {
+    font-weight: bold;
+    background: #fceabb !important;
+  }
+
+  /* ---------- LOADER ---------- */
+  #loader {
+    display:none;
+    margin-top:20px;
+    font-size:20px;
+    font-weight:bold;
+    color:#2980b9;
+  }
+
+  /* ---------- PRINT MODE ---------- */
+  @media print {
+    button, select, h2 { display:none; }
+    body { background:white; padding:0px; }
+    #output { box-shadow:none; padding:0px; }
+    .page-header { display:block; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">📑 Tender Status – NIT Based Report</div>
+
+<h2>📊 Select NIT to Generate Report</h2>
+
+<label>Select NIT:</label>
+<select id="nitSelect"></select>
+
+<button onclick="loadReport()">Load Report</button>
+<button onclick="exportExcel()">Export Excel</button>
+<button onclick="window.print()">Print</button>
+
+<div id="loader">⏳ Generating Report <span>...</span></div>
+
+<div id="output"></div>
+
+<script>
+
+const API = "https://script.google.com/macros/s/AKfycbyhCDxKqIHUOH2KoyTHeO33KW_-UWT3ggL00iH9FMsek_PammWQwX7vRNkoCkGf_7xw/exec";   // <<<<< REPLACE WITH YOUR WEBAPP URL
+
+/* ✅ Load NIT List */
+fetch(API + "?action=listNIT")
+  .then(r => r.json())
+  .then(list => {
+    const sel = document.getElementById("nitSelect");
+    list.forEach(n => {
+      const opt = document.createElement("option");
+      opt.value = n;
+      opt.textContent = n;
+      sel.appendChild(opt);
+    });
+  });
+
+/* ✅ Load Report */
+function loadReport() {
+  const nit = document.getElementById("nitSelect").value;
+
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("output").innerHTML = "";
+
+  fetch(API + "?action=report&nit=" + encodeURIComponent(nit))
+    .then(r => r.json())
+    .then(data => {
+
+      document.getElementById("loader").style.display = "none";
+
+      if (!data.length) {
+        document.getElementById("output").innerHTML =
+          "<b>No records found for this NIT.</b>";
+        return;
+      }
+
+      let totalAccepted = 0;
+      let totalRejected = 0;
+
+      /* ✅ Top printed title */
+      let html = `
+        <div style="
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:10px;
+            text-align:left;
+            color:#2c3e50;">
+          🔍 REPORT FOR NIT: <span style="color:#c0392b">${nit}</span>
+        </div>
+
+        <table id="reportTable" border="1" style="border:1px dotted black">
+          <tr>
+            <th>Vendor</th>
+            <th>Accepted SL</th>
+            <th>Rejected SL</th>
+            <th>Accepted Amt</th>
+            <th>Rejected Amt</th>
+          </tr>
+      `;
+
+      data.forEach(v => {
+        totalAccepted += Number(v.acceptedAmount);
+        totalRejected += Number(v.rejectedAmount);
+
+        html += `
+          <tr>
+            <td>${v.vendor}</td>
+            <td>${v.acceptedSLs.join(", ")}</td>
+            <td>${v.rejectedSLs.join(", ")}</td>
+            <td>${v.acceptedAmount}</td>
+            <td>${v.rejectedAmount}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+        <tr class="total-row">
+          <td colspan="3" style="text-align:right">TOTAL :</td>
+          <td>${totalAccepted}</td>
+          <td>${totalRejected}</td>
+        </tr>
+      `;
+
+      html += "</table>";
+
+      document.getElementById("output").innerHTML = html;
+    });
+}
+
+/* ✅ Export to Excel (with dotted borders) */
+function exportExcel() {
+
+  const table = document.getElementById("reportTable");
+  if (!table) return alert("Generate report first.");
+
+  let html =
+    `<html><head>
+      <meta charset="UTF-8">
+      <style>
+        table, td, th { border:1px dotted #000; }
+        table { border-collapse:collapse; }
+      </style>
+    </head><body>` +
+    table.outerHTML +
+    `</body></html>`;
+
+  let file = new Blob([html], { type: "application/vnd.ms-excel" });
+
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(file);
+  a.download = "NIT_Report.xls";
+  a.click();
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,970 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tender Management Dashboard | Bhagabanpur Gram Panchayat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Header Section */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #2d3748;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .header h1 i {
+            color: #667eea;
+            font-size: 32px;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .refresh-btn {
+            float: right;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Stats Grid - 4 Cards in a Row */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stat-sub {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-top: 8px;
+        }
+        
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Vendors Section */
+        .vendors-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .vendors-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 12px;
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+            font-size: 14px;
+        }
+        
+        .vendor-rank {
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        /* Recent Tenders */
+        .recent-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .tender-item {
+            padding: 15px;
+            border-left: 3px solid #667eea;
+            margin-bottom: 10px;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .tender-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tender-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .tender-details {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: #718096;
+            flex-wrap: wrap;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .status-completed { background: #c6f6d5; color: #22543d; }
+        .status-in-progress { background: #feebc8; color: #7b341e; }
+        .status-pending { background: #fed7d7; color: #742a2a; }
+        
+        /* Animated Loading Screen with Countdown - FIXED for GitHub Pages */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .countdown-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        .circle-svg {
+            width: 200px;
+            height: 200px;
+            transform: rotate(-90deg);
+        }
+        
+        .circle-bg {
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 8;
+            fill: none;
+        }
+        
+        .circle-progress {
+            stroke: white;
+            stroke-width: 8;
+            fill: none;
+            stroke-linecap: round;
+            stroke-dasharray: 565.48;
+            stroke-dashoffset: 565.48;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+        
+        .countdown-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 64px;
+            font-weight: 800;
+            color: white;
+            font-family: 'Inter', monospace;
+            transition: transform 0.15s ease;
+        }
+        
+        .loading-text {
+            margin-top: 30px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        
+        .loading-subtext {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+        
+        .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+            margin: 0 2px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .last-updated {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .connection-status {
+            display: inline-block;
+            margin-left: 15px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #f7fafc;
+        }
+        
+        .status-connected {
+            color: #48bb78;
+        }
+        
+        .status-error {
+            color: #f56565;
+        }
+        
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            body { padding: 10px; }
+            .header h1 { font-size: 20px; }
+            .refresh-btn { float: none; margin-bottom: 15px; display: inline-block; }
+            .countdown-number { font-size: 48px; }
+            .circle-svg { width: 150px; height: 150px; }
+        }
+        
+        .stats-summary {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .summary-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        
+        .summary-label {
+            font-size: 11px;
+            color: #718096;
+        }
+        
+        .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .error-message {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        button {
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Loading Screen with Countdown - Enhanced for GitHub Pages -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="countdown-container">
+            <svg class="circle-svg" viewBox="0 0 200 200">
+                <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                <circle class="circle-progress" cx="100" cy="100" r="90" id="progressCircle"></circle>
+            </svg>
+            <div class="countdown-number" id="countdownNumber">3</div>
+            <div class="loading-text">
+                Loading Dashboard
+                <span class="pulse-dot"></span>
+                <span class="pulse-dot" style="animation-delay: 0.2s"></span>
+                <span class="pulse-dot" style="animation-delay: 0.4s"></span>
+            </div>
+            <div class="loading-subtext" id="loadingStatus">Initializing secure connection...</div>
+        </div>
+    </div>
+    
+    <div class="dashboard-container">
+        <div id="content" style="display: none;">
+            <!-- Header -->
+            <div class="header">
+                <button class="refresh-btn" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+                <h1>
+                    <i class="fas fa-chart-line"></i>
+                    Tender Management Dashboard
+                    <span id="connectionStatus" class="connection-status">
+                        <i class="fas fa-check-circle"></i> Ready
+                    </span>
+                </h1>
+                <p>Bhagabanpur Gram Panchayat | Real-time Tender Statistics & Analytics from Google Sheets</p>
+                <div id="lastUpdated" class="last-updated"></div>
+            </div>
+            
+            <!-- Statistics Cards - 4 Key Metrics -->
+            <div class="stats-grid" id="statsGrid"></div>
+            
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Tender Status Distribution
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Fund Source Analysis
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="fundChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        Monthly Tender Trends
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Vendors -->
+            <div class="vendors-section">
+                <div class="section-title">
+                    <i class="fas fa-trophy"></i>
+                    Top Performing Vendors
+                </div>
+                <div class="vendors-table" id="vendorsTable"></div>
+            </div>
+            
+            <!-- Recent Tenders -->
+            <div class="recent-section">
+                <div class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Recent Tender Activities
+                </div>
+                <div id="recentTenders"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // =====================================================
+        // GOOGLE APPS SCRIPT WEB APP URL - ACTIVE ENDPOINT
+        // =====================================================
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzuFy7WXnxJ1W85avlRrL_9KBE_XEHWyw237NWodssHCXN_GjIkyNFbfVBJjlA4KWOP/exec';
+        
+        let charts = {};
+        let countdownInterval = null;
+        
+        // Animate the circle progress based on countdown value
+        function animateCircle(progress) {
+            const circumference = 565.48;
+            const offset = circumference - (progress * circumference);
+            const circle = document.getElementById('progressCircle');
+            if (circle) {
+                circle.style.strokeDashoffset = offset;
+            }
+        }
+        
+        // Update countdown display with smooth animation
+        function updateCountdown(value, statusText) {
+            const countdownElement = document.getElementById('countdownNumber');
+            const statusElement = document.getElementById('loadingStatus');
+            
+            if (countdownElement) {
+                countdownElement.textContent = value;
+                // Add subtle scale animation
+                countdownElement.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    if (countdownElement) countdownElement.style.transform = 'scale(1)';
+                }, 150);
+            }
+            
+            if (statusElement && statusText) {
+                statusElement.textContent = statusText;
+            }
+            
+            // Update circle progress (value from 3 to 0, progress from 0 to 1)
+            const progress = (3 - value) / 3;
+            animateCircle(Math.min(1, Math.max(0, progress)));
+        }
+        
+        // Start countdown animation with proper async timing
+        async function startCountdown() {
+            // Clear any existing interval to avoid conflicts
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            
+            return new Promise((resolve) => {
+                let countdownValue = 3;
+                updateCountdown(3, 'Connecting to Google Sheets...');
+                
+                countdownInterval = setInterval(() => {
+                    countdownValue--;
+                    
+                    if (countdownValue > 0) {
+                        const statusMessages = {
+                            2: 'Fetching tender statistics...',
+                            1: 'Processing vendor analytics...'
+                        };
+                        updateCountdown(countdownValue, statusMessages[countdownValue] || 'Loading dashboard components...');
+                    } else {
+                        clearInterval(countdownInterval);
+                        countdownInterval = null;
+                        updateCountdown(0, 'Finalizing data visualization!');
+                        setTimeout(() => {
+                            resolve();
+                        }, 200);
+                    }
+                }, 1000);
+            });
+        }
+        
+        // Hide loading screen with smooth transition
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const content = document.getElementById('content');
+            
+            if (loadingScreen && content) {
+                loadingScreen.classList.add('hide');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    content.style.display = 'block';
+                }, 500);
+            }
+        }
+        
+        // Fetch data from Web App with timeout and retry logic
+        async function fetchFromWebApp(action, limit = 10, retries = 2) {
+            const url = `${WEB_APP_URL}?action=${action}&limit=${limit}&t=${Date.now()}`;
+            
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000);
+                    
+                    const response = await fetch(url, { 
+                        signal: controller.signal,
+                        mode: 'cors',
+                        cache: 'no-store'
+                    });
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.warn(`Fetch attempt ${attempt + 1} failed:`, error.message);
+                    if (attempt === retries) throw error;
+                    // Wait before retry
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+            throw new Error('Failed to fetch data after multiple attempts');
+        }
+        
+        // Update connection status indicator
+        function updateConnectionStatus(success, message = '') {
+            const statusEl = document.getElementById('connectionStatus');
+            if (!statusEl) return;
+            
+            if (success) {
+                statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Live Data';
+                statusEl.className = 'connection-status status-connected';
+            } else {
+                statusEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message || 'Demo Mode'}`;
+                statusEl.className = 'connection-status status-error';
+            }
+        }
+        
+        // Load all dashboard data with proper error handling
+        async function loadDashboardData() {
+            const statusElement = document.getElementById('loadingStatus');
+            if (statusElement) statusElement.textContent = 'Fetching tender data from server...';
+            
+            try {
+                // Fetch both statistics and recent tenders in parallel
+                const [statsResult, recentResult] = await Promise.all([
+                    fetchFromWebApp('statistics', 50),
+                    fetchFromWebApp('recent', 10)
+                ]);
+                
+                if (statusElement) statusElement.textContent = 'Processing and visualizing data...';
+                
+                if (statsResult && statsResult.success) {
+                    displayDashboard(statsResult);
+                    updateConnectionStatus(true);
+                } else {
+                    throw new Error(statsResult?.error || 'Failed to load statistics');
+                }
+                
+                if (recentResult && recentResult.success) {
+                    displayRecentTenders(recentResult);
+                }
+                
+                // Update timestamp
+                const lastUpdatedEl = document.getElementById('lastUpdated');
+                if (lastUpdatedEl) {
+                    lastUpdatedEl.innerHTML = `<i class="fas fa-clock"></i> Last updated: ${new Date().toLocaleString('en-IN')}`;
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                updateConnectionStatus(false, error.message.substring(0, 30));
+                
+                const statsGrid = document.getElementById('statsGrid');
+                if (statsGrid) {
+                    statsGrid.innerHTML = `
+                        <div class="error-message" style="grid-column: 1/-1;">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            <h3>Unable to Connect to Data Source</h3>
+                            <p>${error.message}</p>
+                            <button onclick="refreshData()" style="margin-top: 15px; padding: 10px 25px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-sync-alt"></i> Retry Connection
+                            </button>
+                            <p style="margin-top: 15px; font-size: 12px;">Note: The Google Apps Script endpoint may require authorization or may be rate-limited.</p>
+                        </div>
+                    `;
+                }
+                throw error;
+            }
+        }
+        
+        // Main display function for dashboard statistics
+        function displayDashboard(result) {
+            if (!result.success || !result.statistics) {
+                console.warn('Invalid result structure:', result);
+                return;
+            }
+            
+            const stats = result.statistics;
+            
+            // Display 4 Key Metrics Cards
+            const statsGrid = document.getElementById('statsGrid');
+            if (statsGrid) {
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #e9d8fd; color: #9f7aea;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value">${stats.totalVendors || 0}</div>
+                        <div class="stat-label">Total Vendors</div>
+                        <div class="stat-sub">Unique registered vendors</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #c6f6d5; color: #48bb78;">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-value">${stats.totalNIT || 0}</div>
+                        <div class="stat-label">Total NITs</div>
+                        <div class="stat-sub">Unique tender notices</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #feebc8; color: #ed8936;">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-value">${stats.totalSchemes || 0}</div>
+                        <div class="stat-label">Total Schemes</div>
+                        <div class="stat-sub">Unique work schemes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fed7d7; color: #f56565;">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <div class="stat-value">₹${formatNumber(stats.totalEarnestMoney || 0)}</div>
+                        <div class="stat-label">Total Earnest Money</div>
+                        <div class="stat-sub">EMD collected</div>
+                    </div>
+                `;
+            }
+            
+            // Additional Summary Stats
+            const summaryHTML = `
+                <div class="stats-summary">
+                    <div class="summary-item">
+                        <div class="summary-label">Total Tenders</div>
+                        <div class="summary-value">${stats.totalTenders || 0}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Estimate Value</div>
+                        <div class="summary-value">₹${formatNumber(stats.totalEstimateValue || 0)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Net Payment</div>
+                        <div class="summary-value">₹${formatNumber(stats.totalNetPayment || 0)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">EMD Paid Ratio</div>
+                        <div class="summary-value">${stats.emdPaid || 0}/${stats.totalNIT || 0}</div>
+                    </div>
+                </div>
+            `;
+            
+            const existingSummary = document.querySelector('.stats-summary');
+            if (existingSummary) existingSummary.remove();
+            if (statsGrid) statsGrid.insertAdjacentHTML('afterend', summaryHTML);
+            
+            // Create charts with provided distributions
+            createStatusChart(result.statusDistribution || {});
+            createFundChart(result.fundSourceDistribution || {});
+            createTrendChart(result.monthlyTrends || {});
+            
+            // Display vendors
+            displayVendors(result.topVendors || []);
+        }
+        
+        function displayRecentTenders(result) {
+            if (!result.success) return;
+            
+            const recentDiv = document.getElementById('recentTenders');
+            const tenders = result.data || [];
+            
+            if (!recentDiv) return;
+            
+            if (tenders.length === 0) {
+                recentDiv.innerHTML = '<p style="text-align:center; padding:20px;">No recent tenders found.</p>';
+                return;
+            }
+            
+            recentDiv.innerHTML = tenders.slice(0, 8).map(t => {
+                const statusClass = getStatusClass(t['Tender Status']);
+                const date = t['NIT DATE'] ? new Date(t['NIT DATE']).toLocaleDateString('en-IN') : 'N/A';
+                const estimateValue = t['ESTIMATE VALUE'] || 0;
+                const workName = t['Name of the work'] || 'Untitled Work';
+                const vendor = t['VENDOR'] || 'Unknown Vendor';
+                const nitNumber = t['UNIQUE NIT'] || 'N/A';
+                const emd = t['EARNEST MONEY'] || 0;
+                
+                return `
+                    <div class="tender-item">
+                        <div class="tender-name">
+                            <i class="fas fa-tag"></i> <strong>${escapeHtml(nitNumber)}</strong> - ${escapeHtml(workName.substring(0, 75))}${workName.length > 75 ? '...' : ''}
+                        </div>
+                        <div class="tender-details">
+                            <span><i class="fas fa-building"></i> ${escapeHtml(vendor)}</span>
+                            <span><i class="fas fa-calendar"></i> ${date}</span>
+                            <span><i class="fas fa-rupee-sign"></i> ₹${formatNumber(estimateValue)}</span>
+                            <span><i class="fas fa-money-bill-wave"></i> EMD: ₹${formatNumber(emd)}</span>
+                            <span class="status-badge ${statusClass}">${escapeHtml(t['Tender Status'] || 'Pending')}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function displayVendors(vendors) {
+            const vendorsDiv = document.getElementById('vendorsTable');
+            if (!vendorsDiv) return;
+            
+            if (!vendors || vendors.length === 0) {
+                vendorsDiv.innerHTML = '<p style="text-align:center; padding:20px;">No vendor data available.</p>';
+                return;
+            }
+            
+            const maxValue = Math.max(...vendors.map(v => v.totalValue || 0), 1);
+            
+            vendorsDiv.innerHTML = `
+                <table>
+                    <thead>
+                        <tr><th>Rank</th><th>Vendor Name</th><th>Tenders</th><th>Total Value (₹)</th><th>Total Payment (₹)</th><th>Total EMD (₹)</th><th>Performance</th></tr>
+                    </thead>
+                    <tbody>
+                        ${vendors.slice(0, 15).map((v, idx) => `
+                            <tr>
+                                <td class="vendor-rank">#${idx + 1}</td>
+                                <td><strong>${escapeHtml(v.name)}</strong></td>
+                                <td>${v.tenderCount || 0}</td>
+                                <td>₹${formatNumber(v.totalValue || 0)}</td>
+                                <td>₹${formatNumber(v.totalPayment || 0)}</td>
+                                <td>₹${formatNumber(v.totalEMD || 0)}</td>
+                                <td><div class="progress-bar"><div class="progress-fill" style="width: ${((v.totalValue || 0) / maxValue) * 100}%"></div></div></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // Chart creation functions
+        function createStatusChart(data) {
+            const ctx = document.getElementById('statusChart');
+            if (!ctx) return;
+            const labels = Object.keys(data).length ? Object.keys(data) : ['No Data'];
+            const values = Object.keys(data).length ? Object.values(data) : [1];
+            const colors = ['#48bb78', '#ed8936', '#f56565', '#9f7aea', '#4299e1'];
+            if (charts.status) charts.status.destroy();
+            charts.status = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+            });
+        }
+        
+        function createFundChart(data) {
+            const ctx = document.getElementById('fundChart');
+            if (!ctx) return;
+            const labels = Object.keys(data).length ? Object.keys(data) : ['No Data'];
+            const values = Object.keys(data).length ? Object.values(data) : [0];
+            if (charts.fund) charts.fund.destroy();
+            charts.fund = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: labels, datasets: [{ label: 'Number of Tenders', data: values, backgroundColor: '#4299e1', borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+        
+        function createTrendChart(data) {
+            const ctx = document.getElementById('trendChart');
+            if (!ctx) return;
+            let labels = Object.keys(data).length ? Object.keys(data) : ['No Data'];
+            let values = labels.map(l => data[l] || 0);
+            if (charts.trend) charts.trend.destroy();
+            charts.trend = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: 'Tenders Issued', data: values, borderColor: '#667eea', backgroundColor: 'rgba(102, 126, 234, 0.1)', tension: 0.4, fill: true, pointBackgroundColor: '#667eea' }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+        
+        async function refreshData() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'flex';
+                loadingScreen.classList.remove('hide');
+            }
+            const content = document.getElementById('content');
+            if (content) content.style.display = 'none';
+            if (countdownInterval) clearInterval(countdownInterval);
+            await startCountdown();
+            await loadDashboardData();
+            hideLoadingScreen();
+        }
+        
+        function formatNumber(num) {
+            if (!num || num === 0) return '0';
+            if (num >= 10000000) return (num / 10000000).toFixed(2) + ' Cr';
+            if (num >= 100000) return (num / 100000).toFixed(2) + ' L';
+            return num.toLocaleString('en-IN');
+        }
+        
+        function getStatusClass(status) {
+            if (!status) return 'status-pending';
+            const s = status.toLowerCase();
+            if (s.includes('complete')) return 'status-completed';
+            if (s.includes('progress') || s.includes('ongoing')) return 'status-in-progress';
+            return 'status-pending';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await startCountdown();
+            await loadDashboardData();
+            hideLoadingScreen();
+        });
+    </script>
+</body>
+</html>
