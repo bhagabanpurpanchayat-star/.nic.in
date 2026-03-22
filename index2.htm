@@ -1,0 +1,850 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhagabanpur Gram Panchayat | Official Portal | Malda</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary-dark: #0B2B40;
+  --primary-accent: #1E5A6B;
+  --secondary-deep: #1F3B4C;
+  --highlight-gold: #E6B17E;
+  --light-bg: #F4F7FB;
+  --white: #FFFFFF;
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Poppins', 'Roboto', system-ui, sans-serif;
+}
+
+body {
+  background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
+  color: #1E2F3E;
+  overflow-x: hidden;
+}
+
+/* Header with Dual Color Gradient */
+header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-accent) 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+  border-bottom: 2px solid var(--highlight-gold);
+}
+
+.header-container {
+  max-width: 1600px;
+  margin: auto;
+  padding: 0.6rem 2rem;
+}
+
+/* Top Section - Logo and Right Controls in Same Line */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.8rem;
+}
+
+/* Left Section: Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 20px;
+  border-radius: 50px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.logo i {
+  font-size: 1.8rem;
+  color: var(--highlight-gold);
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.logo i:hover {
+  transform: scale(1.08);
+  color: #FFD966;
+}
+
+.logo h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #FFFFFF, #FFE6C7);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.logo span {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #CCE6F0;
+  display: block;
+}
+
+/* Right Side Controls - User Section + Clock + Sign Out (All in same line) */
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+/* User Profile Badge - Google Style Avatar + Username */
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  padding: 4px 16px 4px 8px;
+  border-radius: 50px;
+  border: 1px solid rgba(230, 177, 126, 0.4);
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--highlight-gold), #D49B5F);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border: 2px solid rgba(255,255,240,0.6);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.3px;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--highlight-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Digital Clock - Elegant */
+.digital-clock {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  padding: 7px 18px;
+  border-radius: 40px;
+  font-family: 'Fira Mono', 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  color: #FFF5E6;
+  border: 1px solid rgba(230, 177, 126, 0.6);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.2);
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.clock-date {
+  font-size: 0.6rem;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 500;
+  color: var(--highlight-gold);
+  margin-top: 2px;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+/* Sign Out Button - Premium 3D Raised Effect with Logout Icon */
+.signout-btn {
+  background: linear-gradient(145deg, #D96C6C, #B34A4A);
+  border: none;
+  color: white;
+  font-weight: 700;
+  padding: 8px 26px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  box-shadow: 0 5px 0 #7A2E2E, 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255,255,240,0.5);
+  white-space: nowrap;
+  position: relative;
+  top: 0;
+}
+
+.signout-btn i {
+  font-size: 0.9rem;
+}
+
+.signout-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(145deg, #E68383, #C45A5A);
+  box-shadow: 0 7px 0 #7A2E2E, 0 8px 18px rgba(0, 0, 0, 0.35);
+  color: #FFF5EE;
+}
+
+.signout-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #7A2E2E, 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Navigation - 3D Raised Buttons */
+.nav-wrapper {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+nav li {
+  position: relative;
+}
+
+/* 3D Raised Button Effect for Menu */
+nav > ul > li > a {
+  text-decoration: none;
+  color: white;
+  padding: 10px 24px;
+  min-width: 130px;
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  background: linear-gradient(145deg, var(--primary-accent), var(--primary-dark));
+  border-radius: 12px;
+  box-shadow: 0 5px 0 #08212e, 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.08s linear;
+  position: relative;
+  top: 0;
+}
+
+nav > ul > li > a:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #08212e, 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+nav > ul > li > a:hover {
+  background: linear-gradient(145deg, #2D7A8F, var(--primary-accent));
+  box-shadow: 0 6px 0 #08212e, 0 6px 14px rgba(0, 0, 0, 0.35);
+  transform: translateY(-1px);
+  color: #FFEEDD;
+}
+
+/* Dropdown with 3D Submenu */
+.submenu {
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 240px;
+  background: var(--primary-dark);
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  display: none;
+  flex-direction: column;
+  z-index: 999;
+  padding: 8px 0;
+  border: 1px solid rgba(230, 177, 126, 0.4);
+  border-top: 3px solid var(--highlight-gold);
+}
+
+.submenu li a {
+  padding: 8px 20px;
+  display: block;
+  text-decoration: none;
+  color: #F5F0E6;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin: 2px 8px;
+  border-radius: 30px;
+  background: rgba(30, 90, 107, 0.3);
+  cursor: pointer;
+}
+
+.submenu li a:hover {
+  background: var(--highlight-gold);
+  color: var(--primary-dark);
+  transform: translateX(6px);
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+nav li:hover > .submenu {
+  display: flex;
+  animation: fadeDrop 0.2s ease;
+}
+
+.submenu .submenu {
+  top: 0;
+  left: 100%;
+  margin-left: 5px;
+  background: #0F3B4A;
+}
+
+@keyframes fadeDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.has-submenu::after {
+  content: " ▼";
+  font-size: 0.65rem;
+  font-weight: normal;
+}
+
+.has-submenu-right::after {
+  content: " ▶";
+  font-size: 0.65rem;
+}
+
+/* Iframe Section - FIXED: No padding, matching background */
+.iframe-container {
+  width: 100%;
+  height: calc(100vh - 115px);
+  background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* Footer */
+footer {
+  background: linear-gradient(135deg, var(--primary-dark), #0C3346);
+  color: #E6F0F5;
+  text-align: center;
+  padding: 0.7rem;
+  font-size: 0.72rem;
+  border-top: 2px solid var(--highlight-gold);
+}
+
+/* Toast Notification for Sign Out Feedback */
+.toast-notification {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--primary-dark);
+  color: #FFEEDD;
+  padding: 12px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  border-left: 5px solid var(--highlight-gold);
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(8px);
+  background: rgba(11, 43, 64, 0.95);
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  pointer-events: none;
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+}
+
+.toast-notification i {
+  font-size: 1.2rem;
+  color: var(--highlight-gold);
+}
+
+/* Responsive - Maintain alignment */
+@media (max-width: 1000px) {
+  .header-container {
+    padding: 0.8rem 1.5rem;
+  }
+  
+  .top-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .logo {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .right-controls {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .user-profile-badge {
+    padding: 4px 12px 4px 6px;
+  }
+  
+  .user-name {
+    max-width: 100px;
+    font-size: 0.75rem;
+  }
+  
+  .iframe-container {
+    height: calc(100vh - 210px);
+  }
+}
+
+@media (max-width: 768px) {
+  .digital-clock {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+  }
+  .signout-btn {
+    padding: 6px 18px;
+    font-size: 0.75rem;
+  }
+  .clock-date {
+    font-size: 0.52rem;
+  }
+  nav > ul > li > a {
+    padding: 7px 14px;
+    min-width: auto;
+    font-size: 0.7rem;
+  }
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+  }
+  .user-name {
+    font-size: 0.7rem;
+    max-width: 80px;
+  }
+}
+
+@media (max-width: 550px) {
+  .digital-clock {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+  .signout-btn {
+    padding: 5px 14px;
+    font-size: 0.68rem;
+  }
+  .logo h1 {
+    font-size: 0.8rem;
+  }
+  .logo span {
+    font-size: 0.6rem;
+  }
+  .right-controls {
+    gap: 0.5rem;
+  }
+  .user-profile-badge {
+    gap: 6px;
+    padding: 3px 10px 3px 5px;
+  }
+  .user-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+  .user-name {
+    font-size: 0.65rem;
+    max-width: 70px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-container">
+    <!-- Top Header: Logo and Right Controls in SAME LINE -->
+    <div class="top-header">
+      <!-- Left: Logo with Home Icon -->
+      <div class="logo">
+        <i class="fas fa-home" onclick="loadPage('home1')"></i>
+        <div>
+          <h1>Bhagabanpur Gram Panchayat</h1>
+          <span>ভগবানপুর গ্রাম পঞ্চায়েত | মালদহ</span>
+        </div>
+      </div>
+      
+      <!-- RIGHT SIDE: User Profile Badge + Clock + Sign Out Button (all in same line) -->
+      <div class="right-controls">
+        <!-- Signed-in User Profile Badge (Google-style avatar + username) -->
+        <div class="user-profile-badge" id="userProfileBadge">
+          <div class="user-avatar" id="userAvatar">👤</div>
+          <div class="user-info">
+            <div class="user-name" id="userDisplayName">Guest</div>
+            <div class="user-role" id="userRoleDisplay">User</div>
+          </div>
+        </div>
+        
+        <!-- Digital Clock -->
+        <div class="digital-clock">
+          <div id="liveTime">--:--:--</div>
+          <div id="liveDate" class="clock-date">---</div>
+        </div>
+        
+        <!-- Sign Out Button -->
+        <button class="signout-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+      </div>
+    </div>
+    
+    <!-- Navigation Row - 3D Raised Buttons (Centered below) -->
+    <div class="nav-wrapper">
+      <nav>
+        <ul>
+          <li>
+            <a class="has-submenu">Profile</a>
+            <ul class="submenu">
+              <li><a onclick="loadPage('basicdetails')">Basic Details</a></li>
+              <li><a onclick="loadPage('sansad')">Sansad</a></li>
+              <li><a onclick="loadPage('villages')">Villages</a></li>
+              <li><a onclick="loadPage('mouja')">Mouja</a></li>
+              <li><a onclick="loadPage('school')">School</a></li>
+              <li><a onclick="loadPage('polling')">Polling Stations</a></li>
+              <li><a onclick="loadPage('clubs')">Clubs</a></li>
+              <li><a onclick="loadPage('playgrounds')">Play Grounds</a></li>
+              <li><a onclick="loadPage('waterbodies')">Waterbodies</a></li>
+            </ul>
+          </li>
+          <li>
+            <a class="has-submenu">PRI Details</a>
+            <ul class="submenu">
+              <li><a onclick="loadPage('gp_member')">Gram Panchayat Member</a></li>
+              <li><a onclick="loadPage('ps_member')">Panchayat Samity Member</a></li>
+              <li>
+                <a class="has-submenu-right">Upasamity</a>
+                <ul class="submenu">
+                  <li><a onclick="loadPage('krishi')">কৃষি ও প্রানি সম্পদ বিকাশ</a></li>
+                  <li><a onclick="loadPage('shilpa')">শিল্প ও পরিকাঠামো উপসমিতি</a></li>
+                  <li><a onclick="loadPage('nari')">নারী শিশু উন্নয়ন ও সমাজ কল্যাণ</a></li>
+                  <li><a onclick="loadPage('shiksha')">শিক্ষা ও জন স্বাস্থ্য উপসমিতি</a></li>
+                  <li><a onclick="loadPage('arthik')">অর্থ ও পরিকল্পনা উপসমিতি</a></li>
+                </ul>
+              </li>
+              <li><a onclick="loadPage('staffs')">Gram Panchayat Staffs</a></li>
+              <li><a onclick="loadPage('vrp')">VRP</a></li>
+              <li><a onclick="loadPage('cf')">CF</a></li>
+              <li><a onclick="loadPage('nregs')">NREGS Supervisor</a></li>
+            </ul>
+          </li>
+          <li>
+            <a class="has-submenu">Funds</a>
+            <ul class="submenu">
+              <li><a onclick="loadPage('15fc')">15th FC</a></li>
+              <li><a onclick="loadPage('beup')">BEUP</a></li>
+              <li><a onclick="loadPage('vwsc')">VWSC</a></li>
+              <li><a onclick="loadPage('mgnregs')">MGNREGS</a></li>
+              <li><a onclick="loadPage('mplad')">MPLAD</a></li>
+              <li><a onclick="loadPage('ibrd')">IBRD</a></li>
+              <li><a onclick="loadPage('5sfc')">5th SFC</a></li>
+            </ul>
+          </li>
+          <li>
+            <a class="has-submenu">Our Services</a>
+            <ul class="submenu">
+              <li><a onclick="loadPage('deathbirth')">Death & Birth Registration</a></li>
+              <li><a onclick="loadPage('certificates')">Various Certificates</a></li>
+              <li><a onclick="loadPage('chcmi')">CHCMI</a></li>
+              <li><a onclick="loadPage('laxmirbhandar')">Laxmir Bhandar</a></li>
+              <li><a onclick="loadPage('jaijohar')">Jai Johar</a></li>
+            </ul>
+          </li>
+          <li>
+            <a class="has-submenu">Bill Print</a>
+            <ul class="submenu">
+              <li><a onclick="loadPage('najim')">Najim Ali</a></li>
+              <li><a onclick="loadPage('rehan')">Rehan Ali</a></li>
+              <li><a onclick="loadPage('vrpcf')">VRP and CF Working Certificate</a></li>
+              <li><a onclick="loadPage('teashop')">Tea Shop Bill</a></li>
+              <li><a onclick="loadPage('sansad')">Sansad Meeting Scheduler</a></li>
+              <li><a onclick="loadPage('meeting')">Meeting Management</a></li>
+            </ul>
+          </li>
+          <li>
+            <a class="has-submenu">Forms</a>
+            <ul class="submenu">
+              <li><a onclick="loadPage('samabyathi')">Samabyathi</a></li>
+              <li><a onclick="loadPage('income')">Income</a></li>
+              <li><a onclick="loadPage('domicile')">Domicile</a></li>
+            </ul>
+          </li>
+          <li>
+            <a class="has-submenu">Office Zone</a>
+            <ul class="submenu">
+              <li><a onclick="loadPage('tender')">Tender Management</a></li>
+              <li><a onclick="loadPage('rehan')">Rehan Ali</a></li>
+              <li><a onclick="loadPage('vrpcf')">VRP and CF Working Certificate</a></li>
+              <li><a onclick="loadPage('teashop')">Tea Shop Bill</a></li>
+              <li><a onclick="loadPage('sansad')">Sansad Meeting Scheduler</a></li>
+              <li><a onclick="loadPage('meeting')">Meeting Management</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Main Iframe Content Area -->
+<div class="iframe-container">
+  <iframe id="frameContent" src="home1.htm" title="Gram Panchayat Portal"></iframe>
+</div>
+
+<footer>
+  <p>© 2025 Bhagabanpur Gram Panchayat, Malda | Citizen First | e-Governance Initiative | Digital India</p>
+</footer>
+
+<!-- Toast Notification for Sign Out Feedback -->
+<div id="signoutToast" class="toast-notification">
+  <i class="fas fa-check-circle"></i>
+  <span>Successfully signed out. Redirecting to login page...</span>
+</div>
+
+<script>
+  // DIGITAL CLOCK - Live Update
+  function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`;
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    const dateStr = now.toLocaleDateString('en-IN', options);
+    document.getElementById('liveTime').innerText = timeStr;
+    document.getElementById('liveDate').innerText = dateStr;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+  
+  // Load pages into main iframe
+  function loadPage(page) {
+    const mainFrame = document.getElementById("frameContent");
+    if (mainFrame) mainFrame.src = page + ".htm";
+  }
+  window.loadPage = loadPage;
+  
+  // ==================== USER SESSION & PROFILE DISPLAY ====================
+  // Get user session data from storage
+  function getUserSession() {
+    const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
+    if (session) {
+      try {
+        return JSON.parse(session);
+      } catch(e) {
+        return null;
+      }
+    }
+    return null;
+  }
+  
+  // Get user initials for avatar (Google style)
+  function getUserInitials(name) {
+    if (!name) return "👤";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+  
+  // Update user profile badge with session data
+  function updateUserProfile() {
+    const userData = getUserSession();
+    const userNameElement = document.getElementById('userDisplayName');
+    const userRoleElement = document.getElementById('userRoleDisplay');
+    const userAvatarElement = document.getElementById('userAvatar');
+    
+    if (userData && userData.username) {
+      // Display user name (prefer full name, fallback to username)
+      const displayName = userData.name || userData.username.split('@')[0] || userData.username;
+      userNameElement.textContent = displayName.length > 18 ? displayName.substring(0, 15) + '...' : displayName;
+      
+      // Display role with badge
+      const role = userData.role || 'User';
+      userRoleElement.textContent = role;
+      
+      // Set avatar: either initials or first letter, or default icon
+      const initials = getUserInitials(displayName);
+      if (initials && initials !== "👤") {
+        userAvatarElement.textContent = initials;
+        userAvatarElement.style.background = "linear-gradient(135deg, #E6B17E, #C48445)";
+        userAvatarElement.style.color = "#0B2B40";
+      } else {
+        userAvatarElement.innerHTML = '<i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>';
+        userAvatarElement.style.background = "linear-gradient(135deg, #1E5A6B, #0B2B40)";
+      }
+    } else {
+      // No session - should not happen if session validation passes, but fallback
+      userNameElement.textContent = 'Guest User';
+      userRoleElement.textContent = 'Visitor';
+      userAvatarElement.innerHTML = '<i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>';
+      userAvatarElement.style.background = "linear-gradient(135deg, #1E5A6B, #0B2B40)";
+    }
+  }
+  
+  // SIGN OUT FUNCTIONALITY - Clears session and redirects to sign-in page
+  const signOutBtn = document.getElementById('signOutBtn');
+  const toast = document.getElementById('signoutToast');
+  
+  function showSignOutToast() {
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2000);
+  }
+  
+  function performSignOut() {
+    // Clear all session data from both localStorage and sessionStorage
+    localStorage.removeItem('gp_user_session');
+    localStorage.removeItem('gp_remember_username');
+    sessionStorage.removeItem('gp_user_session');
+    
+    // Clear any other potential stored user data
+    localStorage.removeItem('gp_user_token');
+    localStorage.removeItem('gp_user_name');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
+    sessionStorage.clear();
+    
+    // Show toast notification with success message
+    showSignOutToast();
+    
+    // Small delay to show toast before redirect for better UX
+    setTimeout(() => {
+      window.location.href = 'index.htm';
+    }, 800);
+  }
+  
+  // Attach event listener to Sign Out button
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', performSignOut);
+  }
+  
+  // Session validation: If no active session exists, redirect to login page
+  function validateSession() {
+    const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
+    if (!session) {
+      console.log('No active session found. Redirecting to sign-in page...');
+      window.location.href = 'index.htm';
+    } else {
+      console.log('Active session found. User logged in.');
+      try {
+        const userData = JSON.parse(session);
+        console.log(`Logged in as: ${userData.name || userData.username}`);
+        // Update UI with user profile
+        updateUserProfile();
+      } catch(e) {
+        console.warn('Session parse error');
+      }
+    }
+  }
+  
+  // Run session validation on page load
+  validateSession();
+  
+  // Update profile on any storage changes (in case of multi-tab sync)
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'gp_user_session') {
+      updateUserProfile();
+    }
+  });
+  
+  // Also update when page becomes visible again
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      updateUserProfile();
+      // Re-validate session for safety
+      const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
+      if (!session) {
+        window.location.href = 'index.htm';
+      }
+    }
+  });
+  
+  // Alt+O keyboard shortcut for quick sign-out
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey && e.key === 'o') {
+      e.preventDefault();
+      performSignOut();
+    }
+  });
+  
+  // Also handle Ctrl+Shift+L as an alternative shortcut
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+      e.preventDefault();
+      performSignOut();
+    }
+  });
+  
+  console.log("Bhagabanpur GP Dashboard | User Profile Section Active | Google-style Avatar + Username Display");
+</script>
+
+</body>
+</html>
