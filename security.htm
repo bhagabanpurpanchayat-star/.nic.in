@@ -7,7 +7,7 @@
     body { font-family: Arial, sans-serif; background: #2b2b2b; color: #eee; margin: 0; padding: 10px; font-size: 13px; }
     h2 { color: #fff; font-size: 18px; margin: 0 0 10px 0; }
     .toolbar { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; clear: both; }
-    .toolbar input { padding: 4px; border-radius: 4px; border: 1px solid #555; width: 250px; font-size: 13px; }
+    .toolbar input { padding: 4px; border-radius: 4px; border: 1px solid #555; width: 250px; font-size: 13px; background: #3b3b3b; color: #eee; }
     .toolbar button { padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s ease; font-size: 13px; }
     .toolbar button:hover { background: #218838; }
     .spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
@@ -18,23 +18,22 @@
     th, td { border: 1px solid #555; padding: 6px; text-align: center; white-space: normal; word-wrap: break-word; overflow-wrap: break-word; }
     thead th { position: sticky; top: 0; background: #003366; color: #fff; z-index: 2; font-size: 12px; }
 
-    td:nth-child(3), th:nth-child(3),
-    td:nth-child(4), th:nth-child(4) { width: 20px; max-width: 20px; }
-    td:nth-child(6), th:nth-child(6) { width: 140px; max-width: 140px; }
-    td:nth-child(7), th:nth-child(7) { width: 225px; max-width: 225px; }
-    td:nth-child(9), th:nth-child(9) { width: 105px; max-width: 80px; }
-    td:nth-child(10), th:nth-child(10) { width: 105px; max-width: 90px; }
-
-    td:nth-child(n+12):nth-child(-n+22),
-    th:nth-child(n+12):nth-child(-n+22) { min-width: 60px; }
-
     button.action-btn { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
     #message { margin-bottom: 8px; padding: 8px; display: none; border-radius: 5px; font-weight: bold; text-align: center; font-size: 13px; }
     #message.success { background: #28a745; color: white; }
     #message.error { background: #dc3545; color: white; }
     #message.loading { background: #007bff; color: white; }
 
-    td input, td select { width: 100%; box-sizing: border-box; font-size: 12px; padding: 4px; }
+    td input, td select { width: 100%; box-sizing: border-box; font-size: 12px; padding: 4px; background: #3b3b3b; color: #eee; border: 1px solid #555; }
+    td input[readonly] { background-color: #555; color: #ccc; cursor: not-allowed; }
+    
+    /* Neon green color for SECURITY column */
+    .security-value {
+      color: #39ff14;
+      font-weight: bold;
+      text-shadow: 0 0 5px #39ff14;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -59,15 +58,13 @@
           <th>VENDOR</th>
           <th>Name of the work</th>
           <th>Source of Fund</th>
-          <th>WORK ORDER NO</th>
-          <th>WORK ORDER DATE</th>
-          <th>ESTIMATE VALUE</th>
           <th>GROSS BILL</th>
           <th>Completion Date</th>
           <th>SECURITY</th>
           <th>PAYMENT MODE</th>
           <th>REFERENCE</th>
           <th>SECURITY PAYMENT DATE</th>
+          <th>SDM Payment Reference</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -76,9 +73,53 @@
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzLtoqAZC_Rv0nCDHgzac-GEYOMqaDTjC49Of2vmnptBeO9oVJRzIQ9rp8hd-bSBZA2sw/exec";
+    // REPLACE THIS URL WITH YOUR DEPLOYED WEB APP URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwRcO-H4rvATK_1hfdfUglBW7lwTd6_7-rn20YdNbv68eCnKc6fUuJqb0jhmxJizFuF/exec";
     let tableData = [];
-    let securityIndex = 13;
+    let allData = []; // Store all data with original indices
+    
+    // Column indices based on actual sheet structure
+    const COLUMN_MAPPING = {
+      TIMESTAMP: 0,
+      UNIQUE_NIT: 1,
+      NIT: 2,
+      SL: 3,
+      NIT_DATE: 4,
+      ACTIVITY_ID: 5,
+      NAME_OF_WORK: 6,
+      VENDOR: 7,
+      EARNEST_MONEY: 8,
+      PAYMENT_STATUS: 9,
+      TENDER_STATUS: 10,
+      CHEQUE_NO: 11,
+      DATE: 12,
+      SOURCE_OF_FUND: 13,
+      WORK_ORDER_NO: 14,
+      WORK_ORDER_DATE: 15,
+      ESTIMATE_VALUE: 16,
+      GROSS_BILL: 17,
+      COMPLETION_DATE: 18,
+      TDS: 19,
+      CGST: 20,
+      SGST: 21,
+      LABOUR_CESS: 22,
+      ROYALTY: 23,
+      SECURITY: 24,
+      NET_PAYMENT: 25,
+      PAYMENT_MODE: 26,
+      REFERENCE: 27,
+      SECURITY_PAYMENT_DATE: 28,
+      BID_AMOUNT: 29,
+      SDM_PAYMENT_REFERENCE: 30
+    };
+
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
 
     function formatDisplayDate(value) {
       if (!value) return "";
@@ -87,7 +128,7 @@
       const day = String(d.getDate()).padStart(2, "0");
       const month = String(d.getMonth() + 1).padStart(2, "0");
       const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      return day + "/" + month + "/" + year;
     }
 
     function formatTimestamp(value) {
@@ -100,12 +141,15 @@
       const hours = String(d.getHours()).padStart(2, "0");
       const minutes = String(d.getMinutes()).padStart(2, "0");
       const seconds = String(d.getSeconds()).padStart(2, "0");
-      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+      return day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
     }
 
     function getDurationText(dateStr) {
       try {
-        const [day, month, year] = dateStr.split("/").map(Number);
+        const parts = dateStr.split("/").map(Number);
+        const day = parts[0];
+        const month = parts[1];
+        const year = parts[2];
         const past = new Date(year, month - 1, day);
         const now = new Date();
         if (isNaN(past.getTime())) return "";
@@ -124,12 +168,12 @@
           months += 12;
         }
 
-        let parts = [];
-        if (years > 0) parts.push(`${years} year${years > 1 ? "s" : ""}`);
-        if (months > 0) parts.push(`${months} month${months > 1 ? "s" : ""}`);
-        if (days > 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
-        return parts.length ? parts.join(" ") : "0 days";
-      } catch {
+        let partsArray = [];
+        if (years > 0) partsArray.push(years + " year" + (years > 1 ? "s" : ""));
+        if (months > 0) partsArray.push(months + " month" + (months > 1 ? "s" : ""));
+        if (days > 0) partsArray.push(days + " day" + (days > 1 ? "s" : ""));
+        return partsArray.length ? partsArray.join(" ") : "0 days";
+      } catch(e) {
         return "";
       }
     }
@@ -137,7 +181,7 @@
     async function refreshData() {
       const btn = document.getElementById("refreshBtn");
       const oldText = btn.innerHTML;
-      btn.innerHTML = `<span class="spinner"></span> Refreshing...`;
+      btn.innerHTML = '<span class="spinner"></span> Refreshing...';
       btn.disabled = true;
       showMessage("Refreshing data...", "loading");
       await loadData();
@@ -147,84 +191,146 @@
     }
 
     async function loadData() {
-      const res = await fetch(scriptURL + "?action=getBillPaymentData");
-      let json = await res.json();
+      try {
+        const res = await fetch(scriptURL + "?action=getBillPaymentData");
+        let json = await res.json();
 
-      if (Array.isArray(json) && json.length > 0) {
-        const headerRow = json[0].map(h => h.toString().trim().toLowerCase());
-        const secIdx = headerRow.indexOf("security");
-        if (secIdx !== -1) {
-          securityIndex = secIdx;
-          json = json.slice(1);
+        if (Array.isArray(json) && json.length > 0) {
+          const firstRow = json[0];
+          if (firstRow[0] && firstRow[0].toString().toLowerCase().includes('timestamp')) {
+            json = json.slice(1);
+          }
         }
-      }
 
-      tableData = json;
-      const filteredData = tableData.filter(row => row[securityIndex] && row[securityIndex].toString().trim() !== "");
-      renderTable(filteredData);
+        // Store all data with original indices
+        allData = json.map((row, index) => ({
+          originalIndex: index,
+          rowData: row,
+          uniqueKey: (row[COLUMN_MAPPING.UNIQUE_NIT] || '') + '|' + (row[COLUMN_MAPPING.VENDOR] || '')
+        }));
+        
+        // Filter only rows with SECURITY value
+        tableData = allData.filter(item => 
+          item.rowData[COLUMN_MAPPING.SECURITY] && 
+          item.rowData[COLUMN_MAPPING.SECURITY].toString().trim() !== ""
+        );
+        
+        renderTable(tableData);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showMessage("Error loading data: " + error.message, "error");
+      }
     }
 
     function renderTable(data) {
       const tbody = document.querySelector("#dataTable tbody");
       tbody.innerHTML = "";
+      const todayDate = getTodayDate();
 
       if (!data.length) {
-        tbody.innerHTML = `<tr><td colspan="18" style="color:#ff6666; font-weight:bold;">⚠ No records found with SECURITY value</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="16" style="color:#ff6666; font-weight:bold;">⚠ No records found with SECURITY value</td></tr>';
         return;
       }
 
-      data.forEach((row, i) => {
+      data.forEach(function(item, i) {
+        const row = item.rowData;
+        const uniqueKey = item.uniqueKey;
+        const originalIndex = item.originalIndex;
+        
         let tr = document.createElement("tr");
+        tr.setAttribute('data-unique-key', uniqueKey);
+        tr.setAttribute('data-original-index', originalIndex);
 
-        for (let j = 0; j <= 12; j++) {
-          let td = document.createElement("td");
-          let cellValue = row[j] ?? "";
+        // Column 0: Timestamp
+        let td0 = document.createElement("td");
+        td0.textContent = formatTimestamp(row[COLUMN_MAPPING.TIMESTAMP] || "");
+        tr.appendChild(td0);
 
-          if (j === 0) cellValue = formatTimestamp(cellValue);
-          if (j === 9 || j === 12) {
-            cellValue = formatDisplayDate(cellValue);
+        // Column 1: UNIQUE NIT
+        let td1 = document.createElement("td");
+        td1.textContent = row[COLUMN_MAPPING.UNIQUE_NIT] || "";
+        tr.appendChild(td1);
 
-            if (j === 12 && cellValue) {
-              const duration = getDurationText(cellValue);
-              td.innerHTML = `${cellValue}<br><span style="color:#80ff80; font-size:11px;">(${duration})</span>`;
-            } else {
-              td.textContent = cellValue;
-            }
-          } else {
-            td.textContent = cellValue;
-          }
+        // Column 2: NIT
+        let td2 = document.createElement("td");
+        td2.textContent = row[COLUMN_MAPPING.NIT] || "";
+        tr.appendChild(td2);
 
-          tr.appendChild(td);
+        // Column 3: SL
+        let td3 = document.createElement("td");
+        td3.textContent = row[COLUMN_MAPPING.SL] || "";
+        tr.appendChild(td3);
+
+        // Column 4: NIT DATE
+        let td4 = document.createElement("td");
+        td4.textContent = formatDisplayDate(row[COLUMN_MAPPING.NIT_DATE] || "");
+        tr.appendChild(td4);
+
+        // Column 5: VENDOR
+        let td5 = document.createElement("td");
+        td5.textContent = row[COLUMN_MAPPING.VENDOR] || "";
+        tr.appendChild(td5);
+
+        // Column 6: Name of the work
+        let td6 = document.createElement("td");
+        td6.textContent = row[COLUMN_MAPPING.NAME_OF_WORK] || "";
+        tr.appendChild(td6);
+
+        // Column 7: Source of Fund
+        let td7 = document.createElement("td");
+        td7.textContent = row[COLUMN_MAPPING.SOURCE_OF_FUND] || "";
+        tr.appendChild(td7);
+
+        // Column 8: GROSS BILL
+        let td8 = document.createElement("td");
+        td8.textContent = row[COLUMN_MAPPING.GROSS_BILL] || "";
+        tr.appendChild(td8);
+
+        // Column 9: Completion Date with duration
+        let td9 = document.createElement("td");
+        let completionDate = formatDisplayDate(row[COLUMN_MAPPING.COMPLETION_DATE] || "");
+        if (completionDate) {
+          const duration = getDurationText(completionDate);
+          td9.innerHTML = completionDate + '<br><span style="color:#80ff80; font-size:11px;">(' + duration + ')</span>';
+        } else {
+          td9.textContent = "";
         }
+        tr.appendChild(td9);
 
-        for (let j = 13; j <= 16; j++) {
-          let td = document.createElement("td");
-          let value = row[j] || "";
+        // Column 10: SECURITY (display only with neon green color)
+        let td10 = document.createElement("td");
+        let securityValue = row[COLUMN_MAPPING.SECURITY] || "";
+        td10.innerHTML = '<span class="security-value">' + securityValue + '</span>';
+        tr.appendChild(td10);
 
-          if (j === 13) {
-            td.textContent = value;
-          } 
-          else if (j === 14) {
-            td.innerHTML = `
-              <select id="col_${i}_${j}" onchange="toggleButton(${i})">
-                <option value="">Select</option>
-                <option value="Cheque" ${value === "Cheque" ? "selected" : ""}>Cheque</option>
-                <option value="Online" ${value === "Online" ? "selected" : ""}>Online</option>
-              </select>`;
-          } 
-          else if (j === 16) {
-            const formattedDate = formatToInputDate(value);
-            td.innerHTML = `<input type="date" value="${formattedDate}" id="col_${i}_${j}" oninput="toggleButton(${i})">`;
-          } 
-          else {
-            td.innerHTML = `<input type="text" value="${value}" id="col_${i}_${j}" oninput="toggleButton(${i})">`;
-          }
+        // Column 11: PAYMENT MODE (NON-EDITABLE - text display only)
+        let td11 = document.createElement("td");
+        let paymentModeValue = row[COLUMN_MAPPING.PAYMENT_MODE] || "";
+        td11.textContent = paymentModeValue;
+        tr.appendChild(td11);
 
-          tr.appendChild(td);
-        }
+        // Column 12: REFERENCE (NON-EDITABLE - readonly)
+        let td12 = document.createElement("td");
+        let referenceValue = row[COLUMN_MAPPING.REFERENCE] || "";
+        td12.innerHTML = '<input type="text" value="' + referenceValue.replace(/"/g, '&quot;') + '" readonly style="background-color:#555; color:#ccc; cursor:not-allowed;">';
+        tr.appendChild(td12);
 
+        // Column 13: SECURITY PAYMENT DATE (editable date picker, defaults to today if blank)
+        let td13 = document.createElement("td");
+        let securityPaymentDateValue = row[COLUMN_MAPPING.SECURITY_PAYMENT_DATE] || "";
+        let formattedDate = securityPaymentDateValue ? formatToInputDate(securityPaymentDateValue) : todayDate;
+        td13.innerHTML = '<input type="date" value="' + formattedDate + '" id="security_payment_date_' + i + '" oninput="toggleButton(' + i + ')">';
+        tr.appendChild(td13);
+
+        // Column 14: SDM Payment Reference (editable - column AE/index 30)
+        let td14 = document.createElement("td");
+        let sdmReferenceValue = row[COLUMN_MAPPING.SDM_PAYMENT_REFERENCE] || "";
+        td14.innerHTML = '<input type="text" value="' + sdmReferenceValue.replace(/"/g, '&quot;') + '" placeholder="Enter SDM Reference" id="sdm_reference_' + i + '" oninput="toggleButton(' + i + ')">';
+        tr.appendChild(td14);
+
+        // Column 15: Action button
         let tdAction = document.createElement("td");
-        tdAction.innerHTML = `<button class="action-btn" id="btn_${i}" onclick="updateRow(${i})">SAVE</button>`;
+        tdAction.innerHTML = '<button class="action-btn" id="btn_' + i + '" onclick="updateRow(' + i + ')">SAVE</button>';
         tr.appendChild(tdAction);
 
         tbody.appendChild(tr);
@@ -236,23 +342,27 @@
       if (!value) return "";
       const d = new Date(value);
       if (isNaN(d.getTime())) return "";
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, "0") + '-' + String(d.getDate()).padStart(2, "0");
     }
 
     function filterTable() {
       const search = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = tableData
-        .filter(row => row[securityIndex] && row[securityIndex].toString().trim() !== "")
-        .filter(row =>
-          (row[1] && row[1].toString().toLowerCase().includes(search)) ||
-          (row[2] && row[2].toString().toLowerCase().includes(search)) ||
-          (row[5] && row[5].toString().toLowerCase().includes(search))
-        );
+      const filtered = allData.filter(function(item) {
+        const row = item.rowData;
+        // First filter by SECURITY presence
+        if (!row[COLUMN_MAPPING.SECURITY] || row[COLUMN_MAPPING.SECURITY].toString().trim() === "") {
+          return false;
+        }
+        // Then filter by search term
+        return (row[COLUMN_MAPPING.UNIQUE_NIT] && row[COLUMN_MAPPING.UNIQUE_NIT].toString().toLowerCase().includes(search)) ||
+               (row[COLUMN_MAPPING.NIT] && row[COLUMN_MAPPING.NIT].toString().toLowerCase().includes(search)) ||
+               (row[COLUMN_MAPPING.VENDOR] && row[COLUMN_MAPPING.VENDOR].toString().toLowerCase().includes(search));
+      });
       renderTable(filtered);
     }
 
     function toggleButton(i) {
-      const btn = document.getElementById(`btn_${i}`);
+      const btn = document.getElementById('btn_' + i);
       if (!btn) return;
       btn.textContent = "UPDATE";
       btn.style.background = "blue";
@@ -264,44 +374,74 @@
       msg.textContent = text;
       msg.className = type;
       msg.style.display = "block";
-      setTimeout(() => { msg.style.display = "none"; }, 2500);
+      setTimeout(function() { msg.style.display = "none"; }, 2500);
     }
 
     async function updateRow(i) {
-      const btn = document.getElementById(`btn_${i}`);
-      btn.disabled = true; btn.textContent = "Saving...";
+      const btn = document.getElementById('btn_' + i);
+      btn.disabled = true; 
+      btn.textContent = "Saving...";
 
       try {
-        const formData = new FormData();
-        formData.append("action","updateBillPayment");
-        formData.append("rowIndex", i);
-
-        for (let j = 13; j <= 16; j++) {
-          const el = document.getElementById(`col_${i}_${j}`);
-          formData.append(`col${j}`, el ? el.value : "");
+        // Get the current row data from the filtered view
+        const currentItem = tableData[i];
+        if (!currentItem) {
+          throw new Error("Row data not found");
         }
+        
+        const uniqueKey = currentItem.uniqueKey;
+        const originalIndex = currentItem.originalIndex;
+        const row = currentItem.rowData;
+        
+        // Get the UNIQUE NIT and VENDOR to send as identifiers
+        const uniqueNit = row[COLUMN_MAPPING.UNIQUE_NIT] || "";
+        const vendor = row[COLUMN_MAPPING.VENDOR] || "";
+        
+        const formData = new FormData();
+        formData.append("action", "updateBillPayment");
+        formData.append("uniqueNit", uniqueNit);
+        formData.append("vendor", vendor);
+        formData.append("originalIndex", originalIndex);
+        
+        const securityPaymentDate = document.getElementById('security_payment_date_' + i).value;
+        const sdmReference = document.getElementById('sdm_reference_' + i).value;
+        
+        formData.append("security_payment_date", securityPaymentDate);
+        formData.append("sdm_payment_reference", sdmReference);
 
-        const res = await fetch(scriptURL,{method:"POST",body:formData});
+        const res = await fetch(scriptURL, { method: "POST", body: formData });
         const result = await res.json();
 
         if (result.success) {
-          btn.textContent = "Saved ✔"; btn.style.background = "green";
-          showMessage(`Row ${result.row} updated successfully ✅`,"success");
+          btn.textContent = "Saved ✔"; 
+          btn.style.background = "green";
+          showMessage("Row updated successfully ✅", "success");
           const rowEl = btn.closest("tr");
           rowEl.style.backgroundColor = "#d4edda";
-          setTimeout(()=>{rowEl.style.backgroundColor=""; toggleButton(i);},1500);
+          setTimeout(function() {
+            rowEl.style.backgroundColor = ""; 
+            toggleButton(i);
+          }, 1500);
+          // Reload data to reflect changes
+          setTimeout(function() { loadData(); }, 1000);
         } else {
-          btn.textContent = "Failed ✖"; btn.style.background = "red";
+          btn.textContent = "Failed ✖"; 
+          btn.style.background = "red";
           showMessage("Update failed: " + (result.error || "Unknown"), "error");
         }
       } catch (err) {
-        btn.textContent = "Error ✖"; btn.style.background = "red";
+        btn.textContent = "Error ✖"; 
+        btn.style.background = "red";
         showMessage("Network error: " + err.message, "error");
       } finally {
-        setTimeout(()=>{btn.disabled=false; toggleButton(i);},2000);
+        setTimeout(function() {
+          btn.disabled = false; 
+          toggleButton(i);
+        }, 2000);
       }
     }
 
+    // Initialize the page
     loadData();
   </script>
 </body>
