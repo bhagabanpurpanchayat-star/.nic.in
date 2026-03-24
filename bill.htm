@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,30 +133,26 @@
       vertical-align: middle;
     }
 
-    /* specific column width control for better visibility */
-    th:nth-child(1), td:nth-child(1) { min-width: 110px; max-width: 130px; } /* Timestamp */
-    th:nth-child(2), td:nth-child(2) { min-width: 100px; max-width: 130px; } /* UNIQUE NIT */
-    th:nth-child(3), td:nth-child(3) { min-width: 80px; max-width: 110px; }  /* NIT */
-    th:nth-child(4), td:nth-child(4) { min-width: 55px; max-width: 70px; }   /* SL */
-    th:nth-child(5), td:nth-child(5) { min-width: 95px; max-width: 115px; }  /* NIT DATE */
-    th:nth-child(6), td:nth-child(6) { min-width: 180px; max-width: 240px; }  /* VENDOR */
-    th:nth-child(7), td:nth-child(7) { min-width: 220px; max-width: 300px; }  /* Name of work */
-    th:nth-child(8), td:nth-child(8) { min-width: 130px; max-width: 170px; }  /* Source of Fund */
-    th:nth-child(9), td:nth-child(9) { min-width: 120px; max-width: 150px; }  /* WORK ORDER NO */
-    th:nth-child(10), td:nth-child(10) { min-width: 110px; max-width: 130px; } /* WORK ORDER DATE */
-    th:nth-child(11), td:nth-child(11) { min-width: 110px; max-width: 140px; } /* ESTIMATE VALUE */
-    th:nth-child(12), td:nth-child(12) { min-width: 105px; max-width: 130px; } /* GROSS BILL */
-    th:nth-child(13), td:nth-child(13) { min-width: 110px; max-width: 135px; } /* Completion Date */
-    th:nth-child(14), td:nth-child(14) { min-width: 75px; max-width: 100px; }  /* TDS */
-    th:nth-child(15), td:nth-child(15) { min-width: 75px; max-width: 95px; }   /* CGST */
-    th:nth-child(16), td:nth-child(16) { min-width: 75px; max-width: 95px; }   /* SGST */
-    th:nth-child(17), td:nth-child(17) { min-width: 95px; max-width: 120px; }  /* LABOUR CESS */
-    th:nth-child(18), td:nth-child(18) { min-width: 85px; max-width: 110px; }  /* ROYALTY */
-    th:nth-child(19), td:nth-child(19) { min-width: 90px; max-width: 115px; }  /* SECURITY */
-    th:nth-child(20), td:nth-child(20) { min-width: 110px; max-width: 140px; } /* NET PAYMENT */
-    th:nth-child(21), td:nth-child(21) { min-width: 115px; max-width: 140px; } /* PAYMENT MODE */
-    th:nth-child(22), td:nth-child(22) { min-width: 150px; max-width: 200px; } /* REFERENCE */
-    th:nth-child(23), td:nth-child(23) { min-width: 140px; max-width: 180px; } /* Actions */
+    /* Highlight row when SDM Payment Reference has a value */
+    tr.highlight-row {
+      background-color: #1a4d2a !important;
+      border-left: 3px solid #39ff14;
+      border-right: 3px solid #39ff14;
+    }
+    
+    tr.highlight-row td {
+      background-color: #1a4d2a !important;
+    }
+    
+    /* Hover effect for highlighted rows */
+    tr.highlight-row:hover td {
+      background-color: #236b3a !important;
+    }
+    
+    /* Normal row hover effect */
+    tr:hover td {
+      background-color: #3a3a3a;
+    }
 
     thead th {
       position: sticky;
@@ -463,7 +458,7 @@
 
 <script>
   // ======================== CONFIGURATION ========================
-  const scriptURL = "https://script.google.com/macros/s/AKfycbyIEuA__A7PA7h95vy2QlFvNK5D52fK-wrdURzjz7q96mshnOO2lhvvKKlnDzzOrHw/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwG_VmMzSpUAgAi60tpzgRmdH1xGsIbZt4elyoWBofvdG7EKbGj7bHjyQCbzYrAthEizw/exec";
   let allRawData = [];
   let tableData = [];           // rows with work order number
   let currentFilteredData = [];
@@ -516,17 +511,33 @@
     } catch(e) { return ""; }
   }
 
+  // Function to check if a row has SDM Reference value (for highlighting)
+  function hasSdmReferenceValue(row) {
+    // REFERENCE column is at index 21 in the displayed data (PAYMENT MODE at 20, REFERENCE at 21)
+    const reference = row[21];
+    return reference && reference.toString().trim() !== "";
+  }
+
   async function loadData() {
     try {
       showMessage("Fetching bill data...", "loading");
       const res = await fetch(scriptURL + "?action=getBillPaymentData");
       const data = await res.json();
+      
       if (!Array.isArray(data)) throw new Error("Invalid sheet response");
-      allRawData = data.slice(1);
-      tableData = allRawData.filter(row => {
+      
+      // Store raw data including headers
+      allRawData = data;
+      
+      // Skip header row for data processing
+      const dataRows = data.slice(1);
+      
+      // Filter rows that have WORK ORDER NO (col 8)
+      tableData = dataRows.filter(row => {
         const wo = row[8];
         return wo && wo.toString().trim() !== "";
       });
+      
       if (tableData.length === 0) showMessage("No work order records found", "loading");
       applySearchAndRender();
       showMessage(`✅ Loaded ${tableData.length} bills`, "success");
@@ -549,7 +560,7 @@
 
   function filterTable() { applySearchAndRender(); }
 
-  // ========== RENDER TABLE: INLINE EDITABLE (wide & visible) ==========
+  // ========== RENDER TABLE: INLINE EDITABLE ==========
   function renderTableWithInlineEdits(dataArray) {
     const tbody = document.querySelector("#dataTable tbody");
     tbody.innerHTML = "";
@@ -565,17 +576,30 @@
     }
 
     dataArray.forEach((row, idx) => {
+      // Find original index in tableData using UNIQUE NIT and VENDOR
       const originalTableIndex = tableData.findIndex(r => 
         String(r[1]) === String(row[1]) && String(r[5]) === String(row[5])
       );
+      
       const tr = document.createElement("tr");
       tr.setAttribute("data-original-idx", originalTableIndex);
+      tr.setAttribute("data-unique-nit", row[1] || "");
+      tr.setAttribute("data-vendor", row[5] || "");
+      
+      // Check if row should be highlighted (has REFERENCE value)
+      if (hasSdmReferenceValue(row)) {
+        tr.classList.add('highlight-row');
+      }
       
       // columns 0-10 : read-only display
       for (let j = 0; j <= 10; j++) {
         const td = document.createElement("td");
-        if (j === 0 || j === 9) td.textContent = formatDateToDDMMYYYY(row[j]) ?? "";
-        else td.textContent = row[j] ?? "";
+        if (j === 0 || j === 4 || j === 9) {
+          // Format dates for Timestamp, NIT DATE, WORK ORDER DATE
+          td.textContent = formatDateToDDMMYYYY(row[j]) ?? "";
+        } else {
+          td.textContent = row[j] ?? "";
+        }
         tr.appendChild(td);
       }
 
@@ -584,6 +608,7 @@
         const td = document.createElement("td");
         let currentVal = row[j] || "";
         if (j === 12) {
+          // Completion Date
           const dateForInput = formatToInputDate(currentVal);
           td.innerHTML = `<input type="date" class="inline-edit" data-col="${j}" data-original-idx="${originalTableIndex}" value="${dateForInput}" style="min-width:110px;">`;
         } else {
@@ -592,20 +617,23 @@
         tr.appendChild(td);
       }
 
-      // PAYMENT MODE (col26 -> mapped to col20)
+      // PAYMENT MODE (col20 in display, but corresponds to index 20)
       const tdPayment = document.createElement("td");
-      const paymentMode = row[26] || "";
+      const paymentMode = row[20] || "";
       tdPayment.innerHTML = `<select class="inline-edit" data-col="20" data-original-idx="${originalTableIndex}" style="min-width:100px;">
         <option value="" ${paymentMode === '' ? 'selected' : ''}>Select Mode</option>
         <option value="Online" ${paymentMode === 'Online' ? 'selected' : ''}>Online</option>
         <option value="Cheque" ${paymentMode === 'Cheque' ? 'selected' : ''}>Cheque</option>
+        <option value="Cash" ${paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+        <option value="RTGS" ${paymentMode === 'RTGS' ? 'selected' : ''}>RTGS</option>
+        <option value="NEFT" ${paymentMode === 'NEFT' ? 'selected' : ''}>NEFT</option>
       </select>`;
       tr.appendChild(tdPayment);
 
-      // REFERENCE (col27 -> col21)
+      // REFERENCE (col21 in display)
       const tdRef = document.createElement("td");
-      const reference = row[27] || "";
-      tdRef.innerHTML = `<input type="text" class="inline-edit" data-col="21" data-original-idx="${originalTableIndex}" value="${escapeHtml(reference)}" placeholder="UTR/Cheque no." style="min-width:130px;">`;
+      const reference = row[21] || "";
+      tdRef.innerHTML = `<input type="text" class="inline-edit" data-col="21" data-original-idx="${originalTableIndex}" value="${escapeHtml(reference)}" placeholder="UTR/Cheque no." style="min-width:130px;" oninput="updateRowHighlight(this, ${originalTableIndex})">`;
       tr.appendChild(tdRef);
 
       // Actions
@@ -632,6 +660,19 @@
     });
   }
 
+  // Function to update row highlight when reference input changes
+  function updateRowHighlight(inputElement, originalIdx) {
+    const tr = inputElement.closest('tr');
+    if (tr) {
+      const referenceValue = inputElement.value;
+      if (referenceValue && referenceValue.trim() !== "") {
+        tr.classList.add('highlight-row');
+      } else {
+        tr.classList.remove('highlight-row');
+      }
+    }
+  }
+
   async function saveInlineRow(originalIdx) {
     const rowData = tableData[originalIdx];
     if (!rowData) { showMessage("Row data missing", "error"); return; }
@@ -652,12 +693,14 @@
     formData.append("action", "updateBillPayment");
     formData.append("uniqueNit", uniqueNit);
     formData.append("vendor", vendor);
+    
+    // Send all editable columns
     for (let j = 11; j <= 19; j++) {
       let val = updatedValues[j] !== undefined ? updatedValues[j] : (rowData[j] || "");
       formData.append(`col${j}`, val);
     }
-    formData.append("col20", updatedValues["20"] !== undefined ? updatedValues["20"] : (rowData[26] || ""));
-    formData.append("col21", updatedValues["21"] !== undefined ? updatedValues["21"] : (rowData[27] || ""));
+    formData.append("col20", updatedValues["20"] !== undefined ? updatedValues["20"] : (rowData[20] || ""));
+    formData.append("col21", updatedValues["21"] !== undefined ? updatedValues["21"] : (rowData[21] || ""));
     
     const saveBtns = tr.querySelectorAll(".inline-save-btn");
     let targetBtn = null;
@@ -668,11 +711,21 @@
       const response = await fetch(scriptURL, { method: "POST", body: formData });
       const result = await response.json();
       if (result.success) {
-        for (let j = 11; j <= 19; j++) if (updatedValues[j] !== undefined) rowData[j] = updatedValues[j];
-        if (updatedValues["20"] !== undefined) rowData[26] = updatedValues["20"];
-        if (updatedValues["21"] !== undefined) rowData[27] = updatedValues["21"];
-        showMessage(`✅ Updated: ${uniqueNit}`, "success");
-        applySearchAndRender();
+        // Update local data
+        for (let j = 11; j <= 19; j++) {
+          if (updatedValues[j] !== undefined) rowData[j] = updatedValues[j];
+        }
+        if (updatedValues["20"] !== undefined) rowData[20] = updatedValues["20"];
+        if (updatedValues["21"] !== undefined) rowData[21] = updatedValues["21"];
+        
+        // Update highlight based on reference value
+        if (rowData[21] && rowData[21].toString().trim() !== "") {
+          tr.classList.add('highlight-row');
+        } else {
+          tr.classList.remove('highlight-row');
+        }
+        
+        showMessage(`✅ Updated: ${uniqueNit} - ${vendor}`, "success");
       } else {
         showMessage("Update failed: " + (result.error || "unknown"), "error");
         if (targetBtn) { targetBtn.textContent = "💾 Save Row"; targetBtn.disabled = false; }
@@ -688,15 +741,28 @@
     currentModalOriginalIndex = originalIdx;
     currentModalRow = row;
     
-    const uniqueNit = row[1] || ""; const nit = row[2] || ""; const vendor = row[5] || "";
-    const workOrderNo = row[8] || ""; const workName = row[6] || ""; const sourceFund = row[7] || "";
-    const estimateValue = row[10] || ""; const timestamp = formatDateToDDMMYYYY(row[0]);
-    const nitDate = formatDateToDDMMYYYY(row[4]); const workOrderDate = formatDateToDDMMYYYY(row[9]);
+    const uniqueNit = row[1] || ""; 
+    const nit = row[2] || ""; 
+    const vendor = row[5] || "";
+    const workOrderNo = row[8] || ""; 
+    const workName = row[6] || ""; 
+    const sourceFund = row[7] || "";
+    const estimateValue = row[10] || ""; 
+    const timestamp = formatDateToDDMMYYYY(row[0]);
+    const nitDate = formatDateToDDMMYYYY(row[4]); 
+    const workOrderDate = formatDateToDDMMYYYY(row[9]);
     
-    const grossBill = row[11] || ""; const completionDateRaw = row[12] || "";
-    const tds = row[13] || ""; const cgst = row[14] || ""; const sgst = row[15] || "";
-    const labourCess = row[16] || ""; const royalty = row[17] || ""; const security = row[18] || "";
-    const netPayment = row[19] || ""; const paymentMode = row[26] || ""; const reference = row[27] || "";
+    const grossBill = row[11] || ""; 
+    const completionDateRaw = row[12] || "";
+    const tds = row[13] || ""; 
+    const cgst = row[14] || ""; 
+    const sgst = row[15] || "";
+    const labourCess = row[16] || ""; 
+    const royalty = row[17] || ""; 
+    const security = row[18] || "";
+    const netPayment = row[19] || ""; 
+    const paymentMode = row[20] || ""; 
+    const reference = row[21] || "";
     const completionDateVal = formatToInputDate(completionDateRaw);
     
     const modalBody = document.getElementById("modalBody");
@@ -725,7 +791,14 @@
           <div class="field-group"><label>👑 ROYALTY</label><input type="text" id="modal_royalty" value="${escapeHtml(royalty)}"></div>
           <div class="field-group"><label>🔒 SECURITY</label><input type="text" id="modal_security" value="${escapeHtml(security)}"></div>
           <div class="field-group"><label>💵 NET PAYMENT</label><input type="text" id="modal_netPayment" value="${escapeHtml(netPayment)}"></div>
-          <div class="field-group"><label>💳 PAYMENT MODE</label><select id="modal_paymentMode"><option value="" ${paymentMode===''?'selected':''}>Select Mode</option><option value="Online" ${paymentMode==='Online'?'selected':''}>Online</option><option value="Cheque" ${paymentMode==='Cheque'?'selected':''}>Cheque</option></select></div>
+          <div class="field-group"><label>💳 PAYMENT MODE</label><select id="modal_paymentMode">
+            <option value="" ${paymentMode===''?'selected':''}>Select Mode</option>
+            <option value="Online" ${paymentMode==='Online'?'selected':''}>Online</option>
+            <option value="Cheque" ${paymentMode==='Cheque'?'selected':''}>Cheque</option>
+            <option value="Cash" ${paymentMode==='Cash'?'selected':''}>Cash</option>
+            <option value="RTGS" ${paymentMode==='RTGS'?'selected':''}>RTGS</option>
+            <option value="NEFT" ${paymentMode==='NEFT'?'selected':''}>NEFT</option>
+          </select></div>
           <div class="field-group"><label>📎 REFERENCE</label><input type="text" id="modal_reference" value="${escapeHtml(reference)}"></div>
         </div>
       </div>`;
@@ -736,7 +809,9 @@
   async function saveModalChanges() {
     if (!currentModalRow) { showMessage("No active row", "error"); closeModal(); return; }
     const row = currentModalRow;
-    const uniqueNit = String(row[1] || ""); const vendor = String(row[5] || "");
+    const uniqueNit = String(row[1] || ""); 
+    const vendor = String(row[5] || "");
+    
     const grossBill = document.getElementById("modal_grossBill")?.value || "";
     const completionDate = document.getElementById("modal_completionDate")?.value || "";
     const tds = document.getElementById("modal_tds")?.value || "";
@@ -751,37 +826,94 @@
     
     const formData = new FormData();
     formData.append("action", "updateBillPayment");
-    formData.append("uniqueNit", uniqueNit); formData.append("vendor", vendor);
-    formData.append("col11", grossBill); formData.append("col12", completionDate);
-    formData.append("col13", tds); formData.append("col14", cgst); formData.append("col15", sgst);
-    formData.append("col16", labourCess); formData.append("col17", royalty);
-    formData.append("col18", security); formData.append("col19", netPayment);
-    formData.append("col20", paymentMode); formData.append("col21", reference);
+    formData.append("uniqueNit", uniqueNit); 
+    formData.append("vendor", vendor);
+    formData.append("col11", grossBill); 
+    formData.append("col12", completionDate);
+    formData.append("col13", tds); 
+    formData.append("col14", cgst); 
+    formData.append("col15", sgst);
+    formData.append("col16", labourCess); 
+    formData.append("col17", royalty);
+    formData.append("col18", security); 
+    formData.append("col19", netPayment);
+    formData.append("col20", paymentMode); 
+    formData.append("col21", reference);
     
     const saveBtn = document.getElementById("modalSaveBtn");
     const originalText = saveBtn.innerText;
-    saveBtn.innerText = "⏳ Saving..."; saveBtn.disabled = true;
+    saveBtn.innerText = "⏳ Saving..."; 
+    saveBtn.disabled = true;
     try {
       const response = await fetch(scriptURL, { method: "POST", body: formData });
       const result = await response.json();
       if (result.success) {
-        row[11] = grossBill; row[12] = completionDate; row[13] = tds; row[14] = cgst; row[15] = sgst;
-        row[16] = labourCess; row[17] = royalty; row[18] = security; row[19] = netPayment;
-        row[26] = paymentMode; row[27] = reference;
+        // Update local data
+        row[11] = grossBill; 
+        row[12] = completionDate; 
+        row[13] = tds; 
+        row[14] = cgst; 
+        row[15] = sgst;
+        row[16] = labourCess; 
+        row[17] = royalty; 
+        row[18] = security; 
+        row[19] = netPayment;
+        row[20] = paymentMode; 
+        row[21] = reference;
         applySearchAndRender();
         showMessage(`✅ Modal save successful`, "success");
         closeModal();
-      } else { showMessage("Update failed: " + (result.error || "error"), "error"); }
-    } catch (err) { showMessage("Network error: " + err.message, "error"); }
-    finally { saveBtn.innerText = originalText; saveBtn.disabled = false; }
+      } else { 
+        showMessage("Update failed: " + (result.error || "error"), "error"); 
+      }
+    } catch (err) { 
+      showMessage("Network error: " + err.message, "error"); 
+    } finally { 
+      saveBtn.innerText = originalText; 
+      saveBtn.disabled = false; 
+    }
   }
   
-  function closeModal() { document.getElementById("editModal").classList.remove("active"); currentModalOriginalIndex = null; currentModalRow = null; }
-  function escapeHtml(str) { if(!str) return ""; return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-  async function refreshData() { const btn = document.getElementById("refreshBtn"); const oldHtml = btn.innerHTML; btn.innerHTML = `<span class="spinner"></span> Refreshing...`; btn.disabled = true; await loadData(); btn.innerHTML = oldHtml; btn.disabled = false; }
-  function bindModalEvents() { const modal = document.getElementById("editModal"); document.getElementById("closeModalBtn").onclick = () => closeModal(); document.getElementById("modalCancelBtn").onclick = () => closeModal(); document.getElementById("modalSaveBtn").onclick = () => saveModalChanges(); modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); }); }
+  function closeModal() { 
+    document.getElementById("editModal").classList.remove("active"); 
+    currentModalOriginalIndex = null; 
+    currentModalRow = null; 
+  }
   
-  window.addEventListener("DOMContentLoaded", () => { bindModalEvents(); loadData(); });
+  function escapeHtml(str) { 
+    if(!str) return ""; 
+    return String(str).replace(/[&<>]/g, function(m){ 
+      if(m==='&') return '&amp;'; 
+      if(m==='<') return '&lt;'; 
+      if(m==='>') return '&gt;'; 
+      return m;
+    }); 
+  }
+  
+  async function refreshData() { 
+    const btn = document.getElementById("refreshBtn"); 
+    const oldHtml = btn.innerHTML; 
+    btn.innerHTML = `<span class="spinner"></span> Refreshing...`; 
+    btn.disabled = true; 
+    await loadData(); 
+    btn.innerHTML = oldHtml; 
+    btn.disabled = false; 
+  }
+  
+  function bindModalEvents() { 
+    const modal = document.getElementById("editModal"); 
+    document.getElementById("closeModalBtn").onclick = () => closeModal(); 
+    document.getElementById("modalCancelBtn").onclick = () => closeModal(); 
+    document.getElementById("modalSaveBtn").onclick = () => saveModalChanges(); 
+    modal.addEventListener("click", (e) => { 
+      if (e.target === modal) closeModal(); 
+    }); 
+  }
+  
+  window.addEventListener("DOMContentLoaded", () => { 
+    bindModalEvents(); 
+    loadData(); 
+  });
 </script>
 </body>
 </html>
