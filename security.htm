@@ -34,6 +34,34 @@
       text-shadow: 0 0 5px #39ff14;
       font-size: 13px;
     }
+    
+    /* Highlight row when SDM Payment Reference has a value */
+    tr.highlight-row {
+      background-color: #1a4d2a !important;
+      border-left: 3px solid #39ff14;
+      border-right: 3px solid #39ff14;
+    }
+    
+    tr.highlight-row td {
+      background-color: #1a4d2a !important;
+    }
+    
+    /* Hover effect for highlighted rows */
+    tr.highlight-row:hover td {
+      background-color: #236b3a !important;
+    }
+    
+    /* Normal row hover effect */
+    tr:hover td {
+      background-color: #3a3a3a;
+    }
+    
+    .debug-info {
+      font-size: 10px;
+      color: #888;
+      margin-top: 5px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -74,7 +102,7 @@
 
   <script>
     // REPLACE THIS URL WITH YOUR DEPLOYED WEB APP URL
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwRcO-H4rvATK_1hfdfUglBW7lwTd6_7-rn20YdNbv68eCnKc6fUuJqb0jhmxJizFuF/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw1vVpJleI2n_VO8oc9675kTYrna_GKawfPYKTQl3tc_5yacCO3kKCASPCHR3HqdUjU5w/exec";
     let tableData = [];
     let allData = []; // Store all data with original indices
     
@@ -178,6 +206,26 @@
       }
     }
 
+    // Function to create a consistent unique key
+    function createUniqueKey(uniqueNit, vendor) {
+      // Trim and convert to string, then replace special characters
+      const nit = (uniqueNit || "").toString().trim();
+      const ven = (vendor || "").toString().trim();
+      // Use a pipe separator that's unlikely to appear in data
+      return nit + "|" + ven;
+    }
+
+    // Function to create a safe ID from unique key
+    function createSafeId(uniqueKey) {
+      // Replace any non-alphanumeric characters with underscore
+      return uniqueKey.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    // Function to check if SDM Payment Reference has a value
+    function hasSdmReferenceValue(sdmReference) {
+      return sdmReference && sdmReference.toString().trim() !== "";
+    }
+
     async function refreshData() {
       const btn = document.getElementById("refreshBtn");
       const oldText = btn.innerHTML;
@@ -202,18 +250,37 @@
           }
         }
 
-        // Store all data with original indices
-        allData = json.map((row, index) => ({
-          originalIndex: index,
-          rowData: row,
-          uniqueKey: (row[COLUMN_MAPPING.UNIQUE_NIT] || '') + '|' + (row[COLUMN_MAPPING.VENDOR] || '')
-        }));
+        console.log("Total rows loaded:", json.length);
+        
+        // Store all data with original indices and unique key
+        allData = json.map((row, index) => {
+          const uniqueNit = row[COLUMN_MAPPING.UNIQUE_NIT] || "";
+          const vendor = row[COLUMN_MAPPING.VENDOR] || "";
+          const uniqueKey = createUniqueKey(uniqueNit, vendor);
+          
+          console.log(`Row ${index}: UNIQUE NIT="${uniqueNit}", VENDOR="${vendor}", Key="${uniqueKey}"`);
+          
+          return {
+            originalIndex: index,
+            rowData: row,
+            uniqueKey: uniqueKey,
+            uniqueNit: uniqueNit,
+            vendor: vendor
+          };
+        });
         
         // Filter only rows with SECURITY value
-        tableData = allData.filter(item => 
-          item.rowData[COLUMN_MAPPING.SECURITY] && 
-          item.rowData[COLUMN_MAPPING.SECURITY].toString().trim() !== ""
-        );
+        tableData = allData.filter(item => {
+          const security = item.rowData[COLUMN_MAPPING.SECURITY];
+          const hasSecurity = security && security.toString().trim() !== "";
+          return hasSecurity;
+        });
+        
+        console.log("Rows with SECURITY values:", tableData.length);
+        
+        if (tableData.length === 0) {
+          showMessage("No rows found with SECURITY values. Please check your data.", "error");
+        }
         
         renderTable(tableData);
       } catch (error) {
@@ -232,14 +299,23 @@
         return;
       }
 
-      data.forEach(function(item, i) {
+      data.forEach(function(item, idx) {
         const row = item.rowData;
         const uniqueKey = item.uniqueKey;
-        const originalIndex = item.originalIndex;
+        const safeId = createSafeId(uniqueKey);
+        
+        // Check if SDM Payment Reference has a value
+        const sdmReferenceValue = row[COLUMN_MAPPING.SDM_PAYMENT_REFERENCE] || "";
+        const hasReference = hasSdmReferenceValue(sdmReferenceValue);
         
         let tr = document.createElement("tr");
         tr.setAttribute('data-unique-key', uniqueKey);
-        tr.setAttribute('data-original-index', originalIndex);
+        tr.setAttribute('data-safe-id', safeId);
+        
+        // Add highlight class if SDM Payment Reference has a value
+        if (hasReference) {
+          tr.classList.add('highlight-row');
+        }
 
         // Column 0: Timestamp
         let td0 = document.createElement("td");
@@ -315,27 +391,39 @@
         td12.innerHTML = '<input type="text" value="' + referenceValue.replace(/"/g, '&quot;') + '" readonly style="background-color:#555; color:#ccc; cursor:not-allowed;">';
         tr.appendChild(td12);
 
-        // Column 13: SECURITY PAYMENT DATE (editable date picker, defaults to today if blank)
+        // Column 13: SECURITY PAYMENT DATE (editable date picker)
         let td13 = document.createElement("td");
         let securityPaymentDateValue = row[COLUMN_MAPPING.SECURITY_PAYMENT_DATE] || "";
         let formattedDate = securityPaymentDateValue ? formatToInputDate(securityPaymentDateValue) : todayDate;
-        td13.innerHTML = '<input type="date" value="' + formattedDate + '" id="security_payment_date_' + i + '" oninput="toggleButton(' + i + ')">';
+        td13.innerHTML = '<input type="date" value="' + formattedDate + '" id="security_payment_date_' + safeId + '" onchange="toggleButton(\'' + safeId + '\')">';
         tr.appendChild(td13);
 
-        // Column 14: SDM Payment Reference (editable - column AE/index 30)
+        // Column 14: SDM Payment Reference (editable)
         let td14 = document.createElement("td");
-        let sdmReferenceValue = row[COLUMN_MAPPING.SDM_PAYMENT_REFERENCE] || "";
-        td14.innerHTML = '<input type="text" value="' + sdmReferenceValue.replace(/"/g, '&quot;') + '" placeholder="Enter SDM Reference" id="sdm_reference_' + i + '" oninput="toggleButton(' + i + ')">';
+        let sdmReferenceValueCurrent = row[COLUMN_MAPPING.SDM_PAYMENT_REFERENCE] || "";
+        td14.innerHTML = '<input type="text" value="' + sdmReferenceValueCurrent.replace(/"/g, '&quot;') + '" placeholder="Enter SDM Reference" id="sdm_reference_' + safeId + '" oninput="toggleButton(\'' + safeId + '\'); checkAndHighlightRow(\'' + safeId + '\', this.value);">';
         tr.appendChild(td14);
 
         // Column 15: Action button
         let tdAction = document.createElement("td");
-        tdAction.innerHTML = '<button class="action-btn" id="btn_' + i + '" onclick="updateRow(' + i + ')">SAVE</button>';
+        tdAction.innerHTML = '<button class="action-btn" id="btn_' + safeId + '" onclick="updateRow(\'' + safeId + '\')">SAVE</button>';
         tr.appendChild(tdAction);
 
         tbody.appendChild(tr);
-        toggleButton(i);
+        toggleButton(safeId);
       });
+    }
+    
+    // Function to check and highlight row based on SDM Reference value
+    function checkAndHighlightRow(safeId, sdmValue) {
+      const row = document.querySelector(`tr[data-safe-id="${safeId}"]`);
+      if (row) {
+        if (sdmValue && sdmValue.trim() !== "") {
+          row.classList.add('highlight-row');
+        } else {
+          row.classList.remove('highlight-row');
+        }
+      }
     }
 
     function formatToInputDate(value) {
@@ -361,8 +449,8 @@
       renderTable(filtered);
     }
 
-    function toggleButton(i) {
-      const btn = document.getElementById('btn_' + i);
+    function toggleButton(safeId) {
+      const btn = document.getElementById('btn_' + safeId);
       if (!btn) return;
       btn.textContent = "UPDATE";
       btn.style.background = "blue";
@@ -374,38 +462,45 @@
       msg.textContent = text;
       msg.className = type;
       msg.style.display = "block";
-      setTimeout(function() { msg.style.display = "none"; }, 2500);
+      setTimeout(function() { msg.style.display = "none"; }, 3000);
     }
 
-    async function updateRow(i) {
-      const btn = document.getElementById('btn_' + i);
+    async function updateRow(safeId) {
+      const btn = document.getElementById('btn_' + safeId);
       btn.disabled = true; 
       btn.textContent = "Saving...";
 
       try {
-        // Get the current row data from the filtered view
-        const currentItem = tableData[i];
-        if (!currentItem) {
-          throw new Error("Row data not found");
+        // Find the row data by searching through allData using the safeId
+        let foundItem = null;
+        
+        for (let item of allData) {
+          if (createSafeId(item.uniqueKey) === safeId) {
+            foundItem = item;
+            break;
+          }
         }
         
-        const uniqueKey = currentItem.uniqueKey;
-        const originalIndex = currentItem.originalIndex;
-        const row = currentItem.rowData;
+        if (!foundItem) {
+          throw new Error(`Row data not found for ID: ${safeId}`);
+        }
         
-        // Get the UNIQUE NIT and VENDOR to send as identifiers
-        const uniqueNit = row[COLUMN_MAPPING.UNIQUE_NIT] || "";
-        const vendor = row[COLUMN_MAPPING.VENDOR] || "";
+        const uniqueNit = foundItem.uniqueNit;
+        const vendor = foundItem.vendor;
+        
+        if (!uniqueNit || !vendor) {
+          throw new Error(`Missing data: UNIQUE NIT="${uniqueNit}", VENDOR="${vendor}"`);
+        }
+        
+        const securityPaymentDate = document.getElementById('security_payment_date_' + safeId).value;
+        const sdmReference = document.getElementById('sdm_reference_' + safeId).value;
+        
+        console.log("Updating row:", { uniqueNit, vendor, securityPaymentDate, sdmReference });
         
         const formData = new FormData();
         formData.append("action", "updateBillPayment");
         formData.append("uniqueNit", uniqueNit);
         formData.append("vendor", vendor);
-        formData.append("originalIndex", originalIndex);
-        
-        const securityPaymentDate = document.getElementById('security_payment_date_' + i).value;
-        const sdmReference = document.getElementById('sdm_reference_' + i).value;
-        
         formData.append("security_payment_date", securityPaymentDate);
         formData.append("sdm_payment_reference", sdmReference);
 
@@ -415,28 +510,40 @@
         if (result.success) {
           btn.textContent = "Saved ✔"; 
           btn.style.background = "green";
-          showMessage("Row updated successfully ✅", "success");
+          showMessage(`✅ Updated: ${uniqueNit} - ${vendor}`, "success");
           const rowEl = btn.closest("tr");
           rowEl.style.backgroundColor = "#d4edda";
+          
+          // Update highlight based on new SDM reference value
+          if (sdmReference && sdmReference.trim() !== "") {
+            rowEl.classList.add('highlight-row');
+          } else {
+            rowEl.classList.remove('highlight-row');
+          }
+          
           setTimeout(function() {
             rowEl.style.backgroundColor = ""; 
-            toggleButton(i);
+            toggleButton(safeId);
           }, 1500);
           // Reload data to reflect changes
-          setTimeout(function() { loadData(); }, 1000);
+          setTimeout(function() { loadData(); }, 2000);
         } else {
           btn.textContent = "Failed ✖"; 
           btn.style.background = "red";
-          showMessage("Update failed: " + (result.error || "Unknown"), "error");
+          showMessage(`❌ Update failed: ${result.error || "Unknown error"}`, "error");
+          console.error("Update error:", result);
         }
       } catch (err) {
+        console.error("Update error:", err);
         btn.textContent = "Error ✖"; 
         btn.style.background = "red";
-        showMessage("Network error: " + err.message, "error");
+        showMessage(`❌ Error: ${err.message}`, "error");
       } finally {
         setTimeout(function() {
           btn.disabled = false; 
-          toggleButton(i);
+          if (btn.textContent !== "Saved ✔") {
+            toggleButton(safeId);
+          }
         }, 2000);
       }
     }
