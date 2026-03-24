@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Bhagabanpur Gram Panchayat | Official Portal | Malda</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Google Fonts for consistent typography -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -32,7 +31,6 @@ body {
   color: #1E2F3E;
 }
 
-/* Header with Dual Color Gradient */
 header {
   background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-accent) 100%);
   color: white;
@@ -49,7 +47,6 @@ header {
   padding: 0.6rem 2rem;
 }
 
-/* Top Section - Logo and Right Controls in Same Line */
 .top-header {
   display: flex;
   justify-content: space-between;
@@ -58,7 +55,6 @@ header {
   margin-bottom: 0.8rem;
 }
 
-/* Left Section: Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -100,7 +96,6 @@ header {
   display: block;
 }
 
-/* Right Side Controls - Clock + Sign In (Same Line) */
 .right-controls {
   display: flex;
   align-items: center;
@@ -108,7 +103,6 @@ header {
   flex-shrink: 0;
 }
 
-/* Digital Clock - Elegant */
 .digital-clock {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(6px);
@@ -135,7 +129,6 @@ header {
   letter-spacing: 0.3px;
 }
 
-/* Sign In Button - Premium 3D Raised Effect */
 .signin-btn {
   background: linear-gradient(145deg, var(--highlight-gold), #D49B5F);
   border: none;
@@ -173,7 +166,6 @@ header {
   box-shadow: 0 2px 0 #9B6E42, 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
-/* Navigation - 3D Raised Buttons */
 .nav-wrapper {
   width: 100%;
   margin-top: 0.5rem;
@@ -191,7 +183,6 @@ nav li {
   position: relative;
 }
 
-/* 3D Raised Button Effect for Menu */
 nav > ul > li > a {
   text-decoration: none;
   color: white;
@@ -223,7 +214,6 @@ nav > ul > li > a:hover {
   color: #FFEEDD;
 }
 
-/* Dropdown with 3D Submenu */
 .submenu {
   list-style: none;
   position: absolute;
@@ -297,7 +287,6 @@ nav li:hover > .submenu {
   font-size: 0.65rem;
 }
 
-/* Iframe Section - FIXED BACKGROUND */
 .iframe-container {
   width: 100%;
   height: calc(100vh - 115px);
@@ -315,7 +304,6 @@ iframe {
   display: block;
 }
 
-/* Footer */
 footer {
   background: linear-gradient(135deg, var(--primary-dark), #0C3346);
   color: #E6F0F5;
@@ -325,7 +313,6 @@ footer {
   border-top: 2px solid var(--highlight-gold);
 }
 
-/* ========== MODAL WITH EMBEDDED SIGNIN FORM (REAL LOGIN) ========== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -348,7 +335,6 @@ footer {
   opacity: 1;
 }
 
-/* Modern modal card - consistent with GP theme */
 .auth-modal-card {
   width: 500px;
   max-width: 90vw;
@@ -410,7 +396,6 @@ footer {
   transform: rotate(90deg);
 }
 
-/* embedded form styles */
 .modal-form-content {
   padding: 1.8rem 1.8rem 1.8rem;
 }
@@ -613,34 +598,48 @@ footer {
   to { transform: rotate(360deg); }
 }
 
-/* Debug Console - Optional (shows only when needed) */
-.debug-console {
+.session-toast {
   position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.8);
-  color: #0f0;
-  font-family: monospace;
-  font-size: 10px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  z-index: 9999;
-  display: none;
-  max-width: 300px;
-  word-wrap: break-word;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #B34A4A, #8B3A3A);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  z-index: 10000;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid #FFD966;
+  animation: slideInRight 0.3s ease;
+  max-width: 350px;
 }
 
-.debug-console.show {
-  display: block;
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-/* Responsive */
 @media (max-width: 560px) {
   .auth-modal-card {
     width: 95vw;
   }
   .modal-form-content {
     padding: 1.2rem;
+  }
+  .session-toast {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
   }
 }
 
@@ -757,10 +756,7 @@ footer {
   <p>© 2025 Bhagabanpur Gram Panchayat, Malda | Citizen First | e-Governance Initiative | Digital India</p>
 </footer>
 
-<!-- Debug Console (for troubleshooting) -->
-<div id="debugConsole" class="debug-console"></div>
-
-<!-- SIGN IN MODAL (REAL LOGIN INTEGRATION) -->
+<!-- SIGN IN MODAL -->
 <div id="signinModal" class="modal-overlay">
   <div class="auth-modal-card">
     <div class="modal-header">
@@ -815,24 +811,153 @@ footer {
   // =====================================================
   // GOOGLE APPS SCRIPT WEB APP URL
   // =====================================================
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWMF-BFNYuJBGJcpEfzmQc8RV04bj3F18eoEHRwyKo52SAF7sryetRuWg6wCpQo_jxDw/exec';
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8TuO2JCiZVMkTBt5I7aFoab7HlRxFqXYTFtBotBJglVy-zKYVZ7QWsbmkYchHqpHptg/exec';
   
-  // Debug function
-  function debugLog(message, data = null) {
-    const debugDiv = document.getElementById('debugConsole');
-    if (debugDiv) {
-      const timestamp = new Date().toLocaleTimeString();
-      let logMessage = `[${timestamp}] ${message}`;
-      if (data) {
-        logMessage += `\nData: ${JSON.stringify(data, null, 2)}`;
-      }
-      debugDiv.textContent = logMessage;
-      debugDiv.classList.add('show');
-      setTimeout(() => {
-        debugDiv.classList.remove('show');
-      }, 8000);
+  // ========== SESSION VALIDATION ==========
+  const VALIDATION_INTERVAL = 30000; // Check every 30 seconds
+  let validationInterval = null;
+  
+  function showSessionToast(message, isError = true) {
+    const existingToast = document.getElementById('sessionToast');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.id = 'sessionToast';
+    toast.className = 'session-toast';
+    toast.innerHTML = `
+      <i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+      <div style="flex: 1;">
+        <strong>${isError ? 'Session Expired' : 'Session Updated'}</strong><br>
+        ${message}
+      </div>
+      <i class="fas fa-spinner fa-pulse"></i>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(400px)';
+      setTimeout(() => toast.remove(), 500);
+    }, 5000);
+  }
+  
+  async function validateCurrentSession() {
+    const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
+    
+    if (!session) {
+      return false;
     }
-    console.log(message, data || '');
+    
+    try {
+      const sessionData = JSON.parse(session);
+      const username = sessionData.username;
+      
+      if (!username) {
+        return false;
+      }
+      
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ 
+          action: 'validateSession', 
+          username: username 
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!result.success || !result.data?.isValid) {
+        console.log('Session validation failed:', result.message);
+        localStorage.removeItem('gp_user_session');
+        sessionStorage.removeItem('gp_user_session');
+        
+        showSessionToast(result.message || 'Your access has been revoked. Please login again.');
+        
+        setTimeout(() => {
+          window.location.href = 'index.htm';
+        }, 3000);
+        
+        return false;
+      }
+      
+      // Session valid - check if role changed
+      if (result.data && result.data.role !== sessionData.role) {
+        console.log('Role changed from', sessionData.role, 'to', result.data.role);
+        
+        const updatedSession = {
+          ...sessionData,
+          role: result.data.role,
+          permission: result.data.permission,
+          name: result.data.name,
+          lastValidated: new Date().toISOString()
+        };
+        
+        if (localStorage.getItem('gp_user_session')) {
+          localStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
+        } else {
+          sessionStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
+        }
+        
+        showSessionToast(`Your role has been updated to ${result.data.role}. Redirecting...`, false);
+        
+        setTimeout(() => {
+          if (result.data.role === 'Admin') {
+            window.location.href = 'index3.htm';
+          } else if (result.data.role === 'Office' || result.data.role === 'User') {
+            window.location.href = 'index2.htm';
+          }
+        }, 1500);
+        
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Session validation error:', error);
+      return true; // Don't logout on network error
+    }
+  }
+  
+  function startSessionValidation() {
+    if (validationInterval) clearInterval(validationInterval);
+    validationInterval = setInterval(validateCurrentSession, VALIDATION_INTERVAL);
+    
+    document.addEventListener('visibilitychange', async () => {
+      if (!document.hidden) {
+        await validateCurrentSession();
+      }
+    });
+  }
+  
+  function stopSessionValidation() {
+    if (validationInterval) {
+      clearInterval(validationInterval);
+      validationInterval = null;
+    }
+  }
+  
+  // ========== CHECK EXISTING SESSION ==========
+  async function checkExistingSession() {
+    const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
+    if (session) {
+      try {
+        const sessionData = JSON.parse(session);
+        const isValid = await validateCurrentSession();
+        
+        if (isValid) {
+          const userRole = sessionData.role;
+          if (userRole === 'Admin') {
+            window.location.href = 'index3.htm';
+          } else if (userRole === 'Office' || userRole === 'User') {
+            window.location.href = 'index2.htm';
+          }
+        }
+      } catch(e) {
+        console.log('Session check error:', e);
+      }
+    }
   }
   
   // Digital Clock
@@ -879,7 +1004,6 @@ footer {
     document.getElementById('modalSignupMsg').innerHTML = '';
   });
   
-  // Helper functions
   function showModalMsg(element, text, isError = true, isInfo = false) {
     element.textContent = text;
     element.classList.remove('error-msg-modal', 'success-msg-modal', 'info-msg-modal');
@@ -908,14 +1032,10 @@ footer {
     }
   }
   
-  // =====================================================
-  // AUTHENTICATION WITH ROLE-BASED REDIRECTION
-  // Admin → index3.htm | Office/User → index2.htm
-  // =====================================================
+  // ========== AUTHENTICATION FUNCTIONS ==========
   
   async function authenticateWithGoogleSheet(username, password) {
     try {
-      debugLog('Authenticating user:', username);
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'cors',
@@ -931,12 +1051,9 @@ footer {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data = await response.json();
-      debugLog('Authentication response:', data);
-      return data;
+      return await response.json();
     } catch (error) {
       console.error('Authentication error:', error);
-      debugLog('Authentication error:', error.message);
       return { 
         success: false, 
         message: 'Network error. Please check your connection and try again.' 
@@ -946,7 +1063,6 @@ footer {
   
   async function registerWithGoogleSheet(name, email, password) {
     try {
-      debugLog('Registering new user:', email);
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'cors',
@@ -963,12 +1079,9 @@ footer {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data = await response.json();
-      debugLog('Registration response:', data);
-      return data;
+      return await response.json();
     } catch (error) {
       console.error('Signup error:', error);
-      debugLog('Signup error:', error.message);
       return { 
         success: false, 
         message: 'Network error. Please try again.' 
@@ -976,7 +1089,7 @@ footer {
     }
   }
   
-  // Handle Sign In with Role-Based Redirection
+  // Handle Sign In
   document.getElementById('modalLoginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const user = document.getElementById('modalLoginUser').value.trim().toLowerCase();
@@ -998,11 +1111,9 @@ footer {
     setButtonLoading(btn, true, original);
     
     try {
-      // Proceed with login
       const result = await authenticateWithGoogleSheet(user, pass);
       
       if (result.success) {
-        // Successful login - extract role from response
         const userRole = result.data?.role || result.role || 'User';
         const userName = result.data?.name || result.name || user.split('@')[0];
         
@@ -1011,7 +1122,8 @@ footer {
           role: userRole,
           name: userName,
           permission: result.data?.permission || 'Allowed',
-          loginTime: new Date().toISOString()
+          loginTime: new Date().toISOString(),
+          lastValidated: new Date().toISOString()
         };
         
         if (remember) {
@@ -1022,9 +1134,6 @@ footer {
           localStorage.removeItem('gp_remember_username');
         }
         
-        debugLog('Login successful for user:', sessionData);
-        
-        // ROLE-BASED REDIRECTION
         let redirectUrl = '';
         if (userRole === 'Admin') {
           redirectUrl = 'index3.htm';
@@ -1033,7 +1142,6 @@ footer {
           redirectUrl = 'index2.htm';
           showModalMsg(msgDiv, `✨ Welcome, ${userName}! Redirecting to Office Dashboard...`, false);
         } else {
-          // Default fallback for 'User' role or any other
           redirectUrl = 'index2.htm';
           showModalMsg(msgDiv, `✨ Welcome, ${userName}! Redirecting to Dashboard...`, false);
         }
@@ -1043,9 +1151,7 @@ footer {
           window.location.href = redirectUrl;
         }, 1000);
       } else {
-        // Handle different error messages
         const errorMsg = result.message || 'Invalid username or password.';
-        debugLog('Login failed:', errorMsg);
         
         if (errorMsg.includes('pending admin approval') || errorMsg.includes('not been authorized') || errorMsg.includes('Access denied')) {
           showModalMsg(msgDiv, '⏳ Your account is pending admin approval. Please wait for approval email.', true);
@@ -1059,7 +1165,6 @@ footer {
       }
     } catch (error) {
       console.error('Login error:', error);
-      debugLog('Login exception:', error.message);
       showModalMsg(msgDiv, 'Connection error. Please try again.', true);
       setButtonLoading(btn, false, original);
     }
@@ -1076,7 +1181,6 @@ footer {
     const btn = document.getElementById('modalSignupSubmit');
     const original = btn.innerHTML;
     
-    // Validation
     if (!name) { 
       showModalMsg(msgDiv, 'Please enter your full name.', true); 
       return; 
@@ -1114,15 +1218,12 @@ footer {
       
       if (result.success) {
         showModalMsg(msgDiv, '✅ ' + (result.message || 'Account created successfully! Awaiting admin approval.'), false);
-        debugLog('Registration successful for:', email);
         
-        // Clear form
         document.getElementById('modalSignupName').value = '';
         document.getElementById('modalSignupEmail').value = '';
         document.getElementById('modalSignupPass').value = '';
         document.getElementById('modalTerms').checked = false;
         
-        // Switch to sign in tab after delay
         setTimeout(() => {
           modalSigninTab.click();
           document.getElementById('modalLoginUser').value = email;
@@ -1131,19 +1232,16 @@ footer {
             false, true);
         }, 2000);
       } else {
-        debugLog('Registration failed:', result.message);
         showModalMsg(msgDiv, result.message || 'Signup failed. Email may already exist.', true);
       }
     } catch (error) {
       console.error('Signup error:', error);
-      debugLog('Signup exception:', error.message);
       showModalMsg(msgDiv, 'Connection error. Please try again later.', true);
     } finally {
       setButtonLoading(btn, false, original);
     }
   });
   
-  // Forgot Password
   document.getElementById('modalForgotLink').addEventListener('click', (e) => {
     e.preventDefault();
     const username = document.getElementById('modalLoginUser').value.trim();
@@ -1156,7 +1254,6 @@ footer {
     }
   });
   
-  // Terms Link
   document.getElementById('termsModalLink').addEventListener('click', (e) => {
     e.preventDefault();
     showModalMsg(document.getElementById('modalSignupMsg'), 
@@ -1164,7 +1261,6 @@ footer {
       false, true);
   });
   
-  // Password Toggle
   function setupModalToggle(toggleSel, inputSel) {
     const toggle = document.querySelector(toggleSel);
     const inp = document.querySelector(inputSel);
@@ -1188,36 +1284,17 @@ footer {
   setupModalToggle('.toggle-login-modal', '#modalLoginPass');
   setupModalToggle('.toggle-signup-modal', '#modalSignupPass');
   
-  // Load remembered user
   const rememberedUsername = localStorage.getItem('gp_remember_username');
   if (rememberedUsername) {
     document.getElementById('modalLoginUser').value = rememberedUsername;
     document.getElementById('modalRemember').checked = true;
   }
   
-  // Check if already logged in and redirect based on role
-  const existingSession = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
-  if (existingSession) {
-    try {
-      const sessionData = JSON.parse(existingSession);
-      const userRole = sessionData.role;
-      if (userRole === 'Admin') {
-        window.location.href = 'index3.htm';
-      } else if (userRole === 'Office' || userRole === 'User') {
-        window.location.href = 'index2.htm';
-      }
-    } catch(e) {
-      console.log('Session parse error, clearing session');
-      localStorage.removeItem('gp_user_session');
-      sessionStorage.removeItem('gp_user_session');
-    }
-  }
+  // Initialize - check existing session
+  checkExistingSession();
   
-  // Display system status
-  console.log('✅ Bhagabanpur Gram Panchayat Portal - Role-Based Authentication Active');
-  console.log('🔐 Role-Based Redirection: Admin → index3.htm | Office → index2.htm');
-  console.log('📝 New users: Created with "Denied" permission - Requires admin approval');
-  debugLog('System initialized - Role-based redirection active');
+  console.log('✅ Bhagabanpur Gram Panchayat Portal - Real-time Session Validation Active');
+  console.log('🔐 Session validation every 30 seconds');
 </script>
 </body>
 </html>
