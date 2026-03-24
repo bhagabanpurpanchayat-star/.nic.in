@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Bill Payment Module | Wide View + Modal Editor</title>
+  <title>Bill Payment Module | Optimized View</title>
   <style>
     * {
       box-sizing: border-box;
@@ -106,7 +106,7 @@
     #message.error { background: #b91c1c; color: white; }
     #message.loading { background: #2c6e9e; color: white; }
 
-    /* table container - wider & better scrolling */
+    /* table container */
     .table-container {
       border-radius: 20px;
       overflow-x: auto;
@@ -118,22 +118,63 @@
     }
 
     table {
-      width: max-content;
-      min-width: 100%;
+      width: 100%;
       border-collapse: collapse;
-      font-size: 12.5px;
-      white-space: nowrap;
+      font-size: 12px;
+      table-layout: auto;
     }
 
-    /* improved column widths for readability */
     th, td {
       border: 1px solid #3a6a74;
-      padding: 10px 12px;
+      padding: 8px 10px;
       text-align: center;
       vertical-align: middle;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
     }
 
-    /* Highlight row when SDM Payment Reference has a value */
+    /* Column width optimization */
+    th:nth-child(1), td:nth-child(1) { min-width: 90px; max-width: 110px; } /* Timestamp */
+    th:nth-child(2), td:nth-child(2) { min-width: 80px; max-width: 100px; } /* UNIQUE NIT */
+    th:nth-child(3), td:nth-child(3) { min-width: 60px; max-width: 80px; }  /* NIT */
+    th:nth-child(4), td:nth-child(4) { min-width: 45px; max-width: 55px; }   /* SL */
+    th:nth-child(5), td:nth-child(5) { min-width: 80px; max-width: 95px; }   /* NIT DATE */
+    th:nth-child(6), td:nth-child(6) { min-width: 150px; max-width: 200px; }  /* VENDOR */
+    th:nth-child(7), td:nth-child(7) { min-width: 180px; max-width: 250px; }  /* Name of work */
+    th:nth-child(8), td:nth-child(8) { min-width: 100px; max-width: 140px; }  /* Source of Fund */
+    th:nth-child(9), td:nth-child(9) { min-width: 90px; max-width: 120px; }   /* WORK ORDER NO */
+    th:nth-child(10), td:nth-child(10) { min-width: 90px; max-width: 110px; } /* WORK ORDER DATE */
+    th:nth-child(11), td:nth-child(11) { min-width: 90px; max-width: 120px; } /* ESTIMATE VALUE */
+    
+    /* Editable columns - optimized widths */
+    th:nth-child(12), td:nth-child(12) { min-width: 85px; max-width: 100px; } /* GROSS BILL */
+    th:nth-child(13), td:nth-child(13) { min-width: 95px; max-width: 110px; } /* Completion Date */
+    th:nth-child(14), td:nth-child(14) { min-width: 55px; max-width: 70px; }  /* TDS */
+    th:nth-child(15), td:nth-child(15) { min-width: 55px; max-width: 70px; }  /* CGST */
+    th:nth-child(16), td:nth-child(16) { min-width: 55px; max-width: 70px; }  /* SGST */
+    th:nth-child(17), td:nth-child(17) { min-width: 80px; max-width: 95px; }  /* LABOUR CESS */
+    th:nth-child(18), td:nth-child(18) { min-width: 65px; max-width: 80px; }  /* ROYALTY */
+    th:nth-child(19), td:nth-child(19) { min-width: 70px; max-width: 85px; }  /* SECURITY */
+    th:nth-child(20), td:nth-child(20) { min-width: 85px; max-width: 100px; } /* NET PAYMENT */
+    th:nth-child(21), td:nth-child(21) { min-width: 100px; max-width: 120px; } /* PAYMENT MODE */
+    th:nth-child(22), td:nth-child(22) { min-width: 120px; max-width: 160px; } /* REFERENCE */
+    th:nth-child(23), td:nth-child(23) { min-width: 110px; max-width: 130px; } /* Actions */
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #0a2a30;
+      color: #ffffff;
+      font-weight: 700;
+      z-index: 10;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(4px);
+      padding: 10px 6px;
+    }
+
+    /* Highlight row when REFERENCE has a value */
     tr.highlight-row {
       background-color: #1a4d2a !important;
       border-left: 3px solid #39ff14;
@@ -144,39 +185,25 @@
       background-color: #1a4d2a !important;
     }
     
-    /* Hover effect for highlighted rows */
     tr.highlight-row:hover td {
       background-color: #236b3a !important;
     }
     
-    /* Normal row hover effect */
     tr:hover td {
       background-color: #3a3a3a;
     }
 
-    thead th {
-      position: sticky;
-      top: 0;
-      background: #0a2a30;
-      color: #ffffff;
-      font-weight: 700;
-      z-index: 10;
-      font-size: 12px;
-      letter-spacing: 0.3px;
-      backdrop-filter: blur(4px);
-    }
-
-    /* inline editable controls */
+    /* Inline editable controls - compact */
     td input, td select {
       width: 100%;
-      min-width: 70px;
+      min-width: 50px;
       box-sizing: border-box;
-      font-size: 12px;
-      padding: 6px 8px;
+      font-size: 11px;
+      padding: 5px 6px;
       background: #fff;
       color: #0a1e22;
       border: 1px solid #628e99;
-      border-radius: 8px;
+      border-radius: 6px;
       font-weight: 500;
       transition: 0.1s;
     }
@@ -186,38 +213,53 @@
       border-color: #2c9b6e;
       box-shadow: 0 0 0 2px rgba(44,155,110,0.4);
     }
+    
+    /* Date picker specific */
+    input[type="date"] {
+      min-width: 90px;
+    }
+    
+    /* Number inputs alignment */
+    input[type="text"] {
+      text-align: right;
+    }
+    
+    td input[placeholder="0.00"] {
+      text-align: right;
+    }
 
     .action-group {
       display: flex;
-      gap: 10px;
+      gap: 6px;
       justify-content: center;
       flex-wrap: wrap;
     }
+    
+    .inline-save-btn, .modal-view-btn {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.15s;
+      border: none;
+    }
+    
     .inline-save-btn {
       background: #2c9b6e;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 32px;
       color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 11px;
-      transition: 0.15s;
     }
+    
     .modal-view-btn {
       background: #2c6e9e;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 32px;
       color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 11px;
     }
+    
     .inline-save-btn:hover, .modal-view-btn:hover {
       opacity: 0.85;
       transform: scale(0.96);
     }
+    
     .no-data-message {
       text-align: center;
       padding: 48px;
@@ -225,18 +267,20 @@
       color: #cde7ed;
       background: #1f4149;
     }
+    
     .spinner {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border: 2px solid #fff;
       border-top: 2px solid transparent;
       border-radius: 50%;
       display: inline-block;
       animation: spin 0.7s linear infinite;
     }
+    
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* MODAL STYLES - wide & clean */
+    /* MODAL STYLES */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -253,28 +297,32 @@
       opacity: 0;
       transition: visibility 0.2s, opacity 0.2s;
     }
+    
     .modal-overlay.active {
       visibility: visible;
       opacity: 1;
     }
+    
     .modal-container {
       background: #ffffff;
       color: #1a2f35;
       border-radius: 36px;
       width: 95%;
-      max-width: 1200px;
+      max-width: 1000px;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 30px 50px rgba(0,0,0,0.5);
       animation: fadeSlideUp 0.25s ease-out;
     }
+    
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(25px);}
       to { opacity: 1; transform: translateY(0);}
     }
+    
     .modal-header {
-      padding: 20px 28px;
+      padding: 18px 24px;
       background: #1f5e6e;
       color: white;
       border-radius: 36px 36px 0 0;
@@ -282,139 +330,168 @@
       justify-content: space-between;
       align-items: center;
     }
+    
     .modal-header h3 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 600;
     }
+    
     .close-modal {
       background: none;
       border: none;
-      font-size: 32px;
+      font-size: 28px;
       cursor: pointer;
       color: white;
       font-weight: bold;
       line-height: 1;
       opacity: 0.8;
     }
+    
     .modal-body {
-      padding: 24px 28px;
+      padding: 20px 24px;
       overflow-y: auto;
       flex: 1;
       background: #fafeff;
     }
-    /* two column layout for view-only */
+    
     .modal-details-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 18px 28px;
-      margin-bottom: 28px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px 20px;
+      margin-bottom: 20px;
       background: #f2f9fc;
-      padding: 16px 20px;
-      border-radius: 28px;
+      padding: 14px 18px;
+      border-radius: 24px;
     }
+    
     .info-row {
       background: #ffffff;
-      padding: 10px 16px;
-      border-radius: 24px;
+      padding: 8px 12px;
+      border-radius: 20px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       border: 1px solid #d9e9ef;
     }
+    
     .info-label {
       font-weight: 800;
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       color: #1f8a7a;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.5px;
     }
+    
     .info-value {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: #07323d;
       word-break: break-word;
     }
+    
     .editable-section {
       margin-top: 12px;
       border-top: 2px solid #cbe2ea;
-      padding-top: 20px;
+      padding-top: 18px;
     }
+    
     .editable-title {
       font-weight: 800;
-      font-size: 16px;
-      margin-bottom: 18px;
+      font-size: 15px;
+      margin-bottom: 16px;
       color: #1f5e6e;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
+    
     .editable-fields-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 18px 28px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px 20px;
     }
+    
     .field-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
+    
     .field-group label {
       font-weight: 700;
-      font-size: 12.5px;
+      font-size: 11px;
       color: #1f5e6e;
     }
+    
     .field-group input, .field-group select {
-      padding: 10px 14px;
+      padding: 8px 12px;
       border: 1px solid #c2d9e2;
-      border-radius: 28px;
-      font-size: 13px;
+      border-radius: 24px;
+      font-size: 12px;
       background: white;
     }
+    
     .field-group input:focus, .field-group select:focus {
       border-color: #2c9b6e;
       outline: none;
       box-shadow: 0 0 0 2px rgba(44,155,110,0.25);
     }
+    
     .modal-footer {
-      padding: 18px 28px;
+      padding: 14px 24px;
       background: #eef5f8;
       border-radius: 0 0 36px 36px;
       display: flex;
       justify-content: flex-end;
-      gap: 15px;
+      gap: 12px;
     }
+    
     .modal-footer button {
-      padding: 10px 28px;
+      padding: 8px 24px;
       border-radius: 40px;
       border: none;
       font-weight: bold;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
     }
+    
     .btn-save-modal {
       background: #2c9b6e;
       color: white;
     }
+    
     .btn-cancel-modal {
       background: #6c8b94;
       color: white;
     }
-    hr {
-      margin: 6px 0;
-    }
-    /* wrap text for long content in table */
+    
+    /* Compact text wrapping for long content */
     td {
-      white-space: normal;
+      word-wrap: break-word;
       word-break: break-word;
-      max-width: 280px;
+      white-space: normal;
+      line-height: 1.3;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      body {
+        padding: 10px;
+      }
+      th, td {
+        padding: 6px 8px;
+      }
+      .toolbar {
+        padding: 10px 16px;
+      }
     }
   </style>
 </head>
 <body>
 <div class="app-container">
-  <h2>📄 Bill Payment Entry Module </h2>
+  <h2>📄 Bill Payment Entry Module</h2>
   <div id="message"></div>
   <div class="toolbar">
     <div class="search-wrapper">
@@ -426,20 +503,21 @@
   <div class="table-container">
     <table id="dataTable">
       <thead>
-        <tr><th>Timestamp</th><th>UNIQUE NIT</th><th>NIT</th><th>SL</th><th>NIT DATE</th>
+        <tr>
+          <th>Timestamp</th><th>UNIQUE NIT</th><th>NIT</th><th>SL</th><th>NIT DATE</th>
           <th>VENDOR</th><th>Name of work</th><th>Source of Fund</th><th>WORK ORDER NO</th>
           <th>WORK ORDER DATE</th><th>ESTIMATE VALUE</th>
           <th>GROSS BILL</th><th>Completion Date</th><th>TDS</th><th>CGST</th><th>SGST</th>
           <th>LABOUR CESS</th><th>ROYALTY</th><th>SECURITY</th><th>NET PAYMENT</th>
           <th>PAYMENT MODE</th><th>REFERENCE</th><th>Actions</th>
-        </tr>
+         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 </div>
 
-<!-- MODAL (View-only info + Editable section) -->
+<!-- MODAL -->
 <div id="editModal" class="modal-overlay">
   <div class="modal-container">
     <div class="modal-header">
@@ -460,14 +538,12 @@
   // ======================== CONFIGURATION ========================
   const scriptURL = "https://script.google.com/macros/s/AKfycbwG_VmMzSpUAgAi60tpzgRmdH1xGsIbZt4elyoWBofvdG7EKbGj7bHjyQCbzYrAthEizw/exec";
   let allRawData = [];
-  let tableData = [];           // rows with work order number
+  let tableData = [];
   let currentFilteredData = [];
   
-  // Modal state
   let currentModalOriginalIndex = null;
   let currentModalRow = null;
 
-  // ======================== UTILITIES ========================
   function showMessage(text, type) {
     const msgDiv = document.getElementById("message");
     msgDiv.textContent = text;
@@ -511,9 +587,7 @@
     } catch(e) { return ""; }
   }
 
-  // Function to check if a row has SDM Reference value (for highlighting)
-  function hasSdmReferenceValue(row) {
-    // REFERENCE column is at index 21 in the displayed data (PAYMENT MODE at 20, REFERENCE at 21)
+  function hasReferenceValue(row) {
     const reference = row[21];
     return reference && reference.toString().trim() !== "";
   }
@@ -526,13 +600,9 @@
       
       if (!Array.isArray(data)) throw new Error("Invalid sheet response");
       
-      // Store raw data including headers
       allRawData = data;
-      
-      // Skip header row for data processing
       const dataRows = data.slice(1);
       
-      // Filter rows that have WORK ORDER NO (col 8)
       tableData = dataRows.filter(row => {
         const wo = row[8];
         return wo && wo.toString().trim() !== "";
@@ -560,7 +630,6 @@
 
   function filterTable() { applySearchAndRender(); }
 
-  // ========== RENDER TABLE: INLINE EDITABLE ==========
   function renderTableWithInlineEdits(dataArray) {
     const tbody = document.querySelector("#dataTable tbody");
     tbody.innerHTML = "";
@@ -576,7 +645,6 @@
     }
 
     dataArray.forEach((row, idx) => {
-      // Find original index in tableData using UNIQUE NIT and VENDOR
       const originalTableIndex = tableData.findIndex(r => 
         String(r[1]) === String(row[1]) && String(r[5]) === String(row[5])
       );
@@ -586,16 +654,14 @@
       tr.setAttribute("data-unique-nit", row[1] || "");
       tr.setAttribute("data-vendor", row[5] || "");
       
-      // Check if row should be highlighted (has REFERENCE value)
-      if (hasSdmReferenceValue(row)) {
+      if (hasReferenceValue(row)) {
         tr.classList.add('highlight-row');
       }
       
-      // columns 0-10 : read-only display
+      // Columns 0-10: Read-only display
       for (let j = 0; j <= 10; j++) {
         const td = document.createElement("td");
         if (j === 0 || j === 4 || j === 9) {
-          // Format dates for Timestamp, NIT DATE, WORK ORDER DATE
           td.textContent = formatDateToDDMMYYYY(row[j]) ?? "";
         } else {
           td.textContent = row[j] ?? "";
@@ -603,25 +669,24 @@
         tr.appendChild(td);
       }
 
-      // columns 11-19 : editable (Gross Bill, Completion, TDS, CGST, SGST, Labour Cess, Royalty, Security, Net Payment)
+      // Columns 11-19: Editable
       for (let j = 11; j <= 19; j++) {
         const td = document.createElement("td");
         let currentVal = row[j] || "";
         if (j === 12) {
-          // Completion Date
           const dateForInput = formatToInputDate(currentVal);
-          td.innerHTML = `<input type="date" class="inline-edit" data-col="${j}" data-original-idx="${originalTableIndex}" value="${dateForInput}" style="min-width:110px;">`;
+          td.innerHTML = `<input type="date" class="inline-edit" data-col="${j}" data-original-idx="${originalTableIndex}" value="${dateForInput}" style="min-width:85px;">`;
         } else {
           td.innerHTML = `<input type="text" class="inline-edit" data-col="${j}" data-original-idx="${originalTableIndex}" value="${escapeHtml(currentVal)}" placeholder="0.00">`;
         }
         tr.appendChild(td);
       }
 
-      // PAYMENT MODE (col20 in display, but corresponds to index 20)
+      // PAYMENT MODE
       const tdPayment = document.createElement("td");
       const paymentMode = row[20] || "";
-      tdPayment.innerHTML = `<select class="inline-edit" data-col="20" data-original-idx="${originalTableIndex}" style="min-width:100px;">
-        <option value="" ${paymentMode === '' ? 'selected' : ''}>Select Mode</option>
+      tdPayment.innerHTML = `<select class="inline-edit" data-col="20" data-original-idx="${originalTableIndex}" style="min-width:90px;">
+        <option value="" ${paymentMode === '' ? 'selected' : ''}>Select</option>
         <option value="Online" ${paymentMode === 'Online' ? 'selected' : ''}>Online</option>
         <option value="Cheque" ${paymentMode === 'Cheque' ? 'selected' : ''}>Cheque</option>
         <option value="Cash" ${paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
@@ -630,24 +695,24 @@
       </select>`;
       tr.appendChild(tdPayment);
 
-      // REFERENCE (col21 in display)
+      // REFERENCE
       const tdRef = document.createElement("td");
       const reference = row[21] || "";
-      tdRef.innerHTML = `<input type="text" class="inline-edit" data-col="21" data-original-idx="${originalTableIndex}" value="${escapeHtml(reference)}" placeholder="UTR/Cheque no." style="min-width:130px;" oninput="updateRowHighlight(this, ${originalTableIndex})">`;
+      tdRef.innerHTML = `<input type="text" class="inline-edit" data-col="21" data-original-idx="${originalTableIndex}" value="${escapeHtml(reference)}" placeholder="UTR/Cheque" style="min-width:100px;" oninput="updateRowHighlight(this, ${originalTableIndex})">`;
       tr.appendChild(tdRef);
 
       // Actions
       const tdAction = document.createElement("td");
       tdAction.className = "action-group";
       const saveBtn = document.createElement("button");
-      saveBtn.textContent = "💾 Save Row";
+      saveBtn.textContent = "💾 Save";
       saveBtn.className = "inline-save-btn";
       saveBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         saveInlineRow(originalTableIndex);
       });
       const modalBtn = document.createElement("button");
-      modalBtn.textContent = "🔍 Modal Edit";
+      modalBtn.textContent = "🔍 View";
       modalBtn.className = "modal-view-btn";
       modalBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -660,7 +725,6 @@
     });
   }
 
-  // Function to update row highlight when reference input changes
   function updateRowHighlight(inputElement, originalIdx) {
     const tr = inputElement.closest('tr');
     if (tr) {
@@ -694,7 +758,6 @@
     formData.append("uniqueNit", uniqueNit);
     formData.append("vendor", vendor);
     
-    // Send all editable columns
     for (let j = 11; j <= 19; j++) {
       let val = updatedValues[j] !== undefined ? updatedValues[j] : (rowData[j] || "");
       formData.append(`col${j}`, val);
@@ -711,32 +774,29 @@
       const response = await fetch(scriptURL, { method: "POST", body: formData });
       const result = await response.json();
       if (result.success) {
-        // Update local data
         for (let j = 11; j <= 19; j++) {
           if (updatedValues[j] !== undefined) rowData[j] = updatedValues[j];
         }
         if (updatedValues["20"] !== undefined) rowData[20] = updatedValues["20"];
         if (updatedValues["21"] !== undefined) rowData[21] = updatedValues["21"];
         
-        // Update highlight based on reference value
         if (rowData[21] && rowData[21].toString().trim() !== "") {
           tr.classList.add('highlight-row');
         } else {
           tr.classList.remove('highlight-row');
         }
         
-        showMessage(`✅ Updated: ${uniqueNit} - ${vendor}`, "success");
+        showMessage(`✅ Updated: ${uniqueNit}`, "success");
       } else {
         showMessage("Update failed: " + (result.error || "unknown"), "error");
-        if (targetBtn) { targetBtn.textContent = "💾 Save Row"; targetBtn.disabled = false; }
+        if (targetBtn) { targetBtn.textContent = "💾 Save"; targetBtn.disabled = false; }
       }
     } catch (err) {
       showMessage("Network error: " + err.message, "error");
-      if (targetBtn) { targetBtn.textContent = "💾 Save Row"; targetBtn.disabled = false; }
+      if (targetBtn) { targetBtn.textContent = "💾 Save"; targetBtn.disabled = false; }
     }
   }
 
-  // ======================== MODAL (view-only + editable) ========================
   function openModalForRow(originalIdx, row) {
     currentModalOriginalIndex = originalIdx;
     currentModalRow = row;
@@ -780,7 +840,7 @@
         <div class="info-row"><span class="info-label">📊 ESTIMATE VALUE</span><span class="info-value">${escapeHtml(estimateValue)}</span></div>
       </div>
       <div class="editable-section">
-        <div class="editable-title">✏️ Editable Fields (Financials & Payment)</div>
+        <div class="editable-title">✏️ Editable Fields</div>
         <div class="editable-fields-grid">
           <div class="field-group"><label>💰 GROSS BILL</label><input type="text" id="modal_grossBill" value="${escapeHtml(grossBill)}"></div>
           <div class="field-group"><label>📅 Completion Date</label><input type="date" id="modal_completionDate" value="${completionDateVal}"></div>
@@ -848,7 +908,6 @@
       const response = await fetch(scriptURL, { method: "POST", body: formData });
       const result = await response.json();
       if (result.success) {
-        // Update local data
         row[11] = grossBill; 
         row[12] = completionDate; 
         row[13] = tds; 
