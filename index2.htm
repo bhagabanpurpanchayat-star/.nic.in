@@ -565,6 +565,7 @@ footer {
       try {
         return JSON.parse(session);
       } catch(e) {
+        console.error('Error parsing session:', e);
         return null;
       }
     }
@@ -572,7 +573,6 @@ footer {
   }
   
   function showSessionToast(message, isError = true) {
-    // Remove existing toast
     const existingToast = document.getElementById('sessionToast');
     if (existingToast) existingToast.remove();
     
@@ -600,8 +600,11 @@ footer {
     const session = getUserSession();
     
     if (!session) {
+      console.log('No session found during validation');
       return false;
     }
+    
+    console.log('Validating session for user:', session.username, 'role:', session.role);
     
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -615,6 +618,7 @@ footer {
       });
       
       const result = await response.json();
+      console.log('Validation result:', result);
       
       if (!result.success || !result.data?.isValid) {
         console.log('Session validation failed:', result.message);
@@ -653,9 +657,8 @@ footer {
         setTimeout(() => {
           if (result.data.role === 'Admin') {
             window.location.href = 'index3.htm';
-          } else if (result.data.role === 'User') {
-            // Stay on same page but update profile
-            updateUserProfile();
+          } else {
+            window.location.href = 'index2.htm';
           }
         }, 1500);
         
@@ -697,9 +700,11 @@ footer {
     }
   }
   
-  // CRITICAL FIX: This function handles role-based redirection correctly
+  // FIXED: This function handles role-based redirection correctly
   function validateOfficeSession() {
     const userData = getUserSession();
+    
+    console.log('Validating office session, userData:', userData);
     
     // If no session, user should be on public page, not here
     if (!userData) {
@@ -709,7 +714,7 @@ footer {
     }
     
     const userRole = userData.role;
-    console.log('Current user role:', userRole);
+    console.log('Current user role:', userRole, 'Type:', typeof userRole);
     
     // If user is Admin, redirect to Admin Portal (index3.htm)
     if (userRole === 'Admin') {
@@ -718,14 +723,16 @@ footer {
       return false;
     }
     
-    // If user is Office or User, allow access to this page
-    if (userRole === 'Office' || userRole === 'User') {
+    // FIXED: Check for Office or User role (case-sensitive)
+    // Also handle possible variations in role string
+    const normalizedRole = String(userRole).toLowerCase();
+    if (normalizedRole === 'office' || normalizedRole === 'user') {
       console.log('Office/User role validated. Access granted to Office Portal.');
       return true;
     }
     
     // Unknown role - redirect to public portal
-    console.log('Unknown role detected. Redirecting to public portal.');
+    console.log('Unknown role detected:', userRole, 'Redirecting to public portal.');
     window.location.href = 'index.htm';
     return false;
   }
@@ -736,6 +743,8 @@ footer {
     const userNameElement = document.getElementById('userDisplayName');
     const userRoleElement = document.getElementById('userRoleDisplay');
     const userAvatarElement = document.getElementById('userAvatar');
+    
+    console.log('Updating user profile with data:', userData);
     
     if (userData && userData.username) {
       const displayName = userData.name || userData.username.split('@')[0] || userData.username;
@@ -752,10 +761,13 @@ footer {
       } else {
         userAvatarElement.innerHTML = '<i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>';
       }
+      
+      console.log('Profile updated for:', displayName, 'Role:', role);
     } else {
       userNameElement.textContent = 'Guest';
       userRoleElement.textContent = 'Visitor';
       userAvatarElement.innerHTML = '<i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>';
+      console.log('No user data found for profile update');
     }
   }
   
@@ -781,7 +793,7 @@ footer {
   
   // Sign Out
   function performSignOut() {
-    stopSessionValidation(); // Stop validation before signing out
+    stopSessionValidation();
     localStorage.removeItem('gp_user_session');
     sessionStorage.removeItem('gp_user_session');
     
@@ -796,32 +808,42 @@ footer {
   document.getElementById('signOutBtn')?.addEventListener('click', performSignOut);
   
   // ==================== MAIN EXECUTION ====================
+  console.log('=== Office Portal Initializing ===');
+  
   // First, validate session and redirect if needed
   const isValid = validateOfficeSession();
+  console.log('Session validation result:', isValid);
   
   // If validation passed (user is Office/User), update profile and start validation
   if (isValid) {
+    console.log('Session valid, updating profile and starting validation');
     updateUserProfile();
-    startSessionValidation(); // Start real-time session validation
+    startSessionValidation();
     
     // Also validate immediately on page load
     setTimeout(() => {
+      console.log('Running immediate session validation');
       validateCurrentSession();
     }, 1000);
+  } else {
+    console.log('Session invalid, redirect triggered');
   }
   
   // Listen for storage changes (in case of multiple tabs)
   window.addEventListener('storage', function(e) {
+    console.log('Storage event detected for key:', e.key);
     if (e.key === 'gp_user_session') {
+      console.log('Session changed in another tab, re-validating');
       validateOfficeSession();
       updateUserProfile();
-      validateCurrentSession(); // Validate immediately
+      validateCurrentSession();
     }
   });
   
   // Re-validate when page becomes visible
   document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
+      console.log('Page became visible, re-validating');
       validateOfficeSession();
       updateUserProfile();
       validateCurrentSession();
