@@ -379,8 +379,45 @@ footer {
   transform: translateX(0);
 }
 
+/* Session Toast Styles */
+.session-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #B34A4A, #8B3A3A);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  z-index: 10000;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid #FFD966;
+  animation: slideInRight 0.3s ease;
+  max-width: 350px;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .iframe-container { height: calc(100vh - 180px); }
+  .session-toast {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
 }
 </style>
 </head>
@@ -516,9 +553,12 @@ footer {
   // =====================================================
   // GOOGLE APPS SCRIPT WEB APP URL
   // =====================================================
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWMF-BFNYuJBGJcpEfzmQc8RV04bj3F18eoEHRwyKo52SAF7sryetRuWg6wCpQo_jxDw/exec';
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8TuO2JCiZVMkTBt5I7aFoab7HlRxFqXYTFtBotBJglVy-zKYVZ7QWsbmkYchHqpHptg/exec';
   
-  // ========== OFFICE SESSION VALIDATION ==========
+  // ========== REAL-TIME SESSION VALIDATION ==========
+  const VALIDATION_INTERVAL = 30000; // Check every 30 seconds
+  let validationInterval = null;
+  
   function getUserSession() {
     const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
     if (session) {
@@ -531,15 +571,137 @@ footer {
     return null;
   }
   
+  function showSessionToast(message, isError = true) {
+    // Remove existing toast
+    const existingToast = document.getElementById('sessionToast');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.id = 'sessionToast';
+    toast.className = 'session-toast';
+    toast.innerHTML = `
+      <i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+      <div style="flex: 1;">
+        <strong>${isError ? 'Session Update' : 'Notification'}</strong><br>
+        ${message}
+      </div>
+      <i class="fas fa-spinner fa-pulse"></i>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(400px)';
+      setTimeout(() => toast.remove(), 500);
+    }, 5000);
+  }
+  
+  async function validateCurrentSession() {
+    const session = getUserSession();
+    
+    if (!session) {
+      return false;
+    }
+    
+    try {
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ 
+          action: 'validateSession', 
+          username: session.username 
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!result.success || !result.data?.isValid) {
+        console.log('Session validation failed:', result.message);
+        localStorage.removeItem('gp_user_session');
+        sessionStorage.removeItem('gp_user_session');
+        
+        showSessionToast(result.message || 'Your access has been revoked. Please login again.', true);
+        
+        setTimeout(() => {
+          window.location.href = 'index.htm';
+        }, 3000);
+        
+        return false;
+      }
+      
+      // Check if role changed
+      if (result.data && result.data.role !== session.role) {
+        console.log('Role changed from', session.role, 'to', result.data.role);
+        
+        const updatedSession = { 
+          ...session, 
+          role: result.data.role, 
+          permission: result.data.permission,
+          name: result.data.name,
+          lastValidated: new Date().toISOString() 
+        };
+        
+        if (localStorage.getItem('gp_user_session')) {
+          localStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
+        } else {
+          sessionStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
+        }
+        
+        showSessionToast(`Your role has been updated to ${result.data.role}. Redirecting...`, false);
+        
+        setTimeout(() => {
+          if (result.data.role === 'Admin') {
+            window.location.href = 'index3.htm';
+          } else if (result.data.role === 'User') {
+            // Stay on same page but update profile
+            updateUserProfile();
+          }
+        }, 1500);
+        
+        return false;
+      }
+      
+      // Update last validated timestamp
+      const updatedSession = { ...session, lastValidated: new Date().toISOString() };
+      if (localStorage.getItem('gp_user_session')) {
+        localStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
+      } else {
+        sessionStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Session validation error:', error);
+      return true; // Don't logout on network error
+    }
+  }
+  
+  function startSessionValidation() {
+    if (validationInterval) clearInterval(validationInterval);
+    validationInterval = setInterval(validateCurrentSession, VALIDATION_INTERVAL);
+    console.log('✅ Session validation started (every 30 seconds)');
+    
+    document.addEventListener('visibilitychange', async () => {
+      if (!document.hidden) {
+        await validateCurrentSession();
+      }
+    });
+  }
+  
+  function stopSessionValidation() {
+    if (validationInterval) {
+      clearInterval(validationInterval);
+      validationInterval = null;
+      console.log('🛑 Session validation stopped');
+    }
+  }
+  
   // CRITICAL FIX: This function handles role-based redirection correctly
-  // No session → stays on index.htm (public page)
-  // Admin → goes to index3.htm (Admin Portal)
-  // Office/User → stays on index2.htm (Office Portal)
   function validateOfficeSession() {
     const userData = getUserSession();
     
     // If no session, user should be on public page, not here
-    // This portal requires login, so redirect to index.htm
     if (!userData) {
       console.log('No session found. Redirecting to public portal (index.htm)...');
       window.location.href = 'index.htm';
@@ -619,10 +781,17 @@ footer {
   
   // Sign Out
   function performSignOut() {
+    stopSessionValidation(); // Stop validation before signing out
     localStorage.removeItem('gp_user_session');
     sessionStorage.removeItem('gp_user_session');
-    document.getElementById('signoutToast')?.classList.add('show');
-    setTimeout(() => { window.location.href = 'index.htm'; }, 800);
+    
+    const toast = document.getElementById('signoutToast');
+    if (toast) {
+      toast.classList.add('show');
+      setTimeout(() => { window.location.href = 'index.htm'; }, 800);
+    } else {
+      setTimeout(() => { window.location.href = 'index.htm'; }, 800);
+    }
   }
   document.getElementById('signOutBtn')?.addEventListener('click', performSignOut);
   
@@ -630,9 +799,15 @@ footer {
   // First, validate session and redirect if needed
   const isValid = validateOfficeSession();
   
-  // If validation passed (user is Office/User), update profile
+  // If validation passed (user is Office/User), update profile and start validation
   if (isValid) {
     updateUserProfile();
+    startSessionValidation(); // Start real-time session validation
+    
+    // Also validate immediately on page load
+    setTimeout(() => {
+      validateCurrentSession();
+    }, 1000);
   }
   
   // Listen for storage changes (in case of multiple tabs)
@@ -640,6 +815,7 @@ footer {
     if (e.key === 'gp_user_session') {
       validateOfficeSession();
       updateUserProfile();
+      validateCurrentSession(); // Validate immediately
     }
   });
   
@@ -648,6 +824,7 @@ footer {
     if (!document.hidden) {
       validateOfficeSession();
       updateUserProfile();
+      validateCurrentSession();
     }
   });
   
@@ -659,11 +836,18 @@ footer {
     }
   });
   
-  console.log('✅ Office Portal Loaded - Role-based access control active');
-  console.log('🔐 Access Rules:');
+  // Before page unload, stop validation
+  window.addEventListener('beforeunload', () => {
+    stopSessionValidation();
+  });
+  
+  console.log('✅ Office Portal Loaded - Real-time session validation active');
+  console.log('🔐 Session validation every 30 seconds');
+  console.log('📋 Access Rules:');
   console.log('   - No Session → index.htm (Public Portal)');
   console.log('   - Admin Role → index3.htm (Admin Portal)');
   console.log('   - Office/User Role → index2.htm (This Portal)');
+  console.log('   - Permission change detection: Every 30 seconds');
 </script>
 </body>
 </html>
