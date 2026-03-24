@@ -938,26 +938,32 @@ footer {
     }
   }
   
-  // ========== CHECK EXISTING SESSION ==========
-  async function checkExistingSession() {
+  // ========== CHECK EXISTING SESSION AND REDIRECT ==========
+  // FIXED: This function now ONLY checks and redirects, doesn't validate
+  function checkExistingSessionAndRedirect() {
     const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
     if (session) {
       try {
         const sessionData = JSON.parse(session);
-        const isValid = await validateCurrentSession();
+        const userRole = sessionData.role;
         
-        if (isValid) {
-          const userRole = sessionData.role;
-          if (userRole === 'Admin') {
-            window.location.href = 'index3.htm';
-          } else if (userRole === 'Office' || userRole === 'User') {
-            window.location.href = 'index2.htm';
-          }
+        console.log('Existing session found, role:', userRole);
+        
+        // Direct redirect based on role without validation
+        if (userRole === 'Admin') {
+          console.log('Redirecting Admin to index3.htm');
+          window.location.href = 'index3.htm';
+          return true;
+        } else if (userRole === 'Office' || userRole === 'User') {
+          console.log('Redirecting Office/User to index2.htm');
+          window.location.href = 'index2.htm';
+          return true;
         }
       } catch(e) {
         console.log('Session check error:', e);
       }
     }
+    return false;
   }
   
   // Digital Clock
@@ -1290,11 +1296,19 @@ footer {
     document.getElementById('modalRemember').checked = true;
   }
   
-  // Initialize - check existing session
-  checkExistingSession();
+  // Initialize - ONLY check and redirect existing sessions
+  // DO NOT start validation on the public page
+  const redirected = checkExistingSessionAndRedirect();
   
-  console.log('✅ Bhagabanpur Gram Panchayat Portal - Real-time Session Validation Active');
-  console.log('🔐 Session validation every 30 seconds');
+  if (!redirected) {
+    console.log('No active session, showing public portal');
+    // Optional: Clear any stale sessions
+    localStorage.removeItem('gp_user_session');
+    sessionStorage.removeItem('gp_user_session');
+  }
+  
+  console.log('✅ Bhagabanpur Gram Panchayat Portal - Public Portal Active');
+  console.log('🔐 Session validation will start after login on respective dashboards');
 </script>
 </body>
 </html>
