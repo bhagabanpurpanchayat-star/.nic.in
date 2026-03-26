@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Earnest Money Register | Treasury Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Book Antiqua', 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(145deg, #eef2f7 0%, #e0e6ef 100%);
+            padding: 28px 24px;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .premium-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+
+        .header-section {
+            padding: 22px 32px;
+            background: linear-gradient(115deg, #ffffff, #fefefe);
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 28px 28px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .title-area h1 {
+            font-family: 'Book Antiqua', 'Georgia', serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0a2c3e, #1c4e6e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .title-area p {
+            font-size: 0.7rem;
+            color: #5a6e85;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-elegant {
+            padding: 8px 22px;
+            border: none;
+            border-radius: 40px;
+            font-family: 'Book Antiqua', serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f1f4f9;
+            color: #2c3e50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary-elegant {
+            background: #1e4a6e;
+            color: white;
+            box-shadow: 0 3px 0 #0f2e44;
+        }
+
+        .btn-primary-elegant:hover {
+            background: #265f89;
+            transform: translateY(-1px);
+        }
+
+        .btn-elegant:hover {
+            transform: translateY(-1px);
+        }
+
+        .info-bar {
+            background: #f0f4fa;
+            margin: 20px 24px 0 24px;
+            padding: 10px 20px;
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            font-family: 'Inter', sans-serif;
+            color: #2c5a7a;
+        }
+
+        .table-premium-wrapper {
+            padding: 0 8px 12px 8px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 24px;
+            background: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Inter', 'Book Antiqua', sans-serif;
+            font-size: 0.7rem;
+            min-width: 1200px;
+        }
+
+        /* DARK BLUE HEADERS */
+        .data-table th {
+            background: #0a2c3e;
+            color: #f0f6fa;
+            padding: 14px 12px;
+            text-align: left;
+            font-family: 'Book Antiqua', 'Georgia', serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #2c5f7a;
+        }
+
+        .data-table td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #e9edf2;
+            color: #1e2f3c;
+            font-size: 0.7rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.15s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #fffbf0;
+            transform: scale(1.001);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .status-paid {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 2px solid #10b981;
+        }
+
+        .status-pending {
+            background: #fff3e3;
+            color: #b45309;
+            border-left: 2px solid #f59e0b;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.6rem;
+            font-family: 'Book Antiqua', serif;
+            color: #7a8b9f;
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255,255,240,0.6);
+            border-radius: 30px;
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #1e5a7a;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 780px) {
+            body { padding: 16px; }
+            .header-section { flex-direction: column; align-items: stretch; }
+        }
+
+        /* PRINT STYLES - Optimized for direct browser print without new tab popup */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .btn-group, .btn-elegant, #backBtn, #refreshBtn, #printBtn, #exportBtn, .info-bar, .footer-note, .header-section .btn-group {
+                display: none !important;
+            }
+            .premium-card {
+                box-shadow: none;
+                border-radius: 0;
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            .header-section {
+                background: white;
+                border-bottom: 2px solid #0a2c3e;
+                padding: 10px 20px;
+                margin-bottom: 15px;
+            }
+            .title-area h1 {
+                color: #0a2c3e;
+                background: none;
+                -webkit-background-clip: unset;
+                background-clip: unset;
+                color: #0a2c3e;
+            }
+            .table-premium-wrapper {
+                padding: 0;
+                margin: 0;
+            }
+            .table-container {
+                overflow-x: visible;
+            }
+            .data-table {
+                font-size: 9pt;
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .data-table th {
+                background: #0a2c3e !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border: 1px solid #ccc;
+            }
+            .data-table td {
+                border: 1px solid #ddd;
+                padding: 6px 8px;
+            }
+            .status-badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border: none;
+            }
+            .status-paid {
+                background: #dcfce7 !important;
+                color: #166534 !important;
+            }
+            .status-pending {
+                background: #fff3e3 !important;
+                color: #b45309 !important;
+            }
+            .dashboard-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .premium-card {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="premium-card">
+        <div class="header-section">
+            <div class="title-area">
+                <h1>🏛️ EARNEST MONEY REGISTER</h1>
+                <p>Treasury Department | Earnest Deposit Tracker</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn-elegant" id="backBtn">⬅ Back</button>
+                <button class="btn-elegant" id="refreshBtn">🔄 Refresh</button>
+                <button class="btn-elegant btn-primary-elegant" id="printBtn">🖨️ Print Register</button>
+                <button class="btn-elegant" id="exportBtn">📎 Export Excel</button>
+            </div>
+        </div>
+        <div class="info-bar">
+            <span id="recordCountBadge">📋 Records: —</span>
+            <span style="font-size:0.65rem;">🖨️ Click Print to directly print this page</span>
+        </div>
+
+        <div class="table-premium-wrapper">
+            <div class="table-container">
+                <table class="data-table" id="registerTable">
+                    <thead id="tableHeader"></thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="20" style="text-align:center; padding: 60px;">
+                            <div class="loading-spinner"></div>
+                            <div style="font-family:'Book Antiqua';">Loading earnest money data from secure sheet...</div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="footer-note">
+            🏛️ Earnest Money Register | Data fetched from Google Sheets (Columns B to N) | Printed directly from dashboard
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======================= CONFIGURATION =======================
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwLIWh075mzwO7Wvmxgxr6aKZds1HGPrD4zqG2iAWq-dfjEfx10M7wOgMEc3WUYD1hO/exec";
+    
+    // Exact column headers for B to N (13 columns)
+    const COLUMN_HEADERS = [
+        "UNIQUE NIT", "NIT", "SL", "NIT DATE", "Activity ID",
+        "Name of the work", "VENDOR", "EARNEST MONEY",
+        "Payment Status", "Tender Status", "Cheque No", "Date", "Source of Fund"
+    ];
+    
+    let currentData = [];      // Array of rows (each row 13 columns)
+    let headers = [...COLUMN_HEADERS];
+    while (headers.length < 13) headers.push("Extra");
+    headers = headers.slice(0, 13);
+    
+    // DOM elements
+    const tableHeader = document.getElementById("tableHeader");
+    const tableBody = document.getElementById("tableBody");
+    const recordCountBadge = document.getElementById("recordCountBadge");
+    
+    // Helper: escape HTML
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Fetch data from Google Apps Script Web App
+    async function fetchSheetData() {
+        showLoadingState(true);
+        try {
+            const url = WEB_APP_URL + (WEB_APP_URL.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+            const response = await fetch(url, { method: 'GET', mode: 'cors' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            
+            let rows = [];
+            if (Array.isArray(data)) rows = data;
+            else if (data.data && Array.isArray(data.data)) rows = data.data;
+            else if (data.values && Array.isArray(data.values)) rows = data.values;
+            else throw new Error("Invalid JSON format from Web App");
+            
+            if (!rows.length) throw new Error("No data received");
+            processRawRows(rows);
+        } catch (err) {
+            console.error(err);
+            showErrorState(`❌ Failed to load: ${err.message}. Verify Web App URL and sheet permissions.`);
+        } finally {
+            showLoadingState(false);
+        }
+    }
+    
+    /**
+     * Process raw rows: remove header-like rows, align to 13 columns (B->N)
+     */
+    function processRawRows(rows) {
+        const cleanedRows = [];
+        
+        for (let row of rows) {
+            if (!row || row.length === 0) continue;
+            
+            // Detect header row (contains column name keywords) - skip it
+            let headerKeywords = ["unique nit", "nit", "sl", "nit date", "activity id", "name of the work", "vendor", "earnest money", "payment status"];
+            let matchCount = 0;
+            for (let i = 0; i < Math.min(row.length, 8); i++) {
+                let cellVal = row[i] ? String(row[i]).toLowerCase().trim() : "";
+                if (headerKeywords.some(kw => cellVal.includes(kw) && cellVal.length > 2)) matchCount++;
+            }
+            // If it looks like a header row, skip it entirely
+            if (matchCount >= 4) {
+                continue;
+            }
+            
+            // Build exactly 13 columns (B to N range)
+            const normalizedRow = [];
+            for (let j = 0; j < 13; j++) {
+                let val = (j < row.length && row[j] !== undefined && row[j] !== null) ? row[j] : "";
+                if (val instanceof Date) {
+                    val = val.toLocaleDateString('en-GB');
+                } else {
+                    val = String(val).trim();
+                }
+                normalizedRow.push(val);
+            }
+            // Only add if row has at least one non-empty cell
+            if (normalizedRow.some(v => v !== "")) {
+                cleanedRows.push(normalizedRow);
+            }
+        }
+        
+        if (cleanedRows.length === 0) {
+            showErrorState("No valid data rows after processing. Ensure columns B:N have earnest money entries.");
+            return;
+        }
+        
+        currentData = cleanedRows;
+        
+        // Render table
+        renderTableWithDarkHeaders();
+        
+        // Update record count
+        if (recordCountBadge) {
+            recordCountBadge.innerText = `📋 Records: ${currentData.length}`;
+        }
+    }
+    
+    /**
+     * Render table with DARK BLUE headers, Book Antiqua, smaller font
+     */
+    function renderTableWithDarkHeaders() {
+        if (!tableHeader || !tableBody) return;
+        tableHeader.innerHTML = '';
+        tableBody.innerHTML = '';
+        
+        // Create Header Row (Dark Blue)
+        const headerRow = document.createElement('tr');
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        tableHeader.appendChild(headerRow);
+        
+        if (!currentData.length) {
+            const emptyRow = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = headers.length;
+            td.textContent = "📭 No earnest money records found.";
+            td.style.textAlign = "center";
+            td.style.padding = "48px";
+            td.style.fontFamily = "'Book Antiqua', serif";
+            emptyRow.appendChild(td);
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+        
+        // Render Data Rows
+        currentData.forEach(row => {
+            const tr = document.createElement('tr');
+            for (let col = 0; col < headers.length; col++) {
+                const td = document.createElement('td');
+                let rawVal = (col < row.length) ? row[col] : "";
+                let displayVal = rawVal === "" ? "—" : String(rawVal);
+                
+                // Payment Status column (index 8) -> badge style
+                if (col === 8 && headers[col] === "Payment Status") {
+                    const lowerStatus = displayVal.toLowerCase();
+                    let badgeClass = "status-badge";
+                    if (lowerStatus.includes("paid") || lowerStatus.includes("released")) {
+                        badgeClass = "status-badge status-paid";
+                    } else if (lowerStatus.includes("pend") || lowerStatus.includes("pending")) {
+                        badgeClass = "status-badge status-pending";
+                    }
+                    td.innerHTML = `<span class="${badgeClass}">${escapeHtml(displayVal)}</span>`;
+                } 
+                else if (col === 7 && headers[col] === "EARNEST MONEY") {
+                    // Show amount with subtle styling
+                    td.innerHTML = `<span style="font-weight:600; color:#1f5e3a;">${escapeHtml(displayVal)}</span>`;
+                }
+                else {
+                    td.textContent = displayVal;
+                }
+                tr.appendChild(td);
+            }
+            tableBody.appendChild(tr);
+        });
+    }
+    
+    // Export to Excel
+    function exportToExcel() {
+        if (!currentData.length) {
+            alert("No data to export.");
+            return;
+        }
+        const wsData = [];
+        wsData.push(headers);
+        currentData.forEach(row => {
+            const fullRow = [...row];
+            while (fullRow.length < headers.length) fullRow.push("");
+            wsData.push(fullRow);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Earnest_Money_Register");
+        XLSX.writeFile(wb, `EarnestMoney_${new Date().toISOString().slice(0,19).replace(/:/g, "-")}.xlsx`);
+    }
+    
+    // =============== IMPROVED PRINT FUNCTION: No new tab, prints current page content ===============
+    function printRegisterDirectly() {
+        if (!currentData.length) {
+            alert("No records available to print. Please refresh and ensure data is loaded.");
+            return;
+        }
+        
+        // Simple: just trigger browser's print dialog on the current page
+        // The print stylesheet (CSS @media print) will hide buttons, info-bar, and format elegantly
+        window.print();
+    }
+    
+    // Alternative robust method: creates a temporary print-friendly clone but without opening new tab.
+    // However, using window.print() with well-defined print CSS is cleaner and stays on same page.
+    // No popup, no extra tab — just native print dialog.
+    
+    // UI States
+    function showLoadingState(isLoading) {
+        if (isLoading && (!currentData.length)) {
+            if (tableBody) {
+                tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 50px;"><div class="loading-spinner"></div><div style="font-family:'Book Antiqua';">Fetching earnest money data...</div></td></tr>`;
+            }
+            if (tableHeader) tableHeader.innerHTML = '';
+        }
+    }
+    
+    function showErrorState(msg) {
+        if (tableBody) {
+            tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 50px; color:#b91c1c; background:#fff5f5;">⚠️ ${escapeHtml(msg)}</td></tr>`;
+        }
+        if (tableHeader) tableHeader.innerHTML = '';
+        if (recordCountBadge) recordCountBadge.innerText = `📋 Error loading data`;
+    }
+    
+    function refreshData() {
+        // Clear existing data to show loading state
+        currentData = [];
+        if (tableBody) {
+            tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 50px;"><div class="loading-spinner"></div><div>Refreshing earnest money data...</div></td></tr>`;
+        }
+        if (recordCountBadge) recordCountBadge.innerText = `📋 Refreshing...`;
+        fetchSheetData();
+    }
+    
+    function goBack() {
+        if (document.referrer && document.referrer !== "") {
+            window.location.href = document.referrer;
+        } else {
+            window.history.back();
+        }
+    }
+    
+    // Event listeners with safe checks
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSheetData();
+        
+        const backBtn = document.getElementById('backBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const printBtn = document.getElementById('printBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        
+        if (backBtn) backBtn.addEventListener('click', goBack);
+        if (refreshBtn) refreshBtn.addEventListener('click', refreshData);
+        if (printBtn) printBtn.addEventListener('click', printRegisterDirectly);
+        if (exportBtn) exportBtn.addEventListener('click', exportToExcel);
+    });
+    
+    // Optional: enhance print by adding a temporary header for print only (but not needed)
+    // The existing CSS @media print already handles hiding buttons and showing proper layout.
+    // Also ensures that any background colors (status badges) are printed correctly with color-adjust.
+</script>
+</body>
+</html>
