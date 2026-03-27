@@ -17,11 +17,10 @@
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(145deg, #0b2a36 0%, #123e4e 100%);
             min-height: 100vh;
-            padding: 1.8rem;
+            padding: 1.5rem;
             position: relative;
         }
 
-        /* Animated gradient orbs */
         .orb {
             position: fixed;
             border-radius: 50%;
@@ -44,7 +43,6 @@
             bottom: -200px;
             left: -150px;
             animation-duration: 22s;
-            animation-direction: alternate-reverse;
         }
         .orb-3 {
             width: 300px;
@@ -59,7 +57,6 @@
             100% { transform: translate(60px, 40px) scale(1.2); opacity: 0.7; }
         }
 
-        /* Floating particles (micro) */
         .particle-field {
             position: fixed;
             top: 0;
@@ -74,7 +71,6 @@
             position: absolute;
             background: rgba(255, 255, 245, 0.25);
             border-radius: 50%;
-            box-shadow: 0 0 6px rgba(255,255,200,0.2);
             animation: floatParticle random(8s, 15s) infinite linear;
         }
         @keyframes floatParticle {
@@ -84,7 +80,6 @@
             100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
         }
 
-        /* Main container */
         .dashboard {
             max-width: 1600px;
             margin: 0 auto;
@@ -92,27 +87,33 @@
             z-index: 10;
         }
 
-        /* Glassmorphic header */
+        /* NEW: Header with integrated selection menu - same row as Central Register Hub */
         .glass-header {
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(12px);
             border-radius: 2rem;
-            padding: 1.6rem 2.2rem;
-            margin-bottom: 1.8rem;
+            padding: 1rem 2rem;
+            margin-bottom: 1.5rem;
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: transform 0.2s ease, box-shadow 0.2s;
             animation: fadeSlideDown 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-        .glass-header:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 25px 45px -18px rgba(0, 0, 0, 0.3);
+        
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
+        
         .brand {
             display: flex;
             align-items: center;
             gap: 16px;
+            flex-shrink: 0;
         }
+        
         .brand-icon {
             width: 52px;
             height: 52px;
@@ -122,18 +123,10 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 8px 18px rgba(31,110,140,0.3);
-            animation: pulseGlow 2.5s infinite alternate;
         }
-        .brand-icon i {
-            font-size: 1.8rem;
-            color: white;
-        }
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 5px 12px rgba(31,110,140,0.3); transform: scale(1); }
-            100% { box-shadow: 0 12px 24px rgba(44,125,160,0.5); transform: scale(1.02); }
-        }
+        .brand-icon i { font-size: 1.8rem; color: white; }
         .brand h1 {
-            font-size: 1.9rem;
+            font-size: 1.8rem;
             font-weight: 800;
             background: linear-gradient(125deg, #0a2f3c, #1f6e8c, #3085a8);
             -webkit-background-clip: text;
@@ -142,51 +135,45 @@
             letter-spacing: -0.5px;
         }
         .brand-tag {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #547b8f;
-            margin-top: 6px;
+            margin-top: 4px;
             display: flex;
-            gap: 16px;
+            gap: 12px;
         }
-
-        /* Control panel - modern dropdown */
-        .control-pavilion {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(4px);
-            border-radius: 1.5rem;
-            padding: 1.2rem 1.8rem;
-            margin-bottom: 1.8rem;
+        
+        /* Integrated selection panel - same row */
+        .header-selector-area {
             display: flex;
-            flex-wrap: wrap;
             align-items: flex-end;
-            gap: 1.5rem;
-            box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(44,125,160,0.2);
-            animation: fadeSlideUp 0.5s ease-out 0.1s both;
+            gap: 1rem;
+            background: rgba(31, 110, 140, 0.05);
+            padding: 0.5rem 1.2rem;
+            border-radius: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
-        .selector-area {
-            flex: 2;
+        
+        .selector-group-compact {
             min-width: 260px;
         }
-        .input-label {
+        
+        .input-label-compact {
             font-weight: 600;
             color: #1e4a62;
-            margin-bottom: 8px;
-            font-size: 0.8rem;
+            margin-bottom: 6px;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .input-label i {
-            color: #2c7da0;
-            font-size: 0.9rem;
-        }
-        .elegant-select {
+        
+        .elegant-select-compact {
             width: 100%;
-            padding: 0.9rem 1.3rem;
-            font-size: 1rem;
+            padding: 0.65rem 1.2rem;
+            font-size: 0.9rem;
             font-weight: 500;
             background: #ffffff;
             border: 2px solid #e2edf2;
@@ -196,59 +183,46 @@
             font-family: 'Inter', monospace;
             color: #1f3e4c;
         }
-        .elegant-select:hover {
+        .elegant-select-compact:hover {
             border-color: #2c7da0;
             transform: translateX(3px);
             box-shadow: 0 4px 12px rgba(44,125,160,0.1);
         }
-        .elegant-select:focus {
-            outline: none;
-            border-color: #1f6e8c;
-            box-shadow: 0 0 0 4px rgba(31,110,140,0.2);
-        }
-        .launch-btn {
+        
+        .launch-btn-compact {
             background: linear-gradient(105deg, #1f6e8c 0%, #0e5775 100%);
             border: none;
-            padding: 0.9rem 2.2rem;
+            padding: 0.65rem 1.8rem;
             border-radius: 1.2rem;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.85rem;
             color: white;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            transition: all 0.25s;
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             box-shadow: 0 6px 14px rgba(31,110,140,0.35);
+            white-space: nowrap;
+            margin-bottom: 2px;
         }
-        .launch-btn i {
-            transition: transform 0.2s;
-        }
-        .launch-btn:hover {
-            transform: translateY(-3px);
+        .launch-btn-compact:hover {
+            transform: translateY(-2px);
             background: linear-gradient(105deg, #2c7da0 0%, #1a6685 100%);
-            box-shadow: 0 15px 28px -8px rgba(31,110,140,0.5);
-        }
-        .launch-btn:hover i {
-            transform: translateX(4px);
-        }
-        .launch-btn:active {
-            transform: translateY(1px);
         }
 
-        /* Iframe showcase */
+        /* Quick stats row removed - everything integrated in header */
         .iframe-palace {
             background: #f9fdfe;
             border-radius: 1.8rem;
             box-shadow: 0 25px 45px -18px rgba(0, 0, 0, 0.35);
             overflow: hidden;
             border: 1px solid rgba(44,125,160,0.25);
-            transition: all 0.3s;
-            animation: fadeScaleIn 0.55s ease-out 0.2s both;
+            margin-top: 0.5rem;
         }
         .iframe-toolbar {
             background: rgba(255, 255, 255, 0.98);
-            padding: 0.9rem 1.8rem;
+            padding: 0.7rem 1.5rem;
             border-bottom: 1px solid #e9f0f5;
             display: flex;
             justify-content: space-between;
@@ -265,11 +239,7 @@
             background: #f0f6fc;
             padding: 5px 14px;
             border-radius: 60px;
-            font-size: 0.85rem;
-        }
-        .report-indicator i {
-            color: #1f6e8c;
-            font-size: 1rem;
+            font-size: 0.8rem;
         }
         .badge-live {
             background: #e0f2e9;
@@ -296,16 +266,15 @@
         .action-refresh:hover {
             background: #e6f4fc;
             border-color: #1f6e8c;
-            transform: scale(0.97);
         }
         .iframe-container {
             position: relative;
             background: #ffffff;
-            min-height: 580px;
+            min-height: 600px;
         }
         iframe {
             width: 100%;
-            height: 68vh;
+            height: 70vh;
             min-height: 560px;
             border: none;
             display: block;
@@ -316,7 +285,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 68vh;
+            height: 70vh;
             min-height: 560px;
             background: linear-gradient(135deg, #fefefe, #fafeff);
             color: #7899ae;
@@ -324,22 +293,12 @@
             text-align: center;
             padding: 2rem;
         }
-        .empty-hero i {
-            font-size: 4rem;
-            opacity: 0.5;
-            color: #2c7da0;
-            animation: softBounce 2s infinite ease;
-        }
-        @keyframes softBounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
         .loading-spinner-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.92);
+            background: rgba(255,255,255,0.94);
             backdrop-filter: blur(6px);
             padding: 12px 26px;
             border-radius: 60px;
@@ -350,7 +309,6 @@
             color: #1f6e8c;
             z-index: 20;
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border: 1px solid rgba(44,125,160,0.3);
         }
         .spinner-dot {
             width: 20px;
@@ -362,9 +320,8 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* footer minimal */
         .grace-footer {
-            margin-top: 1.2rem;
+            margin-top: 1rem;
             text-align: center;
             font-size: 0.7rem;
             color: #b6d0dd;
@@ -375,24 +332,52 @@
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeScaleIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @media (max-width: 780px) {
+        
+        /* Responsive: stack header content on mobile */
+        @media (max-width: 900px) {
             body { padding: 1rem; }
-            .glass-header { padding: 1.2rem 1.5rem; }
-            .brand h1 { font-size: 1.4rem; }
-            .brand-icon { width: 42px; height: 42px; }
-            .control-pavilion { flex-direction: column; align-items: stretch; }
-            .launch-btn { justify-content: center; }
-            iframe { height: 55vh; min-height: 420px; }
-            .empty-hero { height: 55vh; min-height: 420px; }
+            .header-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .header-selector-area {
+                justify-content: stretch;
+                width: 100%;
+            }
+            .selector-group-compact {
+                flex: 1;
+                min-width: auto;
+            }
+            .launch-btn-compact {
+                justify-content: center;
+            }
+            iframe { height: 55vh; }
+            .empty-hero { height: 55vh; }
+        }
+        
+        @media (max-width: 550px) {
+            .header-selector-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .launch-btn-compact {
+                width: 100%;
+            }
+        }
+        
+        iframe {
+            transition: opacity 0.2s ease;
+        }
+        
+        .info-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef3f8;
+            padding: 0.25rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            color: #1f6e8c;
         }
     </style>
 </head>
@@ -403,46 +388,45 @@
 <div class="particle-field" id="particleField"></div>
 
 <div class="dashboard">
-    <!-- Premium Header - Clean & professional -->
+    <!-- Header with integrated selection menu in the SAME ROW as Central Register Hub -->
     <div class="glass-header">
-        <div class="brand">
-            <div class="brand-icon">
-                <i class="fas fa-chalkboard-user"></i>
-            </div>
-            <div>
-                <h1>Central Register Hub</h1>
-                <div class="brand-tag">
-                    <span><i class="fas fa-chart-line"></i> Enterprise Report Interface</span>
-                    <span><i class="fas fa-clock"></i> Real-time ready</span>
+        <div class="header-row">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-chalkboard-user"></i></div>
+                <div>
+                    <h1>Central Register Hub</h1>
+                    <div class="brand-tag">
+                        <span><i class="fas fa-chart-line"></i> Enterprise Report Interface</span>
+                        <span><i class="fas fa-file-excel"></i> Excel Export Ready</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Dropdown & action area -->
-    <div class="control-pavilion">
-        <div class="selector-area">
-            <div class="input-label">
-                <i class="fas fa-crown"></i> REPORT MODULE
+            
+            <!-- Selection menu right beside the brand, same row -->
+            <div class="header-selector-area">
+                <div class="selector-group-compact">
+                    <div class="input-label-compact">
+                        <i class="fas fa-crown"></i> REPORT MODULE
+                    </div>
+                    <select id="registerSelect" class="elegant-select-compact">
+                        <option value="" disabled selected>— Select register —</option>
+                        <option value="earnest_money">💰 Earnest Money Register</option>
+                        <option value="security_money">🔒 Security Money Register</option>
+                        <option value="asset">🏭 Asset Register (ACCEPTED Only)</option>
+                        <option value="nit">📄 NIT Register</option>
+                        <option value="scheme_vs_vendor">📑 Scheme Vs Vendor Register</option>
+                        <option value="scheme_vs_fund">💸 Scheme Vs Fund Register</option>
+                        <option value="tenderformregister">📑 Tender Form Register</option>
+                    </select>
+                </div>
+                <button id="viewLaunchBtn" class="launch-btn-compact">
+                    <i class="fas fa-eye"></i> Launch
+                    <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
-            <select id="registerSelect" class="elegant-select">
-                <option value="" disabled selected>— Select register —</option>
-                <option value="earnest_money">💰 Earnest Money Register</option>
-                <option value="security_money">🔒 Security Money Register</option>
-                <option value="asset">🏭 Asset Register (ACCEPTED Only)</option>
-                <option value="nit">📄 NIT Register</option>
-                <option value="scheme_vs_vendor">📑 Scheme Vs Vendor Register</option>
-                <option value="scheme_vs_fund">💸 Scheme Vs Fund Register</option>
-                <option value="tenderformregister">📑Tender Form Register</option>
-            </select>
         </div>
-        <button id="viewLaunchBtn" class="launch-btn">
-            <i class="fas fa-eye"></i> Launch Report
-            <i class="fas fa-arrow-right"></i>
-        </button>
     </div>
 
-    <!-- Iframe Viewport -->
     <div class="iframe-palace">
         <div class="iframe-toolbar">
             <div class="report-indicator" id="reportTitleIndicator">
@@ -461,24 +445,20 @@
             <div id="emptyStateView" class="empty-hero">
                 <i class="fas fa-chalkboard"></i>
                 <h3 style="font-weight: 500;">Ready for your reports</h3>
-                <p style="font-size: 0.9rem; max-width: 380px;">Choose a register from the dropdown and click <strong>Launch Report</strong>. Your custom .htm pages will appear here.</p>
+                <p style="font-size: 0.9rem;">Choose a register from the dropdown and click <strong>Launch</strong>.</p>
                 <div style="margin-top: 1rem; background: #ecf7fc; padding: 6px 16px; border-radius: 40px; font-size: 0.7rem;">
                     <i class="fas fa-folder-open"></i> earnest_money.htm &nbsp;|&nbsp; security_money.htm &nbsp;|&nbsp; asset.htm
                 </div>
             </div>
-            <iframe id="reportFrame" style="display: none;" title="Register Report Viewer" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
+            <iframe id="reportFrame" style="display: none;" title="Register Report Viewer" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-popups-to-escape-sandbox"></iframe>
         </div>
     </div>
     <div class="grace-footer">
-        <i class="fas fa-chart-simple"></i> Seamless integration · Your standalone .htm reports
+        <i class="fas fa-chart-simple"></i> Seamless integration · Standalone .htm reports with full Excel & Print support
     </div>
 </div>
 
 <script>
-    // ============================================================
-    // CONFIGURATION: Map menu values to actual .htm file names
-    // Place these .htm files in the same directory as this launcher.
-    // ============================================================
     const REPORT_MAPPING = {
         'earnest_money': 'earnest_money.htm',
         'security_money': 'security_money.htm',
@@ -496,10 +476,9 @@
         'nit': 'NIT Register',
         'scheme_vs_vendor': 'Scheme Vs Vendor Register',
         'scheme_vs_fund': 'Scheme Vs Fund Register',
-        'tenderformregister': 'tenderformregister',
+        'tenderformregister': 'Tender Form Register'
     };
     
-    // DOM elements
     const selectEl = document.getElementById('registerSelect');
     const launchBtn = document.getElementById('viewLaunchBtn');
     const iframe = document.getElementById('reportFrame');
@@ -509,10 +488,9 @@
     const refreshBtn = document.getElementById('refreshFrameBtn');
     const connectionBadge = document.getElementById('connectionBadge');
     
-    let currentModuleId = null;        // currently loaded module (id)
+    let currentModuleId = null;
     let isLoading = false;
     
-    // Helper to update badge status
     function setBadge(status, isError = false) {
         if(isError) {
             connectionBadge.innerHTML = `<i class="fas fa-exclamation-triangle" style="font-size:0.5rem; color:#e67e22;"></i> ${status}`;
@@ -523,12 +501,11 @@
         }
     }
     
-    // Show/hide loading overlay inside iframe container
     function showLoadingOverlay() {
         if(document.querySelector('.loading-spinner-overlay')) return;
         const overlay = document.createElement('div');
         overlay.className = 'loading-spinner-overlay';
-        overlay.innerHTML = '<div class="spinner-dot"></div><span>Loading report &nbsp;<i class="fas fa-chart-simple"></i></span>';
+        overlay.innerHTML = '<div class="spinner-dot"></div><span>Loading report <i class="fas fa-chart-simple"></i></span>';
         iframeContainer.style.position = 'relative';
         iframeContainer.appendChild(overlay);
     }
@@ -538,7 +515,6 @@
         if(overlay) overlay.remove();
     }
     
-    // Load report based on module id
     function loadReport(moduleId) {
         if(!moduleId) {
             setBadge("Select a module", false);
@@ -558,12 +534,10 @@
         setBadge("Loading...");
         showLoadingOverlay();
         
-        // Hide empty state, show iframe
         emptyState.style.display = 'none';
         iframe.style.display = 'block';
         iframe.style.opacity = '0';
         
-        // Setup onload / onerror
         iframe.onload = () => {
             isLoading = false;
             hideLoadingOverlay();
@@ -584,7 +558,6 @@
             activeReportSpan.innerText = "Error: file missing";
             refreshBtn.style.display = 'none';
             
-            // custom error inside empty state
             emptyState.innerHTML = `
                 <i class="fas fa-file-exclamation" style="color:#c44536;"></i>
                 <h3 style="font-weight: 500;">Report file not found</h3>
@@ -597,28 +570,14 @@
             const resetBtnEmpty = document.getElementById('resetEmptyBtn');
             if(resetBtnEmpty) {
                 resetBtnEmpty.onclick = () => {
-                    emptyState.style.display = 'flex';
-                    iframe.style.display = 'none';
-                    emptyState.innerHTML = `
-                        <i class="fas fa-chalkboard"></i>
-                        <h3 style="font-weight: 500;">Ready for your reports</h3>
-                        <p style="font-size: 0.9rem;">Choose a register and click Launch Report.</p>
-                        <div style="margin-top: 1rem; background: #ecf7fc; padding: 6px 16px; border-radius: 40px; font-size: 0.7rem;">
-                            <i class="fas fa-folder-open"></i> earnest_money.htm &nbsp;|&nbsp; security_money.htm &nbsp;|&nbsp; asset.htm
-                        </div>
-                    `;
-                    activeReportSpan.innerText = "No active report";
-                    refreshBtn.style.display = "none";
-                    setBadge("Standby");
+                    resetToInitialEmptyState();
                 };
             }
             currentModuleId = null;
         };
         
-        // start loading iframe
         iframe.src = reportUrl;
         iframe.style.opacity = '0';
-        // Timeout fallback (if load never triggers)
         setTimeout(() => {
             if(isLoading) {
                 hideLoadingOverlay();
@@ -627,10 +586,26 @@
                 }
                 isLoading = false;
             }
-        }, 12000);
+        }, 15000);
     }
     
-    // Refresh current report
+    function resetToInitialEmptyState() {
+        emptyState.style.display = 'flex';
+        iframe.style.display = 'none';
+        emptyState.innerHTML = `
+            <i class="fas fa-chalkboard"></i>
+            <h3 style="font-weight: 500;">Ready for your reports</h3>
+            <p style="font-size: 0.9rem;">Choose a register from the dropdown and click <strong>Launch</strong>.</p>
+            <div style="margin-top: 1rem; background: #ecf7fc; padding: 6px 16px; border-radius: 40px; font-size: 0.7rem;">
+                <i class="fas fa-folder-open"></i> earnest_money.htm &nbsp;|&nbsp; security_money.htm &nbsp;|&nbsp; asset.htm
+            </div>
+        `;
+        activeReportSpan.innerText = "No active report";
+        refreshBtn.style.display = "none";
+        setBadge("Standby");
+        currentModuleId = null;
+    }
+    
     function refreshCurrentReport() {
         if(currentModuleId && REPORT_MAPPING[currentModuleId]) {
             const fileName = REPORT_MAPPING[currentModuleId];
@@ -641,6 +616,8 @@
                 hideLoadingOverlay();
                 setBadge("Refreshed");
                 activeReportSpan.innerHTML = `<i class="fas fa-sync-alt"></i> ${FRIENDLY_NAMES[currentModuleId] || currentModuleId}`;
+                connectionBadge.innerHTML = `<i class="fas fa-circle" style="font-size:0.5rem; color:#10b981;"></i> Active · ${FRIENDLY_NAMES[currentModuleId]?.split(' ')[0] || 'Report'}`;
+                connectionBadge.style.background = "#e0f2e9";
             };
             iframe.onerror = () => {
                 hideLoadingOverlay();
@@ -652,18 +629,16 @@
         }
     }
     
-    // Launch action: read selected value and load
     function launchFromDropdown() {
         const selectedVal = selectEl.value;
         if(!selectedVal) {
-            // show temporary hint inside empty state if needed
             setBadge("Select a register first", true);
             emptyState.style.display = 'flex';
             iframe.style.display = 'none';
             emptyState.innerHTML = `
                 <i class="fas fa-hand-pointer"></i>
                 <h3 style="font-weight: 500;">Please select a report</h3>
-                <p>Use the dropdown above and click "Launch Report".</p>
+                <p>Use the dropdown in the header and click "Launch".</p>
                 <div style="margin-top: 16px;"><i class="fas fa-arrow-up"></i> Choose register</div>
             `;
             activeReportSpan.innerText = "Awaiting selection";
@@ -673,15 +648,12 @@
         loadReport(selectedVal);
     }
     
-    // Event listeners
     launchBtn.addEventListener('click', launchFromDropdown);
     refreshBtn.addEventListener('click', refreshCurrentReport);
     
-    // extra: if enter on select? not needed
-    // create subtle particles
     function generateParticles() {
         const container = document.getElementById('particleField');
-        for(let i=0;i<70;i++) {
+        for(let i=0;i<60;i++) {
             const particle = document.createElement('div');
             particle.classList.add('particle');
             const size = Math.random() * 4 + 2;
@@ -696,18 +668,20 @@
     }
     generateParticles();
     
-    // initial setup: ensure empty state visible
+    // initial UI state
     emptyState.style.display = 'flex';
     iframe.style.display = 'none';
     refreshBtn.style.display = 'none';
     activeReportSpan.innerText = "Ready";
     setBadge("Standby");
     
-    // small effect on select hover
     selectEl.addEventListener('change', () => {
         if(selectEl.value) {
-            setBadge("Select launched ready", false);
+            setBadge("Ready to launch", false);
+        } else {
+            setBadge("Standby");
         }
     });
 </script>
 </body>
+</html>
