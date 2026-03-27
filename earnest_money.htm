@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Earnest Money Register | Treasury Dashboard</title>
+    <title>Earnest Money Register | Treasury Data</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -15,145 +16,80 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
-            padding: 28px 24px;
+            background: #f1f5f9;
+            padding: 24px 20px;
             min-height: 100vh;
         }
 
-        .dashboard-container {
+        .register-container {
             max-width: 1600px;
             margin: 0 auto;
         }
 
-        /* Modern Glassmorphic Card */
-        .premium-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.03);
+        .data-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             overflow: hidden;
-            transition: box-shadow 0.3s ease;
         }
 
-        .premium-card:hover {
-            box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.12);
-        }
-
-        /* Elegant Header */
-        .header-section {
-            padding: 20px 28px;
-            background: linear-gradient(135deg, #0a2c3a 0%, #134b5f 100%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        .toolbar {
+            padding: 14px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #e9edf2;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .title-area h1 {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #ffffff, #e2e8f0);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .title-area p {
-            font-size: 0.65rem;
-            color: rgba(255, 255, 255, 0.65);
-            margin-top: 4px;
-            letter-spacing: 0.2px;
-            font-weight: 400;
-        }
-
-        /* Modern Button Group */
-        .btn-group {
-            display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
-        .btn-elegant {
-            padding: 7px 18px;
-            border: none;
-            border-radius: 40px;
+        .action-btn {
+            padding: 6px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 32px;
+            background: white;
             font-family: 'Inter', sans-serif;
             font-weight: 500;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            background: rgba(255, 255, 255, 0.12);
-            color: white;
-            backdrop-filter: blur(4px);
+            color: #1e293b;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.2px;
         }
 
-        .btn-primary-elegant {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0a2c3a;
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
-            font-weight: 600;
-        }
-
-        .btn-primary-elegant:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
-            background: linear-gradient(135deg, #fcd34d, #f59e0b);
-        }
-
-        .btn-elegant:hover {
-            transform: translateY(-1px);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Info Bar */
-        .info-bar {
-            background: #f9fafb;
-            margin: 20px 24px 0 24px;
-            padding: 10px 20px;
-            border-radius: 48px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.7rem;
-            font-family: 'Inter', sans-serif;
-            color: #1e4a6e;
-            flex-wrap: wrap;
-            gap: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .record-badge {
-            background: linear-gradient(135deg, #134b5f, #0a2c3a);
-            padding: 4px 14px;
-            border-radius: 32px;
+        .action-btn-primary {
+            background: #0f3b2c;
+            border-color: #0f3b2c;
             color: white;
-            font-weight: 500;
+        }
+
+        .action-btn-primary:hover {
+            background: #1e4a3a;
+            transform: translateY(-1px);
+        }
+
+        .action-btn:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .record-counter {
+            background: #eef2ff;
+            padding: 4px 14px;
+            border-radius: 40px;
             font-size: 0.7rem;
-            letter-spacing: 0.3px;
+            font-weight: 500;
+            color: #1e4620;
+            font-family: 'Inter', monospace;
+            margin-right: auto;
         }
 
-        /* Table Wrapper */
-        .table-premium-wrapper {
-            padding: 0 20px 20px 20px;
-        }
-
-        .table-container {
+        .table-wrapper {
+            padding: 0 0 16px 0;
             overflow-x: auto;
-            border-radius: 16px;
-            background: white;
-            margin-top: 18px;
-            border: 1px solid #e9edf2;
         }
 
         .data-table {
@@ -164,60 +100,52 @@
             min-width: 1200px;
         }
 
-        /* Sharp Headers */
         .data-table th {
-            background: #f8fafc;
+            background: #f9fafb;
             color: #1e4a6e;
-            padding: 12px 12px;
+            padding: 12px 10px;
             text-align: left;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.68rem;
             font-weight: 600;
-            letter-spacing: 0.4px;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            border-bottom: 2px solid #e2e8f0;
+            letter-spacing: 0.3px;
+            border-bottom: 1px solid #e2e8f0;
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 5;
         }
 
         .data-table td {
-            padding: 10px 12px;
+            padding: 10px 10px;
             border-bottom: 1px solid #f0f2f5;
-            color: #334155;
-            font-size: 0.68rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
+            color: #1e293b;
+            font-size: 0.7rem;
         }
 
         .data-table tbody tr:hover {
             background: #fefce8;
         }
 
-        /* Status Badges - Sharp */
         .status-badge {
             display: inline-block;
-            padding: 3px 10px;
+            padding: 2px 10px;
             border-radius: 20px;
             font-size: 0.62rem;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.2px;
         }
 
         .status-paid {
-            background: #dcfce7;
+            background: #e0f2e7;
             color: #166534;
-            border-left: 2px solid #22c55e;
+            border-left: 2px solid #2b9348;
         }
 
         .status-pending {
-            background: #fef3c7;
+            background: #fff0db;
             color: #b45309;
             border-left: 2px solid #f59e0b;
         }
 
-        /* Amount Styling */
         .amount-cell {
             font-weight: 600;
             color: #0f5c2e;
@@ -225,29 +153,23 @@
             font-size: 0.7rem;
         }
 
-        /* Footer */
-        .footer-note {
+        .footer-meta {
             text-align: center;
             font-size: 0.6rem;
-            font-family: 'Inter', sans-serif;
-            color: #64748b;
-            margin-top: 16px;
+            color: #5b6e8c;
             padding: 12px;
-            background: #fafcfd;
-            border-radius: 24px;
-            margin: 16px 24px 24px 24px;
-            border: 1px solid #e9edf2;
+            border-top: 1px solid #edf2f7;
+            background: #fefefe;
         }
 
-        /* Loading Spinner */
         .loading-spinner {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border: 2px solid #e2e8f0;
-            border-top: 2px solid #134b5f;
+            border-top: 2px solid #2c5f2d;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
-            margin: 20px auto;
+            margin: 24px auto;
         }
 
         @keyframes spin {
@@ -255,182 +177,174 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
-
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 4px;
         }
-
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        @media (max-width: 700px) {
+            body { padding: 12px; }
+            .toolbar { padding: 10px 14px; }
+            .action-btn { padding: 5px 12px; font-size: 0.7rem; }
+            .record-counter { font-size: 0.65rem; }
         }
 
-        @media (max-width: 780px) {
-            body { padding: 14px; }
-            .header-section { flex-direction: column; align-items: stretch; text-align: center; }
-            .title-area h1 { font-size: 1.2rem; justify-content: center; }
-            .btn-group { justify-content: center; }
-            .info-bar { margin: 16px 16px 0 16px; flex-direction: column; align-items: stretch; text-align: center; }
-            .table-premium-wrapper { padding: 0 12px 12px 12px; }
-            .footer-note { margin: 12px 16px 16px 16px; }
-        }
-
-        /* PRINT STYLES - DOTTED BORDERS */
+        /* ENHANCED PRINT STYLES - A4 Landscape, dark blue header, black text */
         @media print {
-            body {
-                background: white;
-                padding: 0.2in;
-                margin: 0;
+            @page {
+                size: A4 landscape;
+                margin: 0.4in 0.3in 0.4in 0.3in;
             }
             
-            .btn-group, .btn-elegant, .info-bar, .footer-note, .header-section .btn-group, .record-badge {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                width: 100%;
+            }
+            
+            .toolbar, .action-btn, .footer-meta, .record-counter {
                 display: none !important;
             }
             
-            .premium-card {
+            .register-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .data-card {
                 box-shadow: none;
-                border-radius: 0;
                 background: white;
+                border-radius: 0;
                 margin: 0;
                 padding: 0;
-            }
-            
-            .header-section {
-                background: #0a2c3a;
-                padding: 8px 12px;
-                margin-bottom: 12px;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .title-area h1 {
-                color: white;
-                background: none;
-                -webkit-background-clip: unset;
-                background-clip: unset;
-                font-size: 14pt;
-            }
-            
-            .title-area p {
-                color: #cbd5e1;
-                font-size: 8pt;
-            }
-            
-            .table-premium-wrapper {
-                padding: 0;
-                margin: 0;
-            }
-            
-            .table-container {
-                border: none;
                 overflow: visible;
+            }
+            
+            .table-wrapper {
+                padding: 0;
+                margin: 0;
+                overflow: visible;
+                width: 100%;
             }
             
             .data-table {
                 width: 100%;
                 border-collapse: collapse;
                 font-size: 9pt;
+                font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+                margin: 0;
+                table-layout: auto;
             }
             
+            /* DARK BLUE HEADER BACKGROUND */
             .data-table th {
-                background: #f1f5f9 !important;
-                color: #0a2c3a !important;
-                border: 1px dotted #94a3b8 !important;
-                padding: 8px 6px !important;
-                font-size: 8pt !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                background: #0a2c3a !important;
+                color: white !important;
+                padding: 10px 6px !important;
+                font-weight: 700 !important;
+                font-size: 8.5pt !important;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                border: 1px solid #1e4a6e !important;
+                text-align: left;
+                vertical-align: middle;
             }
             
+            /* Dark black text for all data cells */
             .data-table td {
-                border: 1px dotted #cbd5e1 !important;
-                padding: 6px !important;
+                padding: 7px 6px !important;
+                border: 1px solid #aaa !important;
+                color: #000000 !important;
                 font-size: 8pt !important;
+                font-weight: 500 !important;
+                background: white !important;
+                vertical-align: top;
+            }
+            
+            .data-table td span,
+            .data-table td .status-badge,
+            .data-table td .amount-cell {
+                color: #000000 !important;
+                background: transparent !important;
+                border: none !important;
+                font-weight: 500 !important;
+                padding: 0 !important;
+            }
+            
+            .status-badge {
+                border: 0.5px solid #333 !important;
+                background: #f9f9f9 !important;
+                color: #000000 !important;
+                padding: 1px 6px !important;
+                border-radius: 12px !important;
+                font-weight: 500 !important;
+                display: inline-block;
+            }
+            
+            .status-paid, .status-pending {
+                background: #f0f0f0 !important;
+                color: #000000 !important;
+                border-left: 2px solid #000 !important;
+            }
+            
+            .amount-cell {
+                color: #000000 !important;
+                font-weight: 700 !important;
+                font-family: 'JetBrains Mono', monospace;
             }
             
             .data-table tr {
                 page-break-inside: avoid;
+                break-inside: avoid;
             }
             
-            .status-badge {
-                border: 1px dotted #94a3b8;
-                background: none !important;
-                padding: 2px 6px;
-            }
-            
-            .amount-cell {
-                font-weight: 600;
-            }
-            
-            .dashboard-container {
-                max-width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-        }
-        
-        /* EXPORT EXCEL STYLES - DOTTED BORDERS */
-        @media print, screen {
-            .data-table.export-mode th,
-            .data-table.export-mode td {
-                border: 1px dotted #999 !important;
+            .data-table thead {
+                display: table-header-group;
             }
         }
     </style>
 </head>
 <body>
-
-<div class="dashboard-container">
-    <div class="premium-card">
-        <div class="header-section">
-            <div class="title-area">
-                <h1>
-                    <span>🏛️</span> 
-                    EARNEST MONEY REGISTER
-                </h1>
-                <p>Treasury Department | Earnest Deposit Tracker | Real-time Data</p>
-            </div>
-            <div class="btn-group">
-                <button class="btn-elegant" id="backBtn">← Back</button>
-                <button class="btn-elegant" id="refreshBtn">↻ Refresh</button>
-                <button class="btn-elegant btn-primary-elegant" id="printBtn">🖨️ Print</button>
-                <button class="btn-elegant btn-primary-elegant" id="exportBtn">📎 Excel</button>
-            </div>
-        </div>
-        
-        <div class="info-bar">
-            <span class="record-badge" id="recordCountBadge">📋 Records: —</span>
-            <span style="font-size:0.65rem;">🖨️ Print | 📎 Export Excel with dotted borders</span>
+<div class="register-container">
+    <div class="data-card">
+        <div class="toolbar">
+            <span class="record-counter" id="recordCountBadge">📋 0 records</span>
+            <button class="action-btn" id="refreshBtn">↻ Refresh</button>
+            <button class="action-btn" id="printBtn">🖨️ Print</button>
+            <button class="action-btn action-btn-primary" id="exportBtn">📎 Excel</button>
         </div>
 
-        <div class="table-premium-wrapper">
-            <div class="table-container">
-                <table class="data-table" id="registerTable">
-                    <thead id="tableHeader"></thead>
-                    <tbody id="tableBody">
-                        <tr>
-                            <td colspan="20" style="text-align:center; padding: 50px;">
-                                <div class="loading-spinner"></div>
-                                <div style="font-family:'Inter', sans-serif; font-size:0.7rem;">Loading earnest money data...</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-wrapper">
+            <table class="data-table" id="registerTable">
+                <thead id="tableHeader"></thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="20" style="text-align:center; padding: 48px;">
+                            <div class="loading-spinner"></div>
+                            <div style="font-size:0.7rem; color:#475569;">Loading register data...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        
-        <div class="footer-note">
-            🏛️ Earnest Money Register | Data from Google Sheets | Dotted borders on print & export
+        <div class="footer-meta">
+            Earnest Money Register · Treasury data
         </div>
     </div>
 </div>
@@ -447,7 +361,7 @@
     
     let currentData = [];
     let headers = [...COLUMN_HEADERS];
-    while (headers.length < 13) headers.push("Extra");
+    while (headers.length < 13) headers.push("—");
     headers = headers.slice(0, 13);
     
     const tableHeader = document.getElementById("tableHeader");
@@ -471,8 +385,88 @@
         return "₹" + num.toLocaleString('en-IN');
     }
     
+    /**
+     * Convert any date string to Indian format (DD/MM/YYYY)
+     * Handles various input formats: ISO, US format, Excel serial, etc.
+     */
+    function toIndianDateFormat(dateValue) {
+        if (!dateValue || dateValue === "") return "";
+        
+        const strValue = String(dateValue).trim();
+        
+        // If it's already in DD/MM/YYYY pattern, return as is
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(strValue)) {
+            return strValue;
+        }
+        
+        // Try to parse as date
+        let parsedDate = null;
+        
+        // Check for Excel serial number (numbers like 44562)
+        if (/^\d+$/.test(strValue) && strValue.length >= 5 && strValue.length <= 6) {
+            const excelSerial = parseInt(strValue, 10);
+            if (excelSerial > 40000 && excelSerial < 50000) {
+                const excelEpoch = new Date(1899, 11, 30);
+                parsedDate = new Date(excelEpoch.getTime() + excelSerial * 86400000);
+            }
+        }
+        
+        // Try standard date parsing if not Excel serial
+        if (!parsedDate) {
+            parsedDate = new Date(strValue);
+        }
+        
+        // Check if valid date
+        if (parsedDate && !isNaN(parsedDate.getTime())) {
+            const day = parsedDate.getDate().toString().padStart(2, '0');
+            const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0');
+            const year = parsedDate.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        // Try to handle DD-MM-YYYY or DD.MM.YYYY format
+        if (/^\d{1,2}[-/.]\d{1,2}[-/.]\d{4}$/.test(strValue)) {
+            const parts = strValue.split(/[-/.]/);
+            if (parts.length === 3) {
+                // If first part is > 12, it's likely DD/MM/YYYY
+                if (parseInt(parts[0], 10) > 12) {
+                    return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+                }
+                // If second part > 12, it's likely MM/DD/YYYY, convert to DD/MM/YYYY
+                if (parseInt(parts[1], 10) > 12) {
+                    return `${parts[1].padStart(2, '0')}/${parts[0].padStart(2, '0')}/${parts[2]}`;
+                }
+                // Assume MM/DD/YYYY format (US) -> convert to DD/MM/YYYY
+                return `${parts[1].padStart(2, '0')}/${parts[0].padStart(2, '0')}/${parts[2]}`;
+            }
+        }
+        
+        // If all parsing fails, return original
+        return strValue;
+    }
+    
+    /**
+     * Process a row and convert all date columns (NIT DATE, Date) to Indian format
+     * Date columns are at index 3 (NIT DATE) and index 11 (Date)
+     */
+    function normalizeDateColumns(row) {
+        const normalized = [...row];
+        
+        // Column index 3: NIT DATE
+        if (normalized[3] && normalized[3] !== "") {
+            normalized[3] = toIndianDateFormat(normalized[3]);
+        }
+        
+        // Column index 11: Date (Cheque/Transaction Date)
+        if (normalized[11] && normalized[11] !== "") {
+            normalized[11] = toIndianDateFormat(normalized[11]);
+        }
+        
+        return normalized;
+    }
+    
     async function fetchSheetData() {
-        showLoadingState(true);
+        showLoadingPlaceholder(true);
         try {
             const url = WEB_APP_URL + (WEB_APP_URL.includes('?') ? '&' : '?') + '_cb=' + Date.now();
             const response = await fetch(url, { method: 'GET', mode: 'cors' });
@@ -483,15 +477,15 @@
             if (Array.isArray(data)) rows = data;
             else if (data.data && Array.isArray(data.data)) rows = data.data;
             else if (data.values && Array.isArray(data.values)) rows = data.values;
-            else throw new Error("Invalid JSON format from Web App");
+            else throw new Error("Invalid data format");
             
-            if (!rows.length) throw new Error("No data received");
+            if (!rows.length) throw new Error("No records received");
             processRawRows(rows);
         } catch (err) {
             console.error(err);
-            showErrorState(`❌ Failed to load: ${err.message}`);
+            showErrorState(`Failed to load: ${err.message}`);
         } finally {
-            showLoadingState(false);
+            showLoadingPlaceholder(false);
         }
     }
     
@@ -501,6 +495,7 @@
         for (let row of rows) {
             if (!row || row.length === 0) continue;
             
+            // skip likely header rows
             let headerKeywords = ["unique nit", "nit", "sl", "nit date", "activity id", "name of the work", "vendor", "earnest money", "payment status"];
             let matchCount = 0;
             for (let i = 0; i < Math.min(row.length, 8); i++) {
@@ -513,14 +508,22 @@
             for (let j = 0; j < 13; j++) {
                 let val = (j < row.length && row[j] !== undefined && row[j] !== null) ? row[j] : "";
                 if (val instanceof Date) {
-                    val = val.toLocaleDateString('en-GB');
+                    // Convert Date object to Indian format
+                    const day = val.getDate().toString().padStart(2, '0');
+                    const month = (val.getMonth() + 1).toString().padStart(2, '0');
+                    const year = val.getFullYear();
+                    val = `${day}/${month}/${year}`;
                 } else {
                     val = String(val).trim();
                 }
                 normalizedRow.push(val);
             }
-            if (normalizedRow.some(v => v !== "")) {
-                cleanedRows.push(normalizedRow);
+            
+            // Apply Indian date format to date columns
+            const dateNormalizedRow = normalizeDateColumns(normalizedRow);
+            
+            if (dateNormalizedRow.some(v => v !== "")) {
+                cleanedRows.push(dateNormalizedRow);
             }
         }
         
@@ -533,7 +536,7 @@
         renderTable();
         
         if (recordCountBadge) {
-            recordCountBadge.innerHTML = `📋 Records: ${currentData.length}`;
+            recordCountBadge.innerHTML = `📋 ${currentData.length} records`;
         }
     }
     
@@ -554,7 +557,7 @@
             const emptyRow = document.createElement('tr');
             const td = document.createElement('td');
             td.colSpan = headers.length;
-            td.textContent = "📭 No records found.";
+            td.textContent = "No earnest money records found.";
             td.style.textAlign = "center";
             td.style.padding = "48px";
             emptyRow.appendChild(td);
@@ -591,19 +594,16 @@
         });
     }
     
-    // Export to Excel with DOTTED BORDERS
     function exportToExcel() {
         if (!currentData.length) {
             alert("No data to export.");
             return;
         }
         
-        // Create a clone of the table for export
         const exportTable = document.createElement('table');
         exportTable.style.borderCollapse = 'collapse';
         exportTable.style.width = '100%';
         
-        // Add headers
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         headers.forEach(header => {
@@ -611,14 +611,13 @@
             th.textContent = header;
             th.style.border = '1px dotted #999';
             th.style.padding = '8px';
-            th.style.backgroundColor = '#f5f5f5';
-            th.style.fontWeight = 'bold';
+            th.style.backgroundColor = '#f9fafb';
+            th.style.fontWeight = '600';
             headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
         exportTable.appendChild(thead);
         
-        // Add data rows
         const tbody = document.createElement('tbody');
         currentData.forEach(row => {
             const tr = document.createElement('tr');
@@ -642,7 +641,6 @@
         });
         exportTable.appendChild(tbody);
         
-        // Convert to worksheet
         const ws = XLSX.utils.table_to_sheet(exportTable);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Earnest_Money_Register");
@@ -657,10 +655,10 @@
         window.print();
     }
     
-    function showLoadingState(isLoading) {
-        if (isLoading && (!currentData.length)) {
+    function showLoadingPlaceholder(isLoading) {
+        if (isLoading && (!currentData.length || currentData.length === 0)) {
             if (tableBody) {
-                tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 50px;"><div class="loading-spinner"></div><div>Fetching data...</div></td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 48px;"><div class="loading-spinner"></div><div style="font-size:0.7rem;">Fetching earnest money data...</div></td></tr>`;
             }
             if (tableHeader) tableHeader.innerHTML = '';
         }
@@ -668,31 +666,22 @@
     
     function showErrorState(msg) {
         if (tableBody) {
-            tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 50px; color:#b91c1c;">⚠️ ${escapeHtml(msg)}</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 48px; color:#b91c1c;">⚠️ ${escapeHtml(msg)}</td></tr>`;
         }
-        if (recordCountBadge) recordCountBadge.innerText = `📋 Error`;
+        if (recordCountBadge) recordCountBadge.innerText = `⚠️ error`;
     }
     
     function refreshData() {
         currentData = [];
         if (tableBody) {
-            tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 50px;"><div class="loading-spinner"></div><div>Refreshing...</div></td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="20" style="text-align:center; padding: 48px;"><div class="loading-spinner"></div><div>Refreshing...</div></td></tr>`;
         }
         fetchSheetData();
-    }
-    
-    function goBack() {
-        if (document.referrer && document.referrer !== "") {
-            window.location.href = document.referrer;
-        } else {
-            window.history.back();
-        }
     }
     
     document.addEventListener('DOMContentLoaded', () => {
         fetchSheetData();
         
-        document.getElementById('backBtn')?.addEventListener('click', goBack);
         document.getElementById('refreshBtn')?.addEventListener('click', refreshData);
         document.getElementById('printBtn')?.addEventListener('click', printRegister);
         document.getElementById('exportBtn')?.addEventListener('click', exportToExcel);
