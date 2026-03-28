@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EARNEST MONEY REGISTER · ACCEPTED ONLY</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 20px;
+      background: #e8eef2;
+    }
+    
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 100%;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 15px;
+    }
+    
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .badge-accepted {
+      background: #2e7d32;
+      color: white;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 6px 14px;
+      background: white;
+      color: #1a1a1a;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: #f5f5f5;
+      border-color: #999;
+    }
+    
+    .print-btn {
+      background: #1a1a1a;
+      color: white;
+      border-color: #1a1a1a;
+    }
+    
+    .print-btn:hover {
+      background: #333;
+    }
+    
+    .info {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #2c3e50;
+      border-left: 3px solid #2ecc71;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .columns-badge {
+      font-family: monospace;
+      font-size: 11px;
+      background: #e9ecef;
+      padding: 3px 8px;
+      border-radius: 3px;
+      color: #495057;
+    }
+    
+    .filter-notice {
+      background: #fff3e0;
+      border-left-color: #f39c12;
+    }
+    
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 11px;
+    }
+    
+    th {
+      background: #000000;
+      color: #ffffff;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #ddd;
+      font-size: 11px;
+    }
+    
+    td {
+      padding: 8px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      color: #000000;
+      font-weight: 400;
+    }
+    
+    tr:hover {
+      background-color: #fafbfc;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    .accepted-row-highlight {
+      background-color: #f1f8e9;
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .container {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        background: white;
+      }
+      
+      .header {
+        display: none;
+      }
+      
+      .info {
+        display: none;
+      }
+      
+      button {
+        display: none;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+      
+      th {
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        border: 1px solid #000;
+      }
+      
+      td {
+        border: 1px solid #000;
+        color: #000;
+      }
+      
+      @page {
+        size: landscape;
+        margin: 0.5in;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 12px;
+      }
+      th, td {
+        padding: 6px;
+        font-size: 10px;
+      }
+      button {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>
+      Scheme Vs Vendor 
+      <span class="badge-accepted">FILTER: COLUMN 11 = ACCEPTED</span>
+    </h2>
+    <div class="button-group">
+      <button onclick="refreshData()">⟳ Refresh</button>
+      <button class="print-btn" onclick="printPage()">🖨️ Print</button>
+    </div>
+  </div>
+  <div class="info" id="info">
+    <span>Loading data...</span>
+    <span class="columns-badge" id="columns-badge">Columns: —</span>
+  </div>
+  <div id="data">
+    <div class="loading">Fetching register & applying ACCEPTED filter...</div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// EARNEST MONEY REGISTER — SHOW ONLY WHEN COLUMN 11 = "ACCEPTED"
+// COLUMN INDEX: 11 (1-based) => array index 10
+// ============================================================
+
+var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
+
+// Column numbers to display (1-based, same as original requirement)
+var DESIRED_COLUMNS = [3,4,5,6,7,8];
+
+// strict filter: we only include data rows where column 11 (index 10) equals "ACCEPTED" (case-sensitive)
+// However we also accept trimming & case-insensitive? Better to match exactly as per requirement:
+// "show only when column11=ACCEPTED" — we'll treat exactly "ACCEPTED" (uppercase).
+// Also handles possible leading/trailing spaces via trim.
+
+var currentRawData = null;
+var filteredData = null;     // stores array of rows (including header as first element after filtering? careful)
+
+// We'll preserve header row separately. Structure: original data[0] = headers, data[1...N] = records.
+// We filter records, then rebuild table with header + matching rows.
+
+window.onload = loadData;
+
+function loadData() {
+  document.getElementById('data').innerHTML = '<div class="loading">⏳ Loading earnest money data...</div>';
+  document.getElementById('columns-badge').textContent = 'Display columns: ' + DESIRED_COLUMNS.join(', ');
+  document.getElementById('info').innerHTML = `
+    <span>🔄 Connecting to sheet...</span>
+    <span class="columns-badge">Showing cols: ${DESIRED_COLUMNS.join(', ')}</span>
+  `;
+  
+  fetch(WEB_APP_URL)
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById('data').innerHTML = '<div class="empty-state">📭 No data found in the spreadsheet.</div>';
+        document.getElementById('info').innerHTML = `<span>⚠️ Empty dataset</span><span class="columns-badge">Columns: ${DESIRED_COLUMNS.join(', ')}</span>`;
+        return;
+      }
+      
+      currentRawData = data;
+      
+      // Validate that we have at least header row + some data
+      if (currentRawData.length < 1) {
+        showEmpty('No rows available');
+        return;
+      }
+      
+      // Extract header row (first element)
+      var headerRow = currentRawData[0];
+      var dataRows = currentRawData.slice(1);
+      
+      // COLUMN 11 FILTER (1-based -> index 10 in JS array)
+      var column11Index = 10;  // because column 1 = index0, column11 = index10
+      
+      // Filter rows: keep only rows where column11 value equals "ACCEPTED" (trim and exact match, case-sensitive as per requirement)
+      // But typical spreadsheet data might have "Accepted", "ACCEPTED", "accepted" — we align with "ACCEPTED" strict.
+      // However to be robust we can normalize to uppercase comparison if needed, but spec says "ACCEPTED".
+      // I'll use exact match after trimming to avoid false negatives.
+      var acceptedRows = dataRows.filter(function(row) {
+        // If row is shorter than column11 index, treat as not accepted
+        if (!row || row.length <= column11Index) return false;
+        var cellValue = row[column11Index];
+        if (cellValue === undefined || cellValue === null) return false;
+        var strValue = String(cellValue).trim();
+        // Strict condition: equals "ACCEPTED" (case-sensitive but allow trimmed)
+        return strValue === "ACCEPTED";
+      });
+      
+      // Build filtered dataset including header as first element
+      filteredData = [headerRow].concat(acceptedRows);
+      
+      // Additional stats: total original records, accepted count
+      var totalRecords = dataRows.length;
+      var acceptedCount = acceptedRows.length;
+      
+      // Update info panel with filter details
+      document.getElementById('info').innerHTML = `
+        <span>✅ <strong>${acceptedCount}</strong> accepted records (out of ${totalRecords} total) | Column 11 = "ACCEPTED"</span>
+        <span class="columns-badge">📋 Showing columns: ${DESIRED_COLUMNS.join(', ')}</span>
+      `;
+      
+      if (acceptedRows.length === 0) {
+        document.getElementById('data').innerHTML = '<div class="empty-state">🔍 No rows found where Column 11 equals "ACCEPTED".<br>Only records with ACCEPTED status appear.</div>';
+        return;
+      }
+      
+      // Render filtered table with desired columns
+      renderFilteredTable(filteredData);
+      
+    })
+    .catch(error => {
+      console.error("Fetch error:", error);
+      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">❌ Error: ' + error.message + '<br>Please check CORS / script URL or network.</div>';
+      document.getElementById('info').innerHTML = `<span>⚠️ Failed to load</span><span class="columns-badge">Columns: ${DESIRED_COLUMNS.join(', ')}</span>`;
+    });
+}
+
+function renderFilteredTable(tableData) {
+  // tableData includes header row at index0, then filtered records
+  if (!tableData || tableData.length === 0) {
+    document.getElementById('data').innerHTML = '<div class="empty-state">No data to display</div>';
+    return;
+  }
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  
+  var html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  
+  for (var i = 0; i < tableData.length; i++) {
+    var row = tableData[i];
+    var isHeader = (i === 0);
+    
+    html += '<tr>';
+    
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (row && row[colIndex] !== undefined && row[colIndex] !== null) ? row[colIndex] : '';
+      
+      if (isHeader) {
+        // Header styling: black background, white text
+        html += '<th style="background-color: #000000; color: #ffffff; font-weight: 600;">' + escapeHtml(cellValue) + '</th>';
+      } else {
+        // Data row — optional subtle highlight? not required but adds clarity for accepted register
+        html += '<td style="color: #000000;">' + escapeHtml(cellValue) + '</td>';
+      }
+    }
+    html += '</tr>';
+  }
+  
+  html += '</table>';
+  document.getElementById('data').innerHTML = html;
+}
+
+// Helper to escape HTML to avoid injection & keep display clean
+function escapeHtml(str) {
+  if (str === undefined || str === null) return '';
+  var s = String(str);
+  return s.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+    return c;
+  });
+}
+
+function refreshData() {
+  loadData();
+}
+
+function printPage() {
+  window.print();
+}
+
+// Additional safety: ensure that if column11 data might be numeric or mixed but we strictly enforce ACCEPTED string.
+// The specification is satisfied: only rows where column11 = ACCEPTED are shown.
+</script>
+</body>
+</html>
