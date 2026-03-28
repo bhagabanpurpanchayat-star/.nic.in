@@ -1,422 +1,551 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>EARNEST MONEY REGISTER · ACCEPTED ONLY</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCHEME VS VENDOR · ACCEPTED ONLY</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
       font-size: 12px;
       line-height: 1.4;
-      margin: 0;
+      background: #eef2f5;
       padding: 20px;
-      background: #e8eef2;
     }
-    
-    .container {
+
+    /* Main container */
+    .register-container {
+      max-width: 1400px;
+      margin: 0 auto;
       background: white;
-      padding: 20px;
-      border-radius: 6px;
-      overflow-x: auto;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
-    
-    .header {
+
+    /* Header - screen only, will be hidden in print */
+    .screen-header {
+      padding: 20px 24px 16px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      background: white;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 15px;
-      border-bottom: 1px solid #e0e0e0;
-      padding-bottom: 15px;
+      gap: 16px;
     }
-    
-    h2 {
-      font-size: 18px;
+
+    .title-section h1 {
+      font-size: 1.4rem;
       font-weight: 600;
-      color: #1a1a1a;
+      color: #0a1c2f;
       margin: 0;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-    
+
     .badge-accepted {
       background: #2e7d32;
       color: white;
-      font-size: 10px;
-      font-weight: 500;
-      padding: 2px 8px;
-      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 40px;
       letter-spacing: 0.3px;
     }
-    
-    .button-group {
-      display: flex;
-      gap: 10px;
+
+    .sub-title {
+      font-size: 0.7rem;
+      color: #5a6e85;
+      margin-top: 6px;
     }
-    
-    button {
-      padding: 6px 14px;
-      background: white;
-      color: #1a1a1a;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
+
+    /* Button group - screen only */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.75rem;
       font-weight: 500;
+      background: white;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
       transition: all 0.2s;
+      font-family: inherit;
     }
-    
-    button:hover {
-      background: #f5f5f5;
-      border-color: #999;
-    }
-    
-    .print-btn {
-      background: #1a1a1a;
+
+    .btn-primary {
+      background: #1a2c3e;
+      border-color: #1a2c3e;
       color: white;
-      border-color: #1a1a1a;
     }
-    
-    .print-btn:hover {
-      background: #333;
+
+    .btn-primary:hover {
+      background: #0f1e2c;
     }
-    
-    .info {
-      background: #f8f9fa;
-      padding: 8px 12px;
-      margin-bottom: 15px;
-      border-radius: 4px;
-      font-size: 11px;
-      color: #2c3e50;
-      border-left: 3px solid #2ecc71;
+
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Info panel - screen only */
+    .info-panel {
+      background: #f8fafc;
+      margin: 16px 24px 0 24px;
+      padding: 12px 18px;
+      border-radius: 10px;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
+      font-size: 0.75rem;
+      border-left: 4px solid #2e7d32;
     }
-    
-    .columns-badge {
-      font-family: monospace;
-      font-size: 11px;
+
+    .stats-badge {
       background: #e9ecef;
-      padding: 3px 8px;
-      border-radius: 3px;
-      color: #495057;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
     }
-    
-    .filter-notice {
-      background: #fff3e0;
-      border-left-color: #f39c12;
+
+    /* Table wrapper */
+    .table-wrapper {
+      padding: 20px 24px 24px 24px;
+      overflow-x: auto;
     }
-    
-    table {
-      border-collapse: collapse;
+
+    /* Main table style - clean and print-ready */
+    .earnest-table {
       width: 100%;
-      font-size: 11px;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      background: white;
     }
-    
-    th {
-      background: #000000;
-      color: #ffffff;
-      padding: 10px 8px;
-      text-align: left;
+
+    .earnest-table th {
+      background: #0a2f2a;
+      color: white;
       font-weight: 600;
-      border: 1px solid #ddd;
-      font-size: 11px;
-    }
-    
-    td {
-      padding: 8px;
-      border: 1px solid #e0e0e0;
+      padding: 12px 10px;
+      border: 1px solid #2c4a3a;
       text-align: left;
-      color: #000000;
-      font-weight: 400;
+      font-size: 0.75rem;
     }
-    
-    tr:hover {
-      background-color: #fafbfc;
+
+    .earnest-table td {
+      padding: 10px 10px;
+      border: 1px solid #e2e8f0;
+      color: #1e293b;
+      vertical-align: top;
     }
-    
-    .loading {
+
+    .earnest-table tbody tr:hover {
+      background-color: #faf9f5;
+    }
+
+    /* Loading & empty states */
+    .loading-state, .empty-state {
       text-align: center;
-      padding: 40px;
-      color: #6c757d;
-      font-size: 12px;
+      padding: 60px 24px;
+      color: #5a6e85;
+      font-size: 0.85rem;
+      background: white;
     }
-    
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: #6c757d;
-      font-size: 12px;
+
+    .error-state {
+      color: #b91c1c;
+      background: #fef2f2;
     }
-    
-    .accepted-row-highlight {
-      background-color: #f1f8e9;
-    }
-    
+
+    /* ========== CRITICAL: PRINT STYLES - ONLY GENERATED CONTENT PRINTS ========== */
     @media print {
+      /* Hide all screen-only UI elements */
+      .screen-header,
+      .action-buttons,
+      .btn,
+      .info-panel,
+      .sub-title,
+      .stats-badge,
+      button {
+        display: none !important;
+      }
+
+      /* Remove body padding and background */
       body {
         background: white;
         padding: 0;
         margin: 0;
       }
-      
-      .container {
+
+      /* Container reset for print */
+      .register-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      /* Table wrapper reset - no padding, full width */
+      .table-wrapper {
         padding: 0;
         margin: 0;
-        box-shadow: none;
-        background: white;
+        overflow-x: visible;
       }
-      
-      .header {
-        display: none;
-      }
-      
-      .info {
-        display: none;
-      }
-      
-      button {
-        display: none;
-      }
-      
-      table {
+
+      /* Table print optimization */
+      .earnest-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 10px;
+        font-size: 9pt;
+        margin: 0;
       }
-      
-      th {
+
+      .earnest-table th {
         background: #000000 !important;
-        color: #ffffff !important;
+        color: white !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         border: 1px solid #000;
+        padding: 8px 6px;
       }
-      
-      td {
-        border: 1px solid #000;
-        color: #000;
+
+      .earnest-table td {
+        border: 1px solid #aaa;
+        padding: 6px 6px;
+        background: white;
+        color: black;
       }
-      
+
+      /* Ensure all table rows print with white background */
+      .earnest-table tbody tr {
+        background: white;
+      }
+
+      .earnest-table tbody tr td {
+        background: white !important;
+      }
+
+      /* Portrait page settings */
       @page {
-        size: landscape;
-        margin: 0.5in;
+        size: portrait;
+        margin: 0.5in 0.4in;
+      }
+
+      /* Optional: add a subtle header only for print (just title) */
+      body::before {
+        content: "SCHEME VS VENDOR - ACCEPTED ENTRIES";
+        display: block;
+        text-align: center;
+        font-size: 14pt;
+        font-weight: bold;
+        margin-bottom: 15px;
+        letter-spacing: 1px;
+        font-family: Arial, sans-serif;
+      }
+      
+      /* Add print date footer */
+      body::after {
+        content: "Generated: " attr(data-print-date);
+        display: block;
+        text-align: center;
+        font-size: 8pt;
+        margin-top: 20px;
+        color: #666;
       }
     }
-    
-    @media (max-width: 768px) {
+
+    /* Responsive adjustments */
+    @media (max-width: 700px) {
       body {
-        padding: 10px;
-      }
-      .container {
         padding: 12px;
       }
-      th, td {
-        padding: 6px;
-        font-size: 10px;
+      .screen-header {
+        padding: 16px;
       }
-      button {
-        padding: 4px 10px;
-        font-size: 11px;
+      .table-wrapper {
+        padding: 12px;
+      }
+      .earnest-table th, .earnest-table td {
+        padding: 6px 6px;
+        font-size: 0.7rem;
       }
     }
   </style>
 </head>
-<body>
-<div class="container">
-  <div class="header">
-    <h2>
-      Scheme Vs Vendor 
-      <span class="badge-accepted">FILTER: COLUMN 11 = ACCEPTED</span>
-    </h2>
-    <div class="button-group">
-      <button onclick="refreshData()">⟳ Refresh</button>
-      <button class="print-btn" onclick="printPage()">🖨️ Print</button>
+<body data-print-date="">
+<div class="register-container">
+  <!-- Screen-only header (hidden in print) -->
+  <div class="screen-header">
+    <div class="title-section">
+      <h1>
+        SCHEME VS VENDOR
+        <span class="badge-accepted">✓ ACCEPTED ONLY</span>
+      </h1>
+      <div class="sub-title">Column 11 = "ACCEPTED" | Showing columns: 3, 4, 5, 6, 7, 8</div>
+    </div>
+    <div class="action-buttons">
+      <button class="btn btn-outline" onclick="refreshData()">⟳ Refresh</button>
+      <button class="btn btn-primary" onclick="printOnlyContent()">🖨️ Print (Content Only)</button>
     </div>
   </div>
-  <div class="info" id="info">
-    <span>Loading data...</span>
-    <span class="columns-badge" id="columns-badge">Columns: —</span>
+
+  <!-- Screen-only info panel (hidden in print) -->
+  <div class="info-panel" id="infoPanel">
+    <div>
+      📋 <strong>Filter:</strong> Column 11 = "ACCEPTED" &nbsp;|&nbsp;
+      📊 <strong>Columns:</strong> 3, 4, 5, 6, 7, 8
+    </div>
+    <div class="stats-badge" id="statsBadge">Loading data...</div>
   </div>
-  <div id="data">
-    <div class="loading">Fetching register & applying ACCEPTED filter...</div>
+
+  <!-- Table wrapper - THIS IS THE ONLY CONTENT THAT PRINTS -->
+  <div class="table-wrapper" id="tableContainer">
+    <div class="loading-state">⏳ Fetching SCHEME VS VENDOR & applying ACCEPTED filter...</div>
   </div>
 </div>
 
 <script>
-// ============================================================
-// EARNEST MONEY REGISTER — SHOW ONLY WHEN COLUMN 11 = "ACCEPTED"
-// COLUMN INDEX: 11 (1-based) => array index 10
-// ============================================================
+  // ========================================================================
+  // SCHEME VS VENDOR - ACCEPTED ONLY
+  // FILTER: Column 11 (1-based) must equal "ACCEPTED"
+  // DISPLAY: Columns 3,4,5,6,7,8 (1-based)
+  // PRINT MODULE: Prints ONLY the generated table content, no extra UI
+  // ========================================================================
 
-var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
-
-// Column numbers to display (1-based, same as original requirement)
-var DESIRED_COLUMNS = [3,4,5,6,7,8];
-
-// strict filter: we only include data rows where column 11 (index 10) equals "ACCEPTED" (case-sensitive)
-// However we also accept trimming & case-insensitive? Better to match exactly as per requirement:
-// "show only when column11=ACCEPTED" — we'll treat exactly "ACCEPTED" (uppercase).
-// Also handles possible leading/trailing spaces via trim.
-
-var currentRawData = null;
-var filteredData = null;     // stores array of rows (including header as first element after filtering? careful)
-
-// We'll preserve header row separately. Structure: original data[0] = headers, data[1...N] = records.
-// We filter records, then rebuild table with header + matching rows.
-
-window.onload = loadData;
-
-function loadData() {
-  document.getElementById('data').innerHTML = '<div class="loading">⏳ Loading earnest money data...</div>';
-  document.getElementById('columns-badge').textContent = 'Display columns: ' + DESIRED_COLUMNS.join(', ');
-  document.getElementById('info').innerHTML = `
-    <span>🔄 Connecting to sheet...</span>
-    <span class="columns-badge">Showing cols: ${DESIRED_COLUMNS.join(', ')}</span>
-  `;
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
   
-  fetch(WEB_APP_URL)
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      if (!data || data.length === 0) {
-        document.getElementById('data').innerHTML = '<div class="empty-state">📭 No data found in the spreadsheet.</div>';
-        document.getElementById('info').innerHTML = `<span>⚠️ Empty dataset</span><span class="columns-badge">Columns: ${DESIRED_COLUMNS.join(', ')}</span>`;
+  // Display columns (1-based indices)
+  const DESIRED_COLUMNS = [3, 4, 5, 6, 7, 8];
+  // Column 11 filter (1-based) -> array index 10
+  const ACCEPTED_COLUMN_INDEX = 10; // zero-based
+  
+  let originalFullData = null;      // raw data from sheet [headers, rows...]
+  let filteredAcceptedData = null;  // [headers] + rows where col11 === "ACCEPTED"
+  let acceptedCount = 0;
+  let totalRows = 0;
+
+  // Helper: escape HTML to prevent injection
+  function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    const s = String(str);
+    return s.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // Render the accepted table with desired columns
+  function renderAcceptedTable() {
+    const container = document.getElementById('tableContainer');
+    const statsSpan = document.getElementById('statsBadge');
+    
+    if (!filteredAcceptedData || filteredAcceptedData.length < 2) {
+      const noDataMsg = filteredAcceptedData && filteredAcceptedData.length === 1 
+        ? 'No accepted records found. Only rows with Column 11 = "ACCEPTED" are shown.'
+        : 'No data available.';
+      container.innerHTML = `<div class="empty-state">🔍 ${noDataMsg}</div>`;
+      if (statsSpan) statsSpan.innerHTML = `📊 0 accepted / ${totalRows} total`;
+      return;
+    }
+    
+    const headersRow = filteredAcceptedData[0];
+    const dataRows = filteredAcceptedData.slice(1);
+    const displayAcceptedCount = dataRows.length;
+    acceptedCount = displayAcceptedCount;
+    
+    if (statsSpan) {
+      statsSpan.innerHTML = `✅ ${acceptedCount} accepted / ${totalRows} total · col11="ACCEPTED"`;
+    }
+    
+    // Convert desired columns to zero-based indices
+    const colIndices = DESIRED_COLUMNS.map(col => col - 1);
+    
+    let tableHtml = '<table class="earnest-table" cellspacing="0">';
+    // Header row
+    tableHtml += '<thead><tr>';
+    for (let i = 0; i < colIndices.length; i++) {
+      const colIdx = colIndices[i];
+      let headerText = (headersRow && headersRow[colIdx] !== undefined && headersRow[colIdx] !== null) 
+                        ? headersRow[colIdx] : `Column ${DESIRED_COLUMNS[i]}`;
+      tableHtml += `<th>${escapeHtml(headerText)}</th>`;
+    }
+    tableHtml += '</tr></thead><tbody>';
+    
+    // Data rows (only ACCEPTED rows)
+    for (let r = 0; r < dataRows.length; r++) {
+      const row = dataRows[r];
+      tableHtml += '<tr>';
+      for (let c = 0; c < colIndices.length; c++) {
+        const colIdx = colIndices[c];
+        let cellVal = (row && row[colIdx] !== undefined && row[colIdx] !== null) ? row[colIdx] : '';
+        tableHtml += `<td>${escapeHtml(cellVal)}</td>`;
+      }
+      tableHtml += '</tr>';
+    }
+    tableHtml += '</tbody></table>';
+    
+    container.innerHTML = tableHtml;
+    
+    // Update print date attribute for footer
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    document.body.setAttribute('data-print-date', dateStr);
+  }
+  
+  // Show loading indicator
+  function showLoading(message = "Loading earnest money data & filtering ACCEPTED entries...") {
+    const container = document.getElementById('tableContainer');
+    if (container) {
+      container.innerHTML = `<div class="loading-state">⏳ ${escapeHtml(message)}</div>`;
+    }
+    const statsSpan = document.getElementById('statsBadge');
+    if (statsSpan) statsSpan.innerHTML = '🔄 Fetching...';
+  }
+  
+  function showError(errorMsg) {
+    const container = document.getElementById('tableContainer');
+    container.innerHTML = `<div class="empty-state error-state">❌ Error: ${escapeHtml(errorMsg)}<br>Please check network connection or script URL.</div>`;
+    const statsSpan = document.getElementById('statsBadge');
+    if (statsSpan) statsSpan.innerHTML = '⚠️ Load failed';
+  }
+  
+  function showEmptyAccepted() {
+    const container = document.getElementById('tableContainer');
+    container.innerHTML = `<div class="empty-state">📭 No ACCEPTED entries found.<br>Column 11 must contain exactly "ACCEPTED".<br>Total records in sheet: ${totalRows}</div>`;
+    const statsSpan = document.getElementById('statsBadge');
+    if (statsSpan) statsSpan.innerHTML = `🔍 0 accepted / ${totalRows} total`;
+  }
+  
+  // Core data loading and filtering
+  async function loadEarnestData() {
+    showLoading("Connecting to Google Sheets & applying ACCEPTED filter...");
+    try {
+      const response = await fetch(WEB_APP_URL);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const jsonData = await response.json();
+      
+      // Validate data structure
+      if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
+        originalFullData = null;
+        filteredAcceptedData = null;
+        totalRows = 0;
+        const container = document.getElementById('tableContainer');
+        container.innerHTML = '<div class="empty-state">📭 Spreadsheet is empty or no data returned.</div>';
+        const statsSpan = document.getElementById('statsBadge');
+        if (statsSpan) statsSpan.innerHTML = '📭 No data';
         return;
       }
       
-      currentRawData = data;
+      originalFullData = jsonData;
+      const headers = originalFullData[0] || [];
+      const dataRows = originalFullData.slice(1);
+      totalRows = dataRows.length;
       
-      // Validate that we have at least header row + some data
-      if (currentRawData.length < 1) {
-        showEmpty('No rows available');
-        return;
-      }
-      
-      // Extract header row (first element)
-      var headerRow = currentRawData[0];
-      var dataRows = currentRawData.slice(1);
-      
-      // COLUMN 11 FILTER (1-based -> index 10 in JS array)
-      var column11Index = 10;  // because column 1 = index0, column11 = index10
-      
-      // Filter rows: keep only rows where column11 value equals "ACCEPTED" (trim and exact match, case-sensitive as per requirement)
-      // But typical spreadsheet data might have "Accepted", "ACCEPTED", "accepted" — we align with "ACCEPTED" strict.
-      // However to be robust we can normalize to uppercase comparison if needed, but spec says "ACCEPTED".
-      // I'll use exact match after trimming to avoid false negatives.
-      var acceptedRows = dataRows.filter(function(row) {
-        // If row is shorter than column11 index, treat as not accepted
-        if (!row || row.length <= column11Index) return false;
-        var cellValue = row[column11Index];
+      // FILTER: Column 11 (index 10) must equal "ACCEPTED" after trim
+      const acceptedRows = dataRows.filter(row => {
+        if (!row || row.length <= ACCEPTED_COLUMN_INDEX) return false;
+        const cellValue = row[ACCEPTED_COLUMN_INDEX];
         if (cellValue === undefined || cellValue === null) return false;
-        var strValue = String(cellValue).trim();
-        // Strict condition: equals "ACCEPTED" (case-sensitive but allow trimmed)
+        const strValue = String(cellValue).trim();
+        // Strict match: exactly "ACCEPTED" (case-sensitive per spec)
         return strValue === "ACCEPTED";
       });
       
-      // Build filtered dataset including header as first element
-      filteredData = [headerRow].concat(acceptedRows);
+      // Build filtered dataset: headers + accepted rows
+      filteredAcceptedData = [headers, ...acceptedRows];
+      acceptedCount = acceptedRows.length;
       
-      // Additional stats: total original records, accepted count
-      var totalRecords = dataRows.length;
-      var acceptedCount = acceptedRows.length;
-      
-      // Update info panel with filter details
-      document.getElementById('info').innerHTML = `
-        <span>✅ <strong>${acceptedCount}</strong> accepted records (out of ${totalRecords} total) | Column 11 = "ACCEPTED"</span>
-        <span class="columns-badge">📋 Showing columns: ${DESIRED_COLUMNS.join(', ')}</span>
-      `;
-      
+      // Render based on results
       if (acceptedRows.length === 0) {
-        document.getElementById('data').innerHTML = '<div class="empty-state">🔍 No rows found where Column 11 equals "ACCEPTED".<br>Only records with ACCEPTED status appear.</div>';
-        return;
-      }
-      
-      // Render filtered table with desired columns
-      renderFilteredTable(filteredData);
-      
-    })
-    .catch(error => {
-      console.error("Fetch error:", error);
-      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">❌ Error: ' + error.message + '<br>Please check CORS / script URL or network.</div>';
-      document.getElementById('info').innerHTML = `<span>⚠️ Failed to load</span><span class="columns-badge">Columns: ${DESIRED_COLUMNS.join(', ')}</span>`;
-    });
-}
-
-function renderFilteredTable(tableData) {
-  // tableData includes header row at index0, then filtered records
-  if (!tableData || tableData.length === 0) {
-    document.getElementById('data').innerHTML = '<div class="empty-state">No data to display</div>';
-    return;
-  }
-  
-  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
-  
-  var html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
-  
-  for (var i = 0; i < tableData.length; i++) {
-    var row = tableData[i];
-    var isHeader = (i === 0);
-    
-    html += '<tr>';
-    
-    for (var j = 0; j < colIndices.length; j++) {
-      var colIndex = colIndices[j];
-      var cellValue = (row && row[colIndex] !== undefined && row[colIndex] !== null) ? row[colIndex] : '';
-      
-      if (isHeader) {
-        // Header styling: black background, white text
-        html += '<th style="background-color: #000000; color: #ffffff; font-weight: 600;">' + escapeHtml(cellValue) + '</th>';
+        showEmptyAccepted();
       } else {
-        // Data row — optional subtle highlight? not required but adds clarity for accepted register
-        html += '<td style="color: #000000;">' + escapeHtml(cellValue) + '</td>';
+        renderAcceptedTable();
       }
+      
+    } catch (err) {
+      console.error("Earnest money fetch error:", err);
+      showError(err.message || "Network / CORS issue. Ensure Google Apps Script returns JSON.");
+      filteredAcceptedData = null;
     }
-    html += '</tr>';
   }
   
-  html += '</table>';
-  document.getElementById('data').innerHTML = html;
-}
-
-// Helper to escape HTML to avoid injection & keep display clean
-function escapeHtml(str) {
-  if (str === undefined || str === null) return '';
-  var s = String(str);
-  return s.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-    return c;
+  // Refresh data handler
+  function refreshData() {
+    loadEarnestData();
+  }
+  
+  // ========== PRINT MODULE: PRINTS ONLY THE GENERATED CONTENT ==========
+  // This function triggers print with optimized settings.
+  // The CSS @media print ensures all UI elements are hidden,
+  // only the table inside .table-wrapper prints.
+  function printOnlyContent() {
+    // Brief visual feedback (optional)
+    const printBtn = document.querySelector('.btn-primary');
+    const originalText = printBtn ? printBtn.innerText : 'Print';
+    if (printBtn) {
+      printBtn.innerText = '🖨️ Preparing print...';
+      setTimeout(() => { printBtn.innerText = originalText; }, 1000);
+    }
+    
+    // Ensure print date is updated
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    document.body.setAttribute('data-print-date', dateStr);
+    
+    // If no data loaded, show a small warning but still allow print attempt
+    if (!filteredAcceptedData || filteredAcceptedData.length < 2) {
+      const shouldPrint = confirm("No accepted records found. Print empty register?");
+      if (!shouldPrint) return;
+    }
+    
+    // Trigger browser print - CSS media print handles hiding UI and showing only table
+    window.print();
+  }
+  
+  // Expose functions globally for button onclick handlers
+  window.refreshData = refreshData;
+  window.printOnlyContent = printOnlyContent;
+  
+  // Initialize on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    loadEarnestData();
+    
+    // Optional: Add keyboard shortcut Ctrl+P / Cmd+P to use same print behavior
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        printOnlyContent();
+      }
+    });
   });
-}
-
-function refreshData() {
-  loadData();
-}
-
-function printPage() {
-  window.print();
-}
-
-// Additional safety: ensure that if column11 data might be numeric or mixed but we strictly enforce ACCEPTED string.
-// The specification is satisfied: only rows where column11 = ACCEPTED are shown.
+  
+  // Additional: ensure that if any dynamic changes happen, print remains clean
+  // The CSS media print already guarantees that .screen-header, .info-panel, buttons are hidden
+  // So when user clicks print, ONLY the table inside .table-wrapper appears on paper.
 </script>
 </body>
 </html>
