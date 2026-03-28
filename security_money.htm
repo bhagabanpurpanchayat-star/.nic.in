@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SECURITY MONEY REGISTER</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 20px;
+      background: #e8eef2;
+    }
+    
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 100%;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 15px;
+    }
+    
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 6px 14px;
+      background: white;
+      color: #1a1a1a;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: #f5f5f5;
+      border-color: #999;
+    }
+    
+    .print-btn {
+      background: #1a1a1a;
+      color: white;
+      border-color: #1a1a1a;
+    }
+    
+    .print-btn:hover {
+      background: #333;
+    }
+    
+    .info {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #2c3e50;
+      border-left: 3px solid #2ecc71;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .columns-badge {
+      font-family: monospace;
+      font-size: 11px;
+      background: #e9ecef;
+      padding: 3px 8px;
+      border-radius: 3px;
+      color: #495057;
+    }
+    
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 11px;
+    }
+    
+    th {
+      background: #000000;
+      color: #ffffff;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #ddd;
+      font-size: 11px;
+    }
+    
+    td {
+      padding: 8px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      color: #000000;
+      font-weight: 400;
+    }
+    
+    tr:hover {
+      background-color: #fafbfc;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .container {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        background: white;
+      }
+      
+      .header {
+        display: none;
+      }
+      
+      .info {
+        display: none;
+      }
+      
+      button {
+        display: none;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+      
+      th {
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        border: 1px solid #000;
+      }
+      
+      td {
+        border: 1px solid #000;
+        color: #000;
+      }
+      
+      @page {
+        size: landscape;
+        margin: 0.5in;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 12px;
+      }
+      th, td {
+        padding: 6px;
+        font-size: 10px;
+      }
+      button {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>SECURITY MONEY REGISTER</h2>
+    <div class="button-group">
+      <button onclick="refreshData()">Refresh</button>
+      <button class="print-btn" onclick="printPage()">Print</button>
+    </div>
+  </div>
+  <div class="info" id="info">
+    <span>Loading data...</span>
+    <span class="columns-badge" id="columns-badge">Columns: -</span>
+  </div>
+  <div id="data">
+    <div class="loading">Loading data...</div>
+  </div>
+</div>
+
+<script>
+var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
+
+// CHANGE THESE NUMBERS - Column numbers you want (1,2,3 etc)
+var DESIRED_COLUMNS = [3,4,5,6,7,8,14,15,16,19,25,29,31];
+
+var currentData = null;
+var filteredData = null;
+
+window.onload = loadData;
+
+function loadData() {
+  document.getElementById('data').innerHTML = '<div class="loading">Loading data...</div>';
+  document.getElementById('columns-badge').textContent = 'Columns: ' + DESIRED_COLUMNS.join(', ');
+  
+  fetch(WEB_APP_URL)
+    .then(response => response.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById('data').innerHTML = '<div class="empty-state">No data found</div>';
+        document.getElementById('info').innerHTML = '<span>No data found</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+        return;
+      }
+      
+      currentData = data;
+      
+      var column25Index = 24;
+      var headers = [data[0]];
+      var filteredRows = data.slice(1).filter(function(row) {
+        var cellValue = row[column25Index];
+        return cellValue !== undefined && cellValue !== null && cellValue !== '';
+      });
+      
+      filteredData = headers.concat(filteredRows);
+      
+      displayTable(filteredData);
+      
+      var hiddenCount = (data.length - 1) - filteredRows.length;
+      document.getElementById('info').innerHTML = `
+        <span>Loaded ${filteredRows.length} records | ${filteredData[0].length} total columns | Hidden ${hiddenCount} empty rows</span>
+        <span class="columns-badge">Showing columns: ${DESIRED_COLUMNS.join(', ')}</span>
+      `;
+    })
+    .catch(error => {
+      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">Error: ' + error.message + '</div>';
+      document.getElementById('info').innerHTML = '<span>Failed to load data</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+    });
+}
+
+function refreshData() {
+  loadData();
+}
+
+function printPage() {
+  window.print();
+}
+
+function displayTable(data) {
+  if (!data || data.length === 0) return;
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  
+  var html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  
+  for (var i = 0; i < data.length; i++) {
+    html += '<tr>';
+    
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (data[i][colIndex] !== undefined && data[i][colIndex] !== null) ? data[i][colIndex] : '';
+      
+      if (i === 0) {
+        html += '<th style="background-color: #000000; color: #ffffff;">' + cellValue + '</th>';
+      } else {
+        html += '<td style="color: #000000;">' + cellValue + '</td>';
+      }
+    }
+    
+    html += '</tr>';
+  }
+  
+  html += '</table>';
+  document.getElementById('data').innerHTML = html;
+}
+</script>
+</body>
+</html>
