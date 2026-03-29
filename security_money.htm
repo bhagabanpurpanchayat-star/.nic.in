@@ -132,10 +132,20 @@
       color: #856404;
     }
     
+    /* Enhanced table styles for better text handling */
+    .data-table-wrapper {
+      overflow-x: auto;
+      max-width: 100%;
+      position: relative;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+    }
+    
     table {
       border-collapse: collapse;
       width: 100%;
       font-size: 11px;
+      min-width: 800px;
     }
     
     th {
@@ -146,14 +156,62 @@
       font-weight: 600;
       border: 1px solid #ddd;
       font-size: 11px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #000000;
     }
     
     td {
-      padding: 8px;
+      padding: 10px 8px;
       border: 1px solid #e0e0e0;
       text-align: left;
       color: #000000;
       font-weight: 400;
+      /* Critical: Allow text wrapping and preserve content */
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+      max-width: 350px;
+      min-width: 80px;
+      vertical-align: top;
+    }
+    
+    /* Handle long text in specific columns */
+    td.long-text {
+      word-break: break-all;
+      white-space: normal;
+    }
+    
+    /* Add tooltip for truncated content */
+    td[data-fulltext] {
+      cursor: help;
+      position: relative;
+    }
+    
+    td[data-fulltext]:hover::after {
+      content: attr(data-fulltext);
+      position: absolute;
+      left: 0;
+      top: 100%;
+      background: #333;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: normal;
+      word-wrap: break-word;
+      max-width: 450px;
+      min-width: 200px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+    
+    /* Different positioning for right-aligned columns */
+    td[data-fulltext][data-align="right"]:hover::after {
+      left: auto;
+      right: 0;
     }
     
     tr:hover {
@@ -199,6 +257,32 @@
       }
     }
     
+    /* Scrollbar styling */
+    .data-table-wrapper::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+    
+    .data-table-wrapper::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    .data-table-wrapper::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    
+    .data-table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    
+    /* Number columns alignment */
+    td.number-cell {
+      text-align: right;
+      font-family: monospace;
+    }
+    
     @media print {
       body {
         background: white;
@@ -211,6 +295,7 @@
         margin: 0;
         box-shadow: none;
         background: white;
+        overflow-x: visible;
       }
       
       .header {
@@ -225,10 +310,22 @@
         display: none;
       }
       
+      .data-table-wrapper {
+        overflow-x: visible;
+        border: none;
+      }
+      
       table {
         width: 100%;
         border-collapse: collapse;
         font-size: 10px;
+      }
+      
+      td {
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: normal;
+        border: 1px solid #000;
       }
       
       th {
@@ -242,6 +339,10 @@
       td {
         border: 1px solid #000;
         color: #000;
+      }
+      
+      td[data-fulltext]:hover::after {
+        display: none;
       }
       
       @page {
@@ -267,6 +368,9 @@
       }
       .button-group, .export-group {
         flex-wrap: wrap;
+      }
+      td {
+        max-width: 200px;
       }
     }
   </style>
@@ -391,7 +495,7 @@ function generateExportData(format) {
   return null;
 }
 
-// Generate Excel-compatible HTML
+// Generate Excel-compatible HTML with proper text wrapping
 function generateExcelHTML() {
   const totalRecords = filteredData ? filteredData.length - 1 : 0;
   const hiddenCount = currentData ? (currentData.length - 1) - totalRecords : 0;
@@ -402,9 +506,26 @@ function generateExcelHTML() {
       <meta charset="UTF-8">
       <title>Security Money Register</title>
       <style>
-        th { background-color: #000000; color: #ffffff; }
-        td, th { border: 1px solid #ddd; padding: 8px; }
-        table { border-collapse: collapse; width: 100%; }
+        th { 
+          background-color: #000000; 
+          color: #ffffff; 
+          padding: 10px;
+        }
+        td, th { 
+          border: 1px solid #ddd; 
+          padding: 8px; 
+          vertical-align: top;
+          word-wrap: break-word;
+          white-space: normal;
+        }
+        table { 
+          border-collapse: collapse; 
+          width: 100%; 
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+        }
       </style>
     </head>
     <body>
@@ -419,7 +540,7 @@ function generateExcelHTML() {
   return html;
 }
 
-// Generate HTML optimized for PDF printing
+// Generate HTML optimized for PDF printing with proper text wrapping
 function generateHTMLForPDF() {
   const totalRecords = filteredData ? filteredData.length - 1 : 0;
   const hiddenCount = currentData ? (currentData.length - 1) - totalRecords : 0;
@@ -460,10 +581,20 @@ function generateHTMLForPDF() {
         td {
           padding: 8px;
           border: 1px solid #ddd;
+          word-wrap: break-word;
+          word-break: break-word;
+          white-space: normal;
         }
         @media print {
           body { margin: 0; padding: 0; }
           .no-print { display: none; }
+          table {
+            page-break-inside: avoid;
+          }
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
         }
       </style>
     </head>
@@ -485,12 +616,12 @@ function generateHTMLForPDF() {
   return html;
 }
 
-// Generate table HTML from current data
+// Generate table HTML from current data with enhanced text handling
 function generateTableHTML() {
   if (!filteredData || filteredData.length === 0) return '<p>No data available</p>';
   
   var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
-  var html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  var html = '<div class="data-table-wrapper"><table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
   
   for (var i = 0; i < filteredData.length; i++) {
     html += '<tr>';
@@ -498,18 +629,30 @@ function generateTableHTML() {
     for (var j = 0; j < colIndices.length; j++) {
       var colIndex = colIndices[j];
       var cellValue = (filteredData[i][colIndex] !== undefined && filteredData[i][colIndex] !== null) ? filteredData[i][colIndex] : '';
+      var cellText = cellValue.toString();
+      var escapedText = escapeHtml(cellText);
       
       if (i === 0) {
-        html += '<th style="background-color: #000000; color: #ffffff;">' + escapeHtml(cellValue.toString()) + '</th>';
+        html += '<th style="background-color: #000000; color: #ffffff;">' + escapedText + '</th>';
       } else {
-        html += '<td style="color: #000000;">' + escapeHtml(cellValue.toString()) + '</td>';
+        // Check if text is long (more than 80 characters)
+        var longTextClass = cellText.length > 80 ? 'long-text' : '';
+        // Check if it might be a number (for alignment)
+        var isNumber = /^[\d\s,.-]+$/.test(cellText.trim()) && cellText.trim().length > 0;
+        var alignClass = isNumber ? 'number-cell' : '';
+        // Add data-fulltext attribute for tooltip if text is very long
+        var tooltipAttr = cellText.length > 100 ? ` data-fulltext="${escapeHtml(cellText).replace(/"/g, '&quot;')}"` : '';
+        var alignAttr = isNumber ? ` data-align="right"` : '';
+        
+        html += `<td class="${longTextClass} ${alignClass}"${tooltipAttr}${alignAttr} style="color: #000000; word-wrap: break-word; word-break: break-word; white-space: normal;">${escapedText}`;
+        html += ' </td>';
       }
     }
     
-    html += '</tr>';
+    html += ' </tr>';
   }
   
-  html += '</table>';
+  html += '</table></div>';
   return html;
 }
 
@@ -605,7 +748,7 @@ function displayTable(data) {
   
   var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
   
-  var html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  var html = '<div class="data-table-wrapper"><table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
   
   for (var i = 0; i < data.length; i++) {
     html += '<tr>';
@@ -613,18 +756,28 @@ function displayTable(data) {
     for (var j = 0; j < colIndices.length; j++) {
       var colIndex = colIndices[j];
       var cellValue = (data[i][colIndex] !== undefined && data[i][colIndex] !== null) ? data[i][colIndex] : '';
+      var cellText = cellValue.toString();
+      var escapedText = escapeHtml(cellText);
       
       if (i === 0) {
-        html += '<th style="background-color: #000000; color: #ffffff;">' + escapeHtml(cellValue.toString()) + '</th>';
+        html += '<th style="background-color: #000000; color: #ffffff;">' + escapedText + '</th>';
       } else {
-        html += '<td style="color: #000000;">' + escapeHtml(cellValue.toString()) + '</td>';
+        // Add tooltip for long text
+        var longTextClass = cellText.length > 80 ? 'long-text' : '';
+        var isNumber = /^[\d\s,.-]+$/.test(cellText.trim()) && cellText.trim().length > 0;
+        var alignClass = isNumber ? 'number-cell' : '';
+        var tooltipAttr = cellText.length > 100 ? ` data-fulltext="${escapeHtml(cellText).replace(/"/g, '&quot;')}"` : '';
+        var alignAttr = isNumber ? ` data-align="right"` : '';
+        
+        html += `<td class="${longTextClass} ${alignClass}"${tooltipAttr}${alignAttr} style="color: #000000; word-wrap: break-word; word-break: break-word; white-space: normal;">${escapedText} `;
+        html += '</td>';
       }
     }
     
-    html += '</tr>';
+    html += ' </tr>';
   }
   
-  html += '</table>';
+  html += '</table></div>';
   currentTableHTML = html;
   document.getElementById('data').innerHTML = html;
 }
