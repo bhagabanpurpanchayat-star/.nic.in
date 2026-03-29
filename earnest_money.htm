@@ -133,6 +133,716 @@
       color: #856404;
     }
     
+    /* Enhanced table styles for better text handling */
+    .data-table-wrapper {
+      overflow-x: auto;
+      max-width: 100%;
+      position: relative;
+    }
+    
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 11px;
+      min-width: 600px;
+    }
+    
+    th {
+      background: #000000;
+      color: #ffffff;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #ddd;
+      font-size: 11px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    td {
+      padding: 8px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      color: #000000;
+      font-weight: 400;
+      /* Critical: Allow text wrapping and preserve content */
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+      max-width: 300px;
+      min-width: 80px;
+    }
+    
+    /* Handle long text in specific columns */
+    td.long-text {
+      word-break: break-all;
+      white-space: normal;
+    }
+    
+    /* Add tooltip for truncated content */
+    td[data-fulltext] {
+      cursor: help;
+      position: relative;
+    }
+    
+    td[data-fulltext]:hover::after {
+      content: attr(data-fulltext);
+      position: absolute;
+      left: 0;
+      top: 100%;
+      background: #333;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      white-space: normal;
+      word-wrap: break-word;
+      max-width: 400px;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    tr:hover {
+      background-color: #fafbfc;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    /* Scrollbar styling */
+    .data-table-wrapper::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+    
+    .data-table-wrapper::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    .data-table-wrapper::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    
+    .data-table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .container {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        background: white;
+      }
+      
+      .header {
+        display: none;
+      }
+      
+      .info {
+        display: none;
+      }
+      
+      button {
+        display: none;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+      
+      td {
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: normal;
+      }
+      
+      th {
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        border: 1px solid #000;
+      }
+      
+      td {
+        border: 1px solid #000;
+        color: #000;
+      }
+      
+      @page {
+        size: landscape;
+        margin: 0.5in;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 12px;
+      }
+      th, td {
+        padding: 6px;
+        font-size: 10px;
+      }
+      button {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+      td {
+        max-width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>EARNEST MONEY REGISTER</h2>
+    <div class="button-group">
+      <button onclick="refreshData()">⟳ Refresh</button>
+      <button class="print-btn" onclick="printPage()">🖨️ Print</button>
+    </div>
+    <div class="export-group">
+      <button class="export-excel" onclick="requestParentExport('excel')">📊 Export Excel</button>
+      <button class="export-pdf" onclick="requestParentExport('pdf')">📄 Export PDF</button>
+    </div>
+  </div>
+  <div class="info" id="info">
+    <span>Loading data...</span>
+    <span class="columns-badge" id="columns-badge">Columns: -</span>
+  </div>
+  <div id="data">
+    <div class="loading">Loading data...</div>
+  </div>
+</div>
+
+<script>
+var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
+
+// CHANGE THESE NUMBERS - Column numbers you want (1,2,3 etc)
+var DESIRED_COLUMNS = [3,4,5,6,7,8,9,10,11,12,13];
+
+var currentData = null;
+var currentTableHTML = null;
+
+// Check if we're in an iframe and can communicate with parent
+function isInIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+}
+
+// Request parent to handle export (PostMessage approach)
+function requestParentExport(format) {
+  if (!currentData || currentData.length === 0) {
+    showMessage('No data to export', 'warning');
+    return;
+  }
+  
+  showMessage(`Preparing ${format.toUpperCase()} export...`, 'info');
+  
+  if (isInIframe()) {
+    // Send export request to parent window
+    const exportData = generateExportData(format);
+    
+    window.parent.postMessage({
+      type: 'EXPORT_REQUEST',
+      format: format,
+      data: exportData.data,
+      filename: `Earnest_Money_Register_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}`,
+      mimeType: exportData.mimeType,
+      htmlContent: format === 'pdf' ? generateHTMLForPDF() : null
+    }, '*');
+    
+    showMessage(`${format.toUpperCase()} export requested. Check your downloads folder.`, 'success');
+  } else {
+    // Fallback: direct export if not in iframe
+    directExport(format);
+  }
+}
+
+// Generate data for export
+function generateExportData(format) {
+  if (format === 'excel') {
+    // Generate Excel HTML format with proper text handling
+    const excelHTML = generateExcelHTML();
+    return {
+      data: excelHTML,
+      mimeType: 'application/vnd.ms-excel'
+    };
+  } else if (format === 'pdf') {
+    // For PDF, we'll send HTML that can be printed to PDF
+    const pdfHTML = generateHTMLForPDF();
+    return {
+      data: pdfHTML,
+      mimeType: 'text/html'
+    };
+  }
+  return null;
+}
+
+// Generate Excel-compatible HTML with proper text wrapping
+function generateExcelHTML() {
+  let html = `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Earnest Money Register</title>
+      <style>
+        th { 
+          background-color: #000000; 
+          color: #ffffff; 
+          padding: 10px;
+        }
+        td, th { 
+          border: 1px solid #ddd; 
+          padding: 8px; 
+          vertical-align: top;
+          word-wrap: break-word;
+          white-space: normal;
+        }
+        table { 
+          border-collapse: collapse; 
+          width: 100%; 
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <h2>EARNEST MONEY REGISTER</h2>
+      <p>Generated: ${new Date().toLocaleString()}</p>
+      ${currentTableHTML || generateTableHTML()}
+    </body>
+    </html>
+  `;
+  return html;
+}
+
+// Generate HTML optimized for PDF printing with proper text wrapping
+function generateHTMLForPDF() {
+  let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Earnest Money Register</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          padding: 20px;
+        }
+        h2 {
+          color: #1a1a1a;
+          margin-bottom: 20px;
+        }
+        .info {
+          margin-bottom: 20px;
+          padding: 10px;
+          background: #f8f9fa;
+          border-left: 3px solid #2ecc71;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+        th {
+          background: #000000;
+          color: #ffffff;
+          padding: 10px;
+          border: 1px solid #ddd;
+        }
+        td {
+          padding: 8px;
+          border: 1px solid #ddd;
+          word-wrap: break-word;
+          word-break: break-word;
+          white-space: normal;
+        }
+        @media print {
+          body { margin: 0; padding: 0; }
+          .no-print { display: none; }
+          table {
+            page-break-inside: avoid;
+          }
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <h2>EARNEST MONEY REGISTER</h2>
+      <div class="info">
+        <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
+        <strong>Total Records:</strong> ${currentData.length - 1}<br>
+        <strong>Columns Shown:</strong> ${DESIRED_COLUMNS.join(', ')}
+      </div>
+      ${currentTableHTML || generateTableHTML()}
+      <div class="no-print" style="margin-top: 30px; text-align: center; font-size: 10px; color: #999;">
+        Generated from Central Register Hub
+      </div>
+    </body>
+    </html>
+  `;
+  return html;
+}
+
+// Generate table HTML from current data with enhanced text handling
+function generateTableHTML() {
+  if (!currentData || currentData.length === 0) return '<p>No data available</p>';
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  var html = '<div class="data-table-wrapper"><table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  
+  for (var i = 0; i < currentData.length; i++) {
+    html += '<tr>';
+    
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (currentData[i][colIndex] !== undefined && currentData[i][colIndex] !== null) ? currentData[i][colIndex] : '';
+      var cellText = cellValue.toString();
+      var escapedText = escapeHtml(cellText);
+      
+      if (i === 0) {
+        html += '<th style="background-color: #000000; color: #ffffff;">' + escapedText + '</th>';
+      } else {
+        // Check if text is long (more than 100 characters)
+        var longTextClass = cellText.length > 100 ? 'long-text' : '';
+        // Add data-fulltext attribute for tooltip if text is very long
+        var tooltipAttr = cellText.length > 150 ? ` data-fulltext="${escapeHtml(cellText).replace(/"/g, '&quot;')}"` : '';
+        html += `<td class="${longTextClass}"${tooltipAttr} style="color: #000000; word-wrap: break-word; word-break: break-word; white-space: normal;">${escapedText}</td>`;
+      }
+    }
+    
+    html += '</tr>';
+  }
+  
+  html += '</table></div>';
+  return html;
+}
+
+// Direct export fallback (when not in iframe)
+function directExport(format) {
+  if (format === 'excel') {
+    const excelHTML = generateExcelHTML();
+    const blob = new Blob([excelHTML], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = `Earnest_Money_Register_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showMessage('Excel export complete!', 'success');
+  } else if (format === 'pdf') {
+    // Open print dialog for PDF
+    window.print();
+  }
+}
+
+// Helper function to escape HTML special characters
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// Show temporary message
+function showMessage(msg, type) {
+  const infoDiv = document.getElementById('info');
+  const originalHTML = infoDiv.innerHTML;
+  
+  const messageHTML = `
+    <span style="color: ${type === 'error' ? '#dc3545' : (type === 'success' ? '#28a745' : '#ffc107')}">
+      ${msg}
+    </span>
+    <span class="columns-badge">Columns: ${DESIRED_COLUMNS.join(', ')}</span>
+  `;
+  
+  infoDiv.innerHTML = messageHTML;
+  
+  setTimeout(() => {
+    if (currentData) {
+      infoDiv.innerHTML = `
+        <span>Loaded ${currentData.length - 1} records | ${currentData[0].length} total columns</span>
+        <span class="columns-badge">Showing columns: ${DESIRED_COLUMNS.join(', ')}</span>
+      `;
+    }
+  }, 3000);
+}
+
+window.onload = loadData;
+
+function loadData() {
+  document.getElementById('data').innerHTML = '<div class="loading">Loading data...</div>';
+  document.getElementById('columns-badge').textContent = 'Columns: ' + DESIRED_COLUMNS.join(', ');
+  
+  // Show iframe status
+  if (isInIframe()) {
+    const infoDiv = document.getElementById('info');
+    infoDiv.classList.add('iframe-warning');
+    // Optional: Notify parent that report is loaded
+    window.parent.postMessage({ type: 'REPORT_LOADED', report: 'earnest_money' }, '*');
+  }
+  
+  fetch(WEB_APP_URL)
+    .then(response => response.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById('data').innerHTML = '<div class="empty-state">No data found</div>';
+        document.getElementById('info').innerHTML = '<span>No data found</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+        return;
+      }
+      
+      currentData = data;
+      displayTable(data);
+      
+      document.getElementById('info').innerHTML = `
+        <span>Loaded ${data.length - 1} records | ${data[0].length} total columns</span>
+        <span class="columns-badge">Showing columns: ${DESIRED_COLUMNS.join(', ')}</span>
+      `;
+    })
+    .catch(error => {
+      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">Error: ' + error.message + '</div>';
+      document.getElementById('info').innerHTML = '<span>Failed to load data</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+    });
+}
+
+function refreshData() {
+  loadData();
+}
+
+function printPage() {
+  if (isInIframe()) {
+    // Request parent to handle print
+    window.parent.postMessage({
+      type: 'PRINT_REQUEST',
+      htmlContent: generateHTMLForPDF()
+    }, '*');
+  } else {
+    window.print();
+  }
+}
+
+function displayTable(data) {
+  if (!data || data.length === 0) return;
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  
+  var html = '<div class="data-table-wrapper"><table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  
+  for (var i = 0; i < data.length; i++) {
+    html += '<tr>';
+    
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (data[i][colIndex] !== undefined && data[i][colIndex] !== null) ? data[i][colIndex] : '';
+      var cellText = cellValue.toString();
+      var escapedText = escapeHtml(cellText);
+      
+      if (i === 0) {
+        html += '<th style="background-color: #000000; color: #ffffff;">' + escapedText + '</th>';
+      } else {
+        // Add tooltip for long text
+        var tooltipAttr = cellText.length > 150 ? ` data-fulltext="${escapeHtml(cellText).replace(/"/g, '&quot;')}"` : '';
+        var longTextClass = cellText.length > 100 ? 'class="long-text"' : '';
+        html += `<td ${longTextClass}${tooltipAttr} style="color: #000000; word-wrap: break-word; word-break: break-word; white-space: normal;">${escapedText}</td>`;
+      }
+    }
+    
+    html += '</tr>';
+  }
+  
+  html += '</table></div>';
+  currentTableHTML = html;
+  document.getElementById('data').innerHTML = html;
+}
+
+// Listen for messages from parent (optional)
+window.addEventListener('message', function(event) {
+  if (event.data.type === 'REQUEST_REFRESH') {
+    refreshData();
+  } else if (event.data.type === 'REQUEST_EXPORT') {
+    requestParentExport(event.data.format);
+  }
+});
+</script>
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+  <title>EARNEST MONEY REGISTER</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 20px;
+      background: #e8eef2;
+    }
+    
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 100%;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 15px;
+    }
+    
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 6px 14px;
+      background: white;
+      color: #1a1a1a;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: #f5f5f5;
+      border-color: #999;
+    }
+    
+    .export-group {
+      display: flex;
+      gap: 10px;
+      margin-left: auto;
+    }
+    
+    .export-excel {
+      background: #1e6f3f;
+      color: white;
+      border-color: #1e6f3f;
+    }
+    
+    .export-excel:hover {
+      background: #155a34;
+    }
+    
+    .export-pdf {
+      background: #dc3545;
+      color: white;
+      border-color: #dc3545;
+    }
+    
+    .export-pdf:hover {
+      background: #bb2d3b;
+    }
+    
+    .print-btn {
+      background: #1a1a1a;
+      color: white;
+      border-color: #1a1a1a;
+    }
+    
+    .print-btn:hover {
+      background: #333;
+    }
+    
+    .info {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #2c3e50;
+      border-left: 3px solid #2ecc71;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .columns-badge {
+      font-family: monospace;
+      font-size: 11px;
+      background: #e9ecef;
+      padding: 3px 8px;
+      border-radius: 3px;
+      color: #495057;
+    }
+    
+    .iframe-warning {
+      background: #fff3cd;
+      border-left-color: #ffc107;
+      color: #856404;
+    }
+    
     table {
       border-collapse: collapse;
       width: 100%;
