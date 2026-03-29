@@ -3,6 +3,853 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Nit_vs_Participant – Grouped by UNIQUE NIT</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 20px;
+      background: #eef2f5;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      max-width: 100%;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 6px 18px;
+      background: white;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+
+    .print-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+    }
+
+    .print-btn:hover {
+      background: #1e293b;
+    }
+
+    .export-excel {
+      background: #1e6f3f;
+      color: white;
+      border: none;
+    }
+
+    .export-excel:hover {
+      background: #155a34;
+    }
+
+    .export-pdf {
+      background: #dc3545;
+      color: white;
+      border: none;
+    }
+
+    .export-pdf:hover {
+      background: #bb2d3b;
+    }
+
+    .info-panel {
+      background: #f8fafc;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #0f172a;
+      border-left: 4px solid #3b82f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .stats-badge {
+      background: #e2e8f0;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: monospace;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 11px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    th {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #334155;
+      font-size: 11px;
+    }
+
+    td {
+      padding: 8px 6px;
+      border: 1px solid #e2e8f0;
+      text-align: left;
+      color: #0f172a;
+      background-color: #ffffff;
+      vertical-align: top;
+    }
+
+    .group-row:hover td {
+      background-color: #fefce8;
+    }
+
+    .unique-nit-cell {
+      font-weight: 700;
+      color: #075985;
+    }
+
+    .vertical-list {
+      margin: 0;
+      padding-left: 0;
+      list-style-type: none;
+    }
+    
+    .vertical-list li {
+      margin-bottom: 4px;
+      line-height: 1.3;
+      font-size: 10px;
+      position: relative;
+      padding-left: 0;
+    }
+    
+    .vertical-list li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .list-number {
+      font-weight: 600;
+      color: #3b82f6;
+      margin-right: 6px;
+      display: inline-block;
+    }
+    
+    .vendor-text {
+      color: #1e293b;
+      word-break: break-word;
+    }
+    
+    .empty-value {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: #475569;
+      font-size: 13px;
+      background: #fef9e3;
+      border-radius: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: #2c3e66;
+    }
+
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+      font-size: 12px;
+      font-weight: 500;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .container {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        background: white;
+      }
+      
+      .header {
+        display: none;
+      }
+      
+      .info-panel {
+        display: none;
+      }
+      
+      button {
+        display: none;
+      }
+      
+      th {
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        border: 1px solid #000;
+        font-size: 10px;
+        padding: 8px 5px;
+      }
+      
+      td {
+        border: 1px solid #000;
+        color: #000;
+        font-size: 9px;
+        padding: 5px 4px;
+      }
+      
+      .vertical-list li {
+        font-size: 8px;
+        margin-bottom: 2px;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      
+      .list-number {
+        color: #000 !important;
+        font-weight: 600;
+      }
+      
+      @page {
+        size: portrait;
+        margin: 0.5in;
+      }
+      
+      table {
+        page-break-inside: avoid;
+        width: 100%;
+      }
+      
+      tr {
+        page-break-inside: avoid;
+        page-break-after: avoid;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      th, td {
+        padding: 5px;
+        font-size: 9px;
+      }
+      .vertical-list li {
+        font-size: 8px;
+        margin-bottom: 3px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div>
+      <h2>📋 Nit_vs_Participant</h2>
+      <div class="subtitle">Grouped by UNIQUE NIT | VENDOR list displayed vertically with numbering</div>
+    </div>
+    <div class="button-group">
+      <button onclick="refreshData()">⟳ Refresh</button>
+      <button class="export-excel" onclick="requestExport('excel')">📊 Export Excel</button>
+      <button class="export-pdf" onclick="requestExport('pdf')">📄 Export PDF</button>
+      <button class="print-btn" onclick="requestPrint()">🖨️ Print (Portrait)</button>
+    </div>
+  </div>
+  <div class="info-panel" id="infoPanel">
+    <span>📊 Loading data...</span>
+    <span class="stats-badge" id="statsBadge">UNIQUE NIT | NIT | SL | NIT DATE | Activity ID | Work Name | VENDOR</span>
+  </div>
+  <div id="dataContainer">
+    <div class="loading">⏳ Fetching and grouping data...</div>
+  </div>
+</div>
+
+<script>
+  // Google Apps Script Web App URL
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
+  
+  let rawData = null;
+  let groupedData = null;
+  let currentTableHTML = null;
+  
+  // Check if we're in an iframe
+  function isInIframe() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  }
+  
+  // Show temporary message
+  function showMessage(msg, type = 'info') {
+    const existingToast = document.querySelector('.toast-message');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    const color = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : '#17a2b8');
+    toast.style.borderLeft = `3px solid ${color}`;
+    toast.innerHTML = msg;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+  
+  // Request export from parent or handle directly
+  function requestExport(format) {
+    if (!groupedData || groupedData.length === 0) {
+      showMessage('No data to export', 'error');
+      return;
+    }
+    
+    showMessage(`Preparing ${format.toUpperCase()} export...`, 'info');
+    
+    if (isInIframe()) {
+      const exportData = generateExportData(format);
+      
+      window.parent.postMessage({
+        type: 'EXPORT_REQUEST',
+        format: format,
+        data: exportData.data,
+        filename: `Earnest_Money_Grouped_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}`,
+        mimeType: exportData.mimeType,
+        htmlContent: format === 'pdf' ? generateHTMLForPDF() : null
+      }, '*');
+      
+      showMessage(`${format.toUpperCase()} export requested. Check downloads folder.`, 'success');
+    } else {
+      directExport(format);
+    }
+  }
+  
+  // Request print from parent or handle directly
+  function requestPrint() {
+    if (isInIframe()) {
+      window.parent.postMessage({
+        type: 'PRINT_REQUEST',
+        htmlContent: generateHTMLForPDF()
+      }, '*');
+      showMessage('Print dialog requested', 'info');
+    } else {
+      window.print();
+    }
+  }
+  
+  // Generate data for export
+  function generateExportData(format) {
+    if (format === 'excel') {
+      const excelHTML = generateExcelHTML();
+      return {
+        data: excelHTML,
+        mimeType: 'application/vnd.ms-excel'
+      };
+    } else if (format === 'pdf') {
+      const pdfHTML = generateHTMLForPDF();
+      return {
+        data: pdfHTML,
+        mimeType: 'text/html'
+      };
+    }
+    return null;
+  }
+  
+  // Generate Excel-compatible HTML
+  function generateExcelHTML() {
+    let html = `
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Nit_vs_Participant - Grouped by UNIQUE NIT</title>
+        <style>
+          th { background-color: #000000; color: #ffffff; }
+          td, th { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+          table { border-collapse: collapse; width: 100%; }
+          .vertical-list { margin: 0; padding-left: 20px; }
+          .vertical-list li { margin-bottom: 4px; }
+        </style>
+      </head>
+      <body>
+        <h2>Nit_vs_Participant - GROUPED BY UNIQUE NIT</h2>
+        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>Total Groups:</strong> ${groupedData.length}</p>
+        ${currentTableHTML || generateTableHTML()}
+      </body>
+      </html>
+    `;
+    return html;
+  }
+  
+  // Generate HTML optimized for PDF printing
+  function generateHTMLForPDF() {
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Nit_vs_Participant - Grouped by UNIQUE NIT</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+          }
+          h2 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+          }
+          .info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 3px solid #3b82f6;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+          }
+          th {
+            background: #000000;
+            color: #ffffff;
+            padding: 10px;
+            border: 1px solid #ddd;
+          }
+          td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+          }
+          .vertical-list {
+            margin: 0;
+            padding-left: 20px;
+          }
+          .vertical-list li {
+            margin-bottom: 4px;
+          }
+          @media print {
+            body { margin: 0; padding: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h2>Nit_vs_Participant - GROUPED BY UNIQUE NIT</h2>
+        <div class="info">
+          <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
+          <strong>Total Groups:</strong> ${groupedData.length}<br>
+          <strong>Grouping:</strong> By UNIQUE NIT with vendors as vertical numbered list
+        </div>
+        ${currentTableHTML || generateTableHTML()}
+        <div class="no-print" style="margin-top: 30px; text-align: center; font-size: 10px; color: #999;">
+          Generated from Central Register Hub
+        </div>
+      </body>
+      </html>
+    `;
+    return html;
+  }
+  
+  // Generate table HTML for export
+  function generateTableHTML() {
+    if (!groupedData || groupedData.length === 0) {
+      return '<p>No data available</p>';
+    }
+    
+    let html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+    html += `<thead>
+               <tr>
+                <th>UNIQUE NIT</th>
+                <th>NIT</th>
+                <th>SL</th>
+                <th>NIT DATE</th>
+                <th>Activity ID</th>
+                <th>Name of the work</th>
+                <th>VENDOR</th>
+               </tr>
+             </thead>
+             <tbody>`;
+    
+    for (const row of groupedData) {
+      const vendorList = formatVerticalListForExport(row.vendors);
+      
+      html += `<tr>
+                 <td><strong>${escapeHtml(row.uniqueNit)}</strong></td>
+                 <td>${escapeHtml(row.nit)}</td>
+                 <td>${escapeHtml(row.sl)}</td>
+                 <td>${escapeHtml(row.nitDate)}</td>
+                 <td>${escapeHtml(row.activityId)}</td>
+                 <td>${escapeHtml(row.workName)}</td>
+                 <td>${vendorList}</td>
+               </tr>`;
+    }
+    
+    html += `</tbody></table>`;
+    return html;
+  }
+  
+  // Format vendor list for export (plain text with numbering)
+  function formatVerticalListForExport(vendors) {
+    if (!vendors || vendors.length === 0) {
+      return '—';
+    }
+    
+    const uniqueValues = [];
+    const seen = new Set();
+    for (const val of vendors) {
+      if (!seen.has(val)) {
+        seen.add(val);
+        uniqueValues.push(val);
+      }
+    }
+    
+    let html = '<ul class="vertical-list" style="margin:0; padding-left:20px;">';
+    for (let i = 0; i < uniqueValues.length; i++) {
+      html += `<li style="margin-bottom: 4px;">${i + 1}. ${escapeHtml(uniqueValues[i])}</li>`;
+    }
+    html += '</ul>';
+    
+    return html;
+  }
+  
+  // Direct export fallback (when not in iframe)
+  function directExport(format) {
+    if (format === 'excel') {
+      const excelHTML = generateExcelHTML();
+      const blob = new Blob([excelHTML], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = `Earnest_Money_Grouped_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showMessage('Excel export complete!', 'success');
+    } else if (format === 'pdf') {
+      window.print();
+    }
+  }
+  
+  window.onload = () => {
+    loadAndGroupData();
+  };
+  
+  async function loadAndGroupData() {
+    const container = document.getElementById('dataContainer');
+    const infoPanel = document.getElementById('infoPanel');
+    
+    container.innerHTML = '<div class="loading">🔄 Fetching data from server...</div>';
+    
+    try {
+      const response = await fetch(WEB_APP_URL);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<div class="empty-state">📭 No data found</div>';
+        infoPanel.innerHTML = '<span>⚠️ No data available</span><span class="stats-badge">No records</span>';
+        return;
+      }
+      
+      rawData = data;
+      
+      const groupedResult = groupByUniqueNit(rawData);
+      groupedData = groupedResult;
+      
+      renderGroupedTable(groupedResult);
+      
+      const totalRows = rawData.length - 1;
+      const uniqueGroups = groupedResult.length;
+      infoPanel.innerHTML = `
+        <span>✅ ${totalRows} entries → ${uniqueGroups} unique NIT groups</span>
+        <span class="stats-badge">VENDOR: Vertical numbered list</span>
+      `;
+      
+      // Notify parent if in iframe
+      if (isInIframe()) {
+        window.parent.postMessage({ type: 'REPORT_LOADED', report: 'earnest_money_grouped' }, '*');
+      }
+      
+      showMessage(`Loaded ${uniqueGroups} groups from ${totalRows} entries`, 'success');
+      
+    } catch (error) {
+      console.error('Error:', error);
+      container.innerHTML = `<div class="empty-state" style="color:#dc2626;">❌ Error: ${error.message}<br>Please check network or script URL.</div>`;
+      infoPanel.innerHTML = '<span>❗ Failed to load data</span><span class="stats-badge">Retry</span>';
+    }
+  }
+  
+  function groupByUniqueNit(data) {
+    if (!data || data.length < 2) return [];
+    
+    const headers = data[0];
+    const dataRows = data.slice(1);
+    
+    const COL_UNIQUE_NIT = 1;
+    const COL_NIT = 2;
+    const COL_SL = 3;
+    const COL_NIT_DATE = 4;
+    const COL_ACTIVITY_ID = 5;
+    const COL_WORK_NAME = 6;
+    const COL_VENDOR = 7;
+    
+    const groupsMap = new Map();
+    
+    for (const row of dataRows) {
+      if (!Array.isArray(row)) continue;
+      
+      const uniqueNit = row[COL_UNIQUE_NIT] !== undefined && row[COL_UNIQUE_NIT] !== null 
+        ? String(row[COL_UNIQUE_NIT]).trim() 
+        : '';
+      
+      if (uniqueNit === '') continue;
+      
+      const nit = row[COL_NIT] !== undefined ? row[COL_NIT] : '';
+      const sl = row[COL_SL] !== undefined ? row[COL_SL] : '';
+      const nitDate = row[COL_NIT_DATE] !== undefined ? row[COL_NIT_DATE] : '';
+      const activityId = row[COL_ACTIVITY_ID] !== undefined ? row[COL_ACTIVITY_ID] : '';
+      const workName = row[COL_WORK_NAME] !== undefined ? row[COL_WORK_NAME] : '';
+      const vendorValue = row[COL_VENDOR] !== undefined && row[COL_VENDOR] !== null 
+        ? String(row[COL_VENDOR]).trim() 
+        : '';
+      
+      if (!groupsMap.has(uniqueNit)) {
+        groupsMap.set(uniqueNit, {
+          uniqueNit: uniqueNit,
+          nit: nit,
+          sl: sl,
+          nitDate: nitDate,
+          activityId: activityId,
+          workName: workName,
+          vendors: []
+        });
+      }
+      
+      const group = groupsMap.get(uniqueNit);
+      
+      if (group.nit === '' && nit !== '') group.nit = nit;
+      if (group.sl === '' && sl !== '') group.sl = sl;
+      if (group.nitDate === '' && nitDate !== '') group.nitDate = nitDate;
+      if (group.activityId === '' && activityId !== '') group.activityId = activityId;
+      if (group.workName === '' && workName !== '') group.workName = workName;
+      
+      if (vendorValue !== '') {
+        group.vendors.push(vendorValue);
+      }
+    }
+    
+    const groupedArray = Array.from(groupsMap.values()).map(group => ({
+      uniqueNit: group.uniqueNit,
+      nit: group.nit || '—',
+      sl: group.sl || '—',
+      nitDate: group.nitDate || '—',
+      activityId: group.activityId || '—',
+      workName: group.workName || '—',
+      vendors: group.vendors
+    }));
+    
+    groupedArray.sort((a, b) => a.uniqueNit.localeCompare(b.uniqueNit, undefined, { numeric: true }));
+    
+    return groupedArray;
+  }
+  
+  function formatVerticalList(values) {
+    if (!values || values.length === 0) {
+      return '<span class="empty-value">—</span>';
+    }
+    
+    const uniqueValues = [];
+    const seen = new Set();
+    for (const val of values) {
+      if (!seen.has(val)) {
+        seen.add(val);
+        uniqueValues.push(val);
+      }
+    }
+    
+    let html = '<ul class="vertical-list" style="margin:0; padding-left:0; list-style:none;">';
+    for (let i = 0; i < uniqueValues.length; i++) {
+      html += `<li style="margin-bottom: 4px; line-height: 1.3;">
+                <span class="list-number" style="font-weight: 600; color: #3b82f6;">${i + 1}.</span>
+                <span class="vendor-text" style="color: #1e293b;">${escapeHtml(uniqueValues[i])}</span>
+               </li>`;
+    }
+    html += '</ul>';
+    
+    return html;
+  }
+  
+  function renderGroupedTable(groupedRows) {
+    const container = document.getElementById('dataContainer');
+    
+    if (!groupedRows || groupedRows.length === 0) {
+      container.innerHTML = '<div class="empty-state">🏷️ No unique NIT groups found. Please check if UNIQUE NIT column has values.</div>';
+      return;
+    }
+    
+    let html = '<table cellspacing="0" style="width:100%;">';
+    
+    html += `<thead>
+               <tr>
+                <th style="width: 10%;">UNIQUE NIT</th>
+                <th style="width: 8%;">NIT</th>
+                <th style="width: 5%;">SL</th>
+                <th style="width: 10%;">NIT DATE</th>
+                <th style="width: 12%;">Activity ID</th>
+                <th style="width: 30%;">Name of the work</th>
+                <th style="width: 25%;">VENDOR</th>
+               </tr>
+             </thead>
+             <tbody>`;
+    
+    for (const row of groupedRows) {
+      const vendorDisplay = formatVerticalList(row.vendors);
+      
+      html += `<tr class="group-row">
+                 <td class="unique-nit-cell" style="vertical-align: top;"><strong>${escapeHtml(row.uniqueNit)}</strong></td>
+                 <td style="vertical-align: top;">${escapeHtml(row.nit)}</td>
+                 <td style="vertical-align: top;">${escapeHtml(row.sl)}</td>
+                 <td style="vertical-align: top;">${escapeHtml(row.nitDate)}</td>
+                 <td style="vertical-align: top;">${escapeHtml(row.activityId)}</td>
+                 <td style="vertical-align: top;">${escapeHtml(row.workName)}</td>
+                 <td style="vertical-align: top;">${vendorDisplay}</td>
+               </tr>`;
+    }
+    
+    html += `</tbody></table>`;
+    
+    currentTableHTML = html;
+    container.innerHTML = html;
+  }
+  
+  function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    const s = String(str);
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  
+  function refreshData() {
+    loadAndGroupData();
+  }
+  
+  // Listen for messages from parent
+  window.addEventListener('message', function(event) {
+    if (event.data.type === 'REQUEST_REFRESH') {
+      refreshData();
+    } else if (event.data.type === 'REQUEST_EXPORT') {
+      requestExport(event.data.format);
+    } else if (event.data.type === 'REQUEST_PRINT') {
+      requestPrint();
+    }
+  });
+  
+  // Expose functions globally
+  window.refreshData = refreshData;
+  window.requestExport = requestExport;
+  window.requestPrint = requestPrint;
+</script>
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>EARNEST MONEY REGISTER – Grouped by UNIQUE NIT</title>
   <style>
     * {
