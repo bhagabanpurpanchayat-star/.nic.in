@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>NIT SUMMARY</title>
+  <title>SECURITY MONEY REGISTER - NIT SUMMARY</title>
   <style>
     * {
       margin: 0;
@@ -358,11 +358,28 @@
       font-weight: 600;
     }
     
+    .modal-export-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .modal-export-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.02);
+    }
+    
     .close-modal {
       font-size: 28px;
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
+      margin-left: 15px;
     }
     
     .close-modal:hover {
@@ -481,7 +498,7 @@
 <body>
 <div class="container">
   <div class="header">
-    <h2>🏦 NIT SUMMARY (Scheme_Amount_NIT)</h2>
+    <h2>🏦 SECURITY MONEY REGISTER</h2>
     <div class="button-group">
       <button onclick="refreshData()">🔄 Refresh</button>
       <button class="print-btn" onclick="window.print()">🖨️ Print</button>
@@ -497,7 +514,10 @@
   <div class="modal-content">
     <div class="modal-header">
       <h3 id="modalTitle">📋 NIT Details</h3>
-      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="modal-export-btn" id="modalExportBtn" onclick="exportModalToExcel()">📊 Export to Excel</button>
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+      </div>
     </div>
     <div class="modal-body" id="modalBody">
       <div class="loading">Loading...</div>
@@ -512,6 +532,7 @@ var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4H
 var DESIRED_COLUMNS = [3, 5, 11, 17];
 var currentData = null;
 var filteredData = null;
+var currentModalData = null; // Store current modal data for export
 
 function colToIndex(colNumber) {
   return colNumber - 1;
@@ -571,9 +592,8 @@ function calculateNITTotals() {
     if (nitTotals[nit]) {
       nitTotals[nit].total += amount;
       nitTotals[nit].count++;
-      nitTotals[nit].rows.push(i);
     } else {
-      nitTotals[nit] = { total: amount, count: 1, rows: [i] };
+      nitTotals[nit] = { total: amount, count: 1 };
     }
   }
   return nitTotals;
@@ -613,6 +633,16 @@ function showNITDetails(nitNumber) {
       detailsRows.push(rowData);
     }
   }
+  
+  // Store modal data for export (CRITICAL FIX)
+  currentModalData = {
+    nit: nitNumber,
+    rows: detailsRows,
+    totalAmount: totalAmount,
+    recordCount: detailsRows.length
+  };
+  
+  console.log('Modal data stored:', currentModalData); // Debug log
   
   var html = '<table class="detail-table">';
   html += '<thead>';
@@ -655,8 +685,86 @@ function showNITDetails(nitNumber) {
   document.getElementById('nitModal').style.display = 'block';
 }
 
+function exportModalToExcel() {
+  // Check if modal data exists
+  if (!currentModalData || !currentModalData.rows || currentModalData.rows.length === 0) {
+    showMessage('No data to export. Please reopen the NIT details.', 'error');
+    console.log('No modal data available:', currentModalData);
+    return;
+  }
+  
+  console.log('Exporting modal data for NIT:', currentModalData.nit);
+  console.log('Rows to export:', currentModalData.rows.length);
+  
+  var excelData = [];
+  
+  // Title and header
+  excelData.push(['SECURITY MONEY REGISTER - NIT DETAILS']);
+  excelData.push(['NIT Number:', currentModalData.nit]);
+  excelData.push(['Generated:', new Date().toLocaleString()]);
+  excelData.push([]);
+  
+  // Column Headers
+  excelData.push(['NIT', 'SL', 'NIT DATE', 'Activity ID', 'Name of the work', 'Total Tender Amount (₹)']);
+  
+  // Data rows
+  for (var i = 0; i < currentModalData.rows.length; i++) {
+    var row = currentModalData.rows[i];
+    var amount = 0;
+    if (row.amount !== '') {
+      var cleaned = String(row.amount).replace(/[^0-9.-]/g, '');
+      if (cleaned !== '' && !isNaN(parseFloat(cleaned))) {
+        amount = parseFloat(cleaned);
+      }
+    }
+    excelData.push([
+      row.nit,
+      row.sl,
+      row.nitDate,
+      row.activityId,
+      row.workName,
+      amount
+    ]);
+  }
+  
+  // Summary
+  excelData.push([]);
+  excelData.push(['SUMMARY']);
+  excelData.push(['Total Records:', currentModalData.recordCount]);
+  excelData.push(['Total Amount (₹):', currentModalData.totalAmount]);
+  
+  // Create CSV content
+  var csvContent = excelData.map(function(row) {
+    return row.map(function(cell) {
+      if (cell === undefined || cell === null) cell = '';
+      var strCell = String(cell);
+      // Handle cells with commas, quotes, or newlines
+      if (strCell.includes(',') || strCell.includes('"') || strCell.includes('\n')) {
+        strCell = strCell.replace(/"/g, '""');
+        return '"' + strCell + '"';
+      }
+      return strCell;
+    }).join(',');
+  }).join('\n');
+  
+  // Add BOM for UTF-8 to handle special characters
+  var blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+  var link = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = 'NIT_' + currentModalData.nit + '_Details_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  showMessage('✅ NIT ' + currentModalData.nit + ' details exported successfully!', 'success');
+}
+
 function closeModal() {
   document.getElementById('nitModal').style.display = 'none';
+  // Don't clear modal data immediately so export still works if needed
+  // currentModalData = null;
 }
 
 window.onclick = function(event) {
@@ -734,7 +842,7 @@ function renderSummaryOnly() {
   
   // Footer
   html += '<div class="footer-info">';
-  html += '✨ Click on record count to view detailed breakdown (NIT, SL, NIT DATE, Activity ID, Name of work, Total Tender Amount)';
+  html += '✨ Click on record count to view detailed breakdown | 📊 Export to Excel available in modal';
   html += '</div>';
   
   document.getElementById('summaryContainer').innerHTML = html;
@@ -805,7 +913,7 @@ function exportToExcel() {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
   
-  showMessage('Exported Successfully!', 'success');
+  showMessage('✅ Main summary exported successfully!', 'success');
 }
 
 function escapeHtml(text) {
