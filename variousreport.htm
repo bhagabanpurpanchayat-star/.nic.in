@@ -436,6 +436,43 @@
             font-size: 0.7rem;
             color: #1f6e8c;
         }
+        
+        /* Print overlay for same-window printing */
+        .print-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            overflow: auto;
+            padding: 20px;
+            display: none;
+        }
+        
+        .print-overlay.active {
+            display: block;
+        }
+        
+        .print-close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 10000;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .print-close-btn:hover {
+            background: #bb2d3b;
+        }
     </style>
 </head>
 <body>
@@ -443,6 +480,14 @@
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
 <div class="particle-field" id="particleField"></div>
+
+<!-- Print overlay for same-window printing -->
+<div id="printOverlay" class="print-overlay">
+    <button id="closePrintBtn" class="print-close-btn">
+        <i class="fas fa-times"></i> Close Print View
+    </button>
+    <div id="printContent"></div>
+</div>
 
 <div class="dashboard">
     <div class="glass-header">
@@ -494,7 +539,7 @@
                         <i class="fas fa-file-excel"></i> Export Excel
                     </button>
                     <button id="exportPdfBtn" class="export-btn export-pdf-btn">
-                        <i class="fas fa-file-pdf"></i> Export PDF
+                        <i class="fas fa-file-pdf"></i> Print
                     </button>
                 </div>
                 <div class="badge-live" id="connectionBadge">
@@ -556,6 +601,9 @@
     const exportButtonsGroup = document.getElementById('exportButtonsGroup');
     const exportExcelBtn = document.getElementById('exportExcelBtn');
     const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const printOverlay = document.getElementById('printOverlay');
+    const printContent = document.getElementById('printContent');
+    const closePrintBtn = document.getElementById('closePrintBtn');
     
     let currentModuleId = null;
     let isLoading = false;
@@ -602,21 +650,79 @@
         if(overlay) overlay.remove();
     }
     
+    // Print in same window using iframe's print method
+    function printInSameWindow() {
+        if (!currentModuleId) {
+            showToast('No active report to print', 'error');
+            return;
+        }
+        
+        try {
+            // Method 1: Use iframe's contentWindow.print() - prints directly in same window
+            if (iframe.contentWindow) {
+                showToast('Opening print dialog...', 'info');
+                
+                // Focus the iframe and trigger print
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                
+                showToast('Print dialog opened. Use Ctrl+P or click Print.', 'success');
+            } else {
+                // Fallback: extract content and print
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const content = iframeDoc.documentElement.cloneNode(true);
+                printContent.innerHTML = '';
+                printContent.appendChild(content);
+                printOverlay.classList.add('active');
+                window.print();
+            }
+        } catch (error) {
+            console.error('Print failed:', error);
+            showToast('Print failed. Trying alternative method...', 'error');
+            
+            // Fallback: Open print dialog via browser
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+    }
+    
+    // Alternative: Print using overlay (for better control)
+    function printWithOverlay(htmlContent) {
+        printContent.innerHTML = htmlContent;
+        printOverlay.classList.add('active');
+        
+        // Small delay to ensure content is rendered
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+    
+    // Close print overlay
+    closePrintBtn.addEventListener('click', function() {
+        printOverlay.classList.remove('active');
+        printContent.innerHTML = '';
+    });
+    
+    // Handle print after window print finishes
+    window.addEventListener('afterprint', function() {
+        if (printOverlay.classList.contains('active')) {
+            printOverlay.classList.remove('active');
+            printContent.innerHTML = '';
+        }
+    });
+    
     // Handle export requests from iframe
     function handleExport(exportData) {
         const { format, data, filename, mimeType, htmlContent } = exportData;
         
         try {
             if (format === 'pdf') {
-                // For PDF, open in new window with print dialog
-                const printWindow = window.open('', '_blank');
-                if (printWindow) {
-                    printWindow.document.write(htmlContent || data);
-                    printWindow.document.close();
-                    printWindow.print();
-                    showToast(`PDF export prepared - use print dialog to save as PDF`, 'success');
+                // Use same-window printing for PDF
+                if (htmlContent) {
+                    printWithOverlay(htmlContent);
                 } else {
-                    showToast('Popup blocked! Please allow popups for this site', 'error');
+                    printInSameWindow();
                 }
             } else {
                 // Handle Excel and other formats
@@ -638,14 +744,29 @@
     }
     
     function handlePrint(printData) {
-        const printWindow = window.open('', '_blank');
-        if (printWindow) {
-            printWindow.document.write(printData.htmlContent);
-            printWindow.document.close();
-            printWindow.print();
-            showToast('Print dialog opened', 'success');
+        // Print in same window without opening new tab
+        if (printData.htmlContent) {
+            printWithOverlay(printData.htmlContent);
         } else {
-            showToast('Popup blocked! Please allow popups for this site', 'error');
+            printInSameWindow();
+        }
+    }
+    
+    // Request print from iframe
+    function requestIframePrint() {
+        if (!currentModuleId) {
+            showToast('No active report to print', 'error');
+            return;
+        }
+        
+        if (iframe.contentWindow) {
+            showToast('Preparing print dialog...', 'info');
+            iframe.contentWindow.postMessage({
+                type: 'REQUEST_PRINT'
+            }, '*');
+        } else {
+            // Fallback: try to print iframe directly
+            printInSameWindow();
         }
     }
     
@@ -824,7 +945,7 @@
     launchBtn.addEventListener('click', launchFromDropdown);
     refreshBtn.addEventListener('click', refreshCurrentReport);
     exportExcelBtn.addEventListener('click', () => requestIframeExport('excel'));
-    exportPdfBtn.addEventListener('click', () => requestIframeExport('pdf'));
+    exportPdfBtn.addEventListener('click', () => requestIframePrint()); // Print instead of PDF
     
     function generateParticles() {
         const container = document.getElementById('particleField');
