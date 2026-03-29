@@ -36,6 +36,684 @@
   }
 
   /* ---------- SELECT + BUTTONS ---------- */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .control-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  select, button {
+    padding: 12px 18px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.25s ease;
+  }
+
+  select {
+    background: white;
+    border: 1px solid #bbb;
+    min-width: 250px;
+  }
+
+  button {
+    background: #3498db;
+    color: white;
+    font-weight: 500;
+  }
+
+  button:hover {
+    background: #217dbb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .btn-excel {
+    background: #1e6f3f;
+  }
+
+  .btn-excel:hover {
+    background: #155a34;
+  }
+
+  .btn-pdf {
+    background: #dc3545;
+  }
+
+  .btn-pdf:hover {
+    background: #bb2d3b;
+  }
+
+  .btn-print {
+    background: #0f172a;
+  }
+
+  .btn-print:hover {
+    background: #1e293b;
+  }
+
+  /* ---------- OUTPUT CARD ---------- */
+  #output {
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  /* ---------- TABLE ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  th {
+    background: #2c3e50;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #4a627a;
+  }
+
+  td {
+    padding: 9px;
+    border: 1px solid #ddd;
+  }
+
+  tr:hover td {
+    background: #f1f7ff;
+  }
+
+  .total-row {
+    font-weight: bold;
+    background: #fceabb !important;
+  }
+
+  /* ---------- LOADER ---------- */
+  #loader {
+    display: none;
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #2980b9;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .toast-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 1000;
+    font-size: 12px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* ---------- PRINT MODE ---------- */
+  @media print {
+    button, select, h2, .controls, .control-group, label {
+      display: none !important;
+    }
+    body {
+      background: white;
+      padding: 0px;
+      margin: 0;
+    }
+    #output {
+      box-shadow: none;
+      padding: 0px;
+      margin: 0;
+    }
+    .page-header {
+      display: block;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    th {
+      background: #000000 !important;
+      color: white !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    @page {
+      size: landscape;
+      margin: 0.5in;
+    }
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 15px;
+    }
+    select, button {
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 6px;
+      font-size: 11px;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">📑 Tender Status – NIT Based Report</div>
+
+<h2>📊 Select NIT to Generate Report</h2>
+
+<div class="controls">
+  <div class="control-group">
+    <label>Select NIT:</label>
+    <select id="nitSelect"></select>
+  </div>
+  <button onclick="loadReport()">📋 Load Report</button>
+  <button class="btn-excel" onclick="requestExport('excel')">📊 Export Excel</button>
+  <button class="btn-pdf" onclick="requestExport('pdf')">📄 Export PDF</button>
+  <button class="btn-print" onclick="requestPrint()">🖨️ Print</button>
+</div>
+
+<div id="loader">⏳ Generating Report <span>...</span></div>
+
+<div id="output"></div>
+
+<script>
+
+const API = "https://script.google.com/macros/s/AKfycbyhCDxKqIHUOH2KoyTHeO33KW_-UWT3ggL00iH9FMsek_PammWQwX7vRNkoCkGf_7xw/exec";
+
+let currentNIT = null;
+let currentReportData = null;
+let currentTableHTML = null;
+let totalAccepted = 0;
+let totalRejected = 0;
+
+// Check if we're in an iframe
+function isInIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+}
+
+// Show temporary message
+function showMessage(msg, type = 'info') {
+  const existingToast = document.querySelector('.toast-message');
+  if (existingToast) existingToast.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast-message';
+  const color = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : '#17a2b8');
+  toast.style.borderLeft = `3px solid ${color}`;
+  toast.innerHTML = msg;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// Request export from parent or handle directly
+function requestExport(format) {
+  if (!currentReportData || currentReportData.length === 0) {
+    showMessage('No data to export. Please load a report first.', 'error');
+    return;
+  }
+  
+  showMessage(`Preparing ${format.toUpperCase()} export...`, 'info');
+  
+  if (isInIframe()) {
+    const exportData = generateExportData(format);
+    
+    window.parent.postMessage({
+      type: 'EXPORT_REQUEST',
+      format: format,
+      data: exportData.data,
+      filename: `NIT_Report_${currentNIT}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}`,
+      mimeType: exportData.mimeType,
+      htmlContent: format === 'pdf' ? generateHTMLForPDF() : null
+    }, '*');
+    
+    showMessage(`${format.toUpperCase()} export requested. Check downloads folder.`, 'success');
+  } else {
+    directExport(format);
+  }
+}
+
+// Request print from parent or handle directly
+function requestPrint() {
+  if (!currentReportData || currentReportData.length === 0) {
+    showMessage('No data to print. Please load a report first.', 'error');
+    return;
+  }
+  
+  if (isInIframe()) {
+    window.parent.postMessage({
+      type: 'PRINT_REQUEST',
+      htmlContent: generateHTMLForPDF()
+    }, '*');
+    showMessage('Print dialog requested', 'info');
+  } else {
+    window.print();
+  }
+}
+
+// Generate data for export
+function generateExportData(format) {
+  if (format === 'excel') {
+    const excelHTML = generateExcelHTML();
+    return {
+      data: excelHTML,
+      mimeType: 'application/vnd.ms-excel'
+    };
+  } else if (format === 'pdf') {
+    const pdfHTML = generateHTMLForPDF();
+    return {
+      data: pdfHTML,
+      mimeType: 'text/html'
+    };
+  }
+  return null;
+}
+
+// Generate Excel-compatible HTML
+function generateExcelHTML() {
+  let html = `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>NIT Report - ${currentNIT}</title>
+      <style>
+        th { background-color: #000000; color: #ffffff; }
+        td, th { border: 1px solid #ddd; padding: 8px; }
+        table { border-collapse: collapse; width: 100%; }
+        .total-row { background-color: #fceabb; font-weight: bold; }
+      </style>
+    </head>
+    <body>
+      <h2 style="color: #2c3e50;">NIT REPORT: ${currentNIT}</h2>
+      <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+      <p><strong>Total Vendors:</strong> ${currentReportData.length}</p>
+      <p><strong>Total Accepted Amount:</strong> ${totalAccepted}</p>
+      <p><strong>Total Rejected Amount:</strong> ${totalRejected}</p>
+      ${currentTableHTML || generateTableHTML()}
+    </body>
+    </html>
+  `;
+  return html;
+}
+
+// Generate HTML optimized for PDF printing
+function generateHTMLForPDF() {
+  let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>NIT Report - ${currentNIT}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          padding: 20px;
+        }
+        h2 {
+          color: #2c3e50;
+          margin-bottom: 20px;
+        }
+        .info {
+          margin-bottom: 20px;
+          padding: 10px;
+          background: #f8f9fa;
+          border-left: 3px solid #3498db;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+        th {
+          background: #000000;
+          color: #ffffff;
+          padding: 10px;
+          border: 1px solid #ddd;
+        }
+        td {
+          padding: 8px;
+          border: 1px solid #ddd;
+        }
+        .total-row {
+          background-color: #fceabb;
+          font-weight: bold;
+        }
+        @media print {
+          body { margin: 0; padding: 0; }
+          .no-print { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <h2>NIT REPORT: ${currentNIT}</h2>
+      <div class="info">
+        <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
+        <strong>Total Vendors:</strong> ${currentReportData.length}<br>
+        <strong>Total Accepted Amount:</strong> ${totalAccepted}<br>
+        <strong>Total Rejected Amount:</strong> ${totalRejected}
+      </div>
+      ${currentTableHTML || generateTableHTML()}
+      <div class="no-print" style="margin-top: 30px; text-align: center; font-size: 10px; color: #999;">
+        Generated from Central Register Hub
+      </div>
+    </body>
+    </html>
+  `;
+  return html;
+}
+
+// Generate table HTML for export
+function generateTableHTML() {
+  if (!currentReportData || currentReportData.length === 0) {
+    return '<p>No data available</p>';
+  }
+  
+  let html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  html += `
+    <thead>
+      <tr>
+        <th>Vendor</th>
+        <th>Accepted SL</th>
+        <th>Rejected SL</th>
+        <th>Accepted Amt</th>
+        <th>Rejected Amt</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+  
+  currentReportData.forEach(v => {
+    html += `
+      <tr>
+        <td>${escapeHtml(v.vendor)}</td>
+        <td>${v.acceptedSLs.join(", ")}</td>
+        <td>${v.rejectedSLs.join(", ")}</td>
+        <td>${v.acceptedAmount}</td>
+        <td>${v.rejectedAmount}</td>
+      </tr>
+    `;
+  });
+  
+  html += `
+      <tr class="total-row">
+        <td colspan="3" style="text-align:right">TOTAL :</td>
+        <td>${totalAccepted}</td>
+        <td>${totalRejected}</td>
+      </tr>
+    </tbody>
+  </table>`;
+  
+  return html;
+}
+
+// Direct export fallback (when not in iframe)
+function directExport(format) {
+  if (format === 'excel') {
+    const excelHTML = generateExcelHTML();
+    const blob = new Blob([excelHTML], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = `NIT_Report_${currentNIT}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showMessage('Excel export complete!', 'success');
+  } else if (format === 'pdf') {
+    window.print();
+  }
+}
+
+// Escape HTML helper
+function escapeHtml(str) {
+  if (str === undefined || str === null) return '';
+  const s = String(str);
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ✅ Load NIT List */
+fetch(API + "?action=listNIT")
+  .then(r => r.json())
+  .then(list => {
+    const sel = document.getElementById("nitSelect");
+    list.forEach(n => {
+      const opt = document.createElement("option");
+      opt.value = n;
+      opt.textContent = n;
+      sel.appendChild(opt);
+    });
+    showMessage('NIT list loaded successfully', 'success');
+  })
+  .catch(err => {
+    console.error('Error loading NIT list:', err);
+    showMessage('Failed to load NIT list', 'error');
+  });
+
+/* ✅ Load Report */
+function loadReport() {
+  const nit = document.getElementById("nitSelect").value;
+  
+  if (!nit) {
+    showMessage('Please select a NIT first', 'error');
+    return;
+  }
+  
+  currentNIT = nit;
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("output").innerHTML = "";
+  
+  fetch(API + "?action=report&nit=" + encodeURIComponent(nit))
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("loader").style.display = "none";
+      
+      if (!data.length) {
+        document.getElementById("output").innerHTML =
+          "<b>No records found for this NIT.</b>";
+        showMessage('No records found for this NIT', 'info');
+        currentReportData = null;
+        return;
+      }
+      
+      currentReportData = data;
+      totalAccepted = 0;
+      totalRejected = 0;
+      
+      data.forEach(v => {
+        totalAccepted += Number(v.acceptedAmount);
+        totalRejected += Number(v.rejectedAmount);
+      });
+      
+      let html = `
+        <div style="
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:15px;
+            text-align:left;
+            color:#2c3e50;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;">
+          🔍 REPORT FOR NIT: <span style="color:#c0392b">${escapeHtml(nit)}</span>
+          <span style="float: right; font-size: 12px; font-weight: normal;">
+            Generated: ${new Date().toLocaleString()}
+          </span>
+        </div>
+      `;
+      
+      html += '<table id="reportTable" border="1" style="border-collapse: collapse; width: 100%;">';
+      html += `
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Accepted SL</th>
+            <th>Rejected SL</th>
+            <th>Accepted Amt</th>
+            <th>Rejected Amt</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+      
+      data.forEach(v => {
+        html += `
+          <tr>
+            <td>${escapeHtml(v.vendor)}</td>
+            <td>${v.acceptedSLs.join(", ")}</td>
+            <td>${v.rejectedSLs.join(", ")}</td>
+            <td>${v.acceptedAmount}</td>
+            <td>${v.rejectedAmount}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+        <tr class="total-row">
+          <td colspan="3" style="text-align:right; font-weight: bold;">TOTAL :</td>
+          <td style="font-weight: bold;">${totalAccepted}</td>
+          <td style="font-weight: bold;">${totalRejected}</td>
+        </tr>
+      `;
+      
+      html += "</tbody></table>";
+      
+      currentTableHTML = html;
+      document.getElementById("output").innerHTML = html;
+      
+      // Notify parent if in iframe
+      if (isInIframe()) {
+        window.parent.postMessage({ type: 'REPORT_LOADED', report: 'nit_report', nit: nit }, '*');
+      }
+      
+      showMessage(`Report loaded for NIT: ${nit}`, 'success');
+    })
+    .catch(err => {
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("output").innerHTML =
+        `<b style="color:#dc3545;">Error loading report: ${err.message}</b>`;
+      showMessage('Failed to load report: ' + err.message, 'error');
+      console.error('Error:', err);
+    });
+}
+
+// Listen for messages from parent
+window.addEventListener('message', function(event) {
+  if (event.data.type === 'REQUEST_REFRESH') {
+    loadReport();
+  } else if (event.data.type === 'REQUEST_EXPORT') {
+    requestExport(event.data.format);
+  } else if (event.data.type === 'REQUEST_PRINT') {
+    requestPrint();
+  }
+});
+
+// Expose functions globally
+window.loadReport = loadReport;
+window.requestExport = requestExport;
+window.requestPrint = requestPrint;
+
+// Load first NIT automatically if available (optional)
+setTimeout(() => {
+  const sel = document.getElementById("nitSelect");
+  if (sel && sel.options.length > 0) {
+    // Optional: auto-load first NIT
+    // loadReport();
+  }
+}, 1000);
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NIT Report Viewer</title>
+
+<style>
+
+  /* ---------- GLOBAL UI ---------- */
+  body {
+    font-family: "Segoe UI", sans-serif;
+    background: #eef1f7;
+    padding: 30px;
+    color: #2c3e50;
+  }
+
+  /* ---------- HEADER STRIP ---------- */
+  .page-header {
+    padding: 18px;
+    background: linear-gradient(135deg,#34495e,#2c3e50);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #34495e;
+    text-align: left;
+  }
+
+  /* ---------- SELECT + BUTTONS ---------- */
   select, button {
     padding: 12px 18px;
     font-size: 16px;
