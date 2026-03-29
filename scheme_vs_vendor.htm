@@ -72,6 +72,7 @@
     .action-buttons {
       display: flex;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -99,6 +100,26 @@
     .btn-outline:hover {
       background: #f1f5f9;
       border-color: #94a3b8;
+    }
+
+    .btn-excel {
+      background: #1e6f3f;
+      border-color: #1e6f3f;
+      color: white;
+    }
+
+    .btn-excel:hover {
+      background: #155a34;
+    }
+
+    .btn-pdf {
+      background: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+
+    .btn-pdf:hover {
+      background: #bb2d3b;
     }
 
     /* Info panel - screen only */
@@ -174,9 +195,33 @@
       background: #fef2f2;
     }
 
-    /* ========== CRITICAL: PRINT STYLES - ONLY GENERATED CONTENT PRINTS ========== */
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+      font-size: 12px;
+      font-weight: 500;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* ========== PRINT STYLES ========== */
     @media print {
-      /* Hide all screen-only UI elements */
       .screen-header,
       .action-buttons,
       .btn,
@@ -187,14 +232,12 @@
         display: none !important;
       }
 
-      /* Remove body padding and background */
       body {
         background: white;
         padding: 0;
         margin: 0;
       }
 
-      /* Container reset for print */
       .register-container {
         max-width: 100%;
         margin: 0;
@@ -204,14 +247,12 @@
         border-radius: 0;
       }
 
-      /* Table wrapper reset - no padding, full width */
       .table-wrapper {
         padding: 0;
         margin: 0;
         overflow-x: visible;
       }
 
-      /* Table print optimization */
       .earnest-table {
         width: 100%;
         border-collapse: collapse;
@@ -235,7 +276,6 @@
         color: black;
       }
 
-      /* Ensure all table rows print with white background */
       .earnest-table tbody tr {
         background: white;
       }
@@ -244,13 +284,11 @@
         background: white !important;
       }
 
-      /* Portrait page settings */
       @page {
         size: portrait;
         margin: 0.5in 0.4in;
       }
 
-      /* Optional: add a subtle header only for print (just title) */
       body::before {
         content: "SCHEME VS VENDOR - ACCEPTED ENTRIES";
         display: block;
@@ -262,7 +300,6 @@
         font-family: Arial, sans-serif;
       }
       
-      /* Add print date footer */
       body::after {
         content: "Generated: " attr(data-print-date);
         display: block;
@@ -273,7 +310,6 @@
       }
     }
 
-    /* Responsive adjustments */
     @media (max-width: 700px) {
       body {
         padding: 12px;
@@ -304,7 +340,9 @@
     </div>
     <div class="action-buttons">
       <button class="btn btn-outline" onclick="refreshData()">⟳ Refresh</button>
-      <button class="btn btn-primary" onclick="printOnlyContent()">🖨️ Print (Content Only)</button>
+      <button class="btn btn-excel" onclick="requestExport('excel')">📊 Export Excel</button>
+      <button class="btn btn-pdf" onclick="requestExport('pdf')">📄 Export PDF</button>
+      <button class="btn btn-primary" onclick="requestPrint()">🖨️ Print</button>
     </div>
   </div>
 
@@ -328,7 +366,7 @@
   // SCHEME VS VENDOR - ACCEPTED ONLY
   // FILTER: Column 11 (1-based) must equal "ACCEPTED"
   // DISPLAY: Columns 3,4,5,6,7,8 (1-based)
-  // PRINT MODULE: Prints ONLY the generated table content, no extra UI
+  // EXPORT: PostMessage to parent launcher for Excel/PDF
   // ========================================================================
 
   const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
@@ -338,10 +376,240 @@
   // Column 11 filter (1-based) -> array index 10
   const ACCEPTED_COLUMN_INDEX = 10; // zero-based
   
-  let originalFullData = null;      // raw data from sheet [headers, rows...]
-  let filteredAcceptedData = null;  // [headers] + rows where col11 === "ACCEPTED"
+  let originalFullData = null;
+  let filteredAcceptedData = null;
   let acceptedCount = 0;
   let totalRows = 0;
+  let currentTableHTML = null;
+
+  // Check if we're in an iframe
+  function isInIframe() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  // Show temporary message
+  function showMessage(msg, type = 'info') {
+    const existingToast = document.querySelector('.toast-message');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    const color = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : '#17a2b8');
+    toast.style.borderLeft = `3px solid ${color}`;
+    toast.innerHTML = msg;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+
+  // Request export from parent or handle directly
+  function requestExport(format) {
+    if (!filteredAcceptedData || filteredAcceptedData.length < 2) {
+      showMessage('No data to export', 'error');
+      return;
+    }
+    
+    showMessage(`Preparing ${format.toUpperCase()} export...`, 'info');
+    
+    if (isInIframe()) {
+      const exportData = generateExportData(format);
+      
+      window.parent.postMessage({
+        type: 'EXPORT_REQUEST',
+        format: format,
+        data: exportData.data,
+        filename: `Scheme_Vs_Vendor_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}`,
+        mimeType: exportData.mimeType,
+        htmlContent: format === 'pdf' ? generateHTMLForPDF() : null
+      }, '*');
+      
+      showMessage(`${format.toUpperCase()} export requested. Check downloads folder.`, 'success');
+    } else {
+      directExport(format);
+    }
+  }
+
+  // Request print from parent or handle directly
+  function requestPrint() {
+    if (isInIframe()) {
+      window.parent.postMessage({
+        type: 'PRINT_REQUEST',
+        htmlContent: generateHTMLForPDF()
+      }, '*');
+      showMessage('Print dialog requested', 'info');
+    } else {
+      window.print();
+    }
+  }
+
+  // Generate data for export
+  function generateExportData(format) {
+    if (format === 'excel') {
+      const excelHTML = generateExcelHTML();
+      return {
+        data: excelHTML,
+        mimeType: 'application/vnd.ms-excel'
+      };
+    } else if (format === 'pdf') {
+      const pdfHTML = generateHTMLForPDF();
+      return {
+        data: pdfHTML,
+        mimeType: 'text/html'
+      };
+    }
+    return null;
+  }
+
+  // Generate Excel-compatible HTML
+  function generateExcelHTML() {
+    let html = `
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Scheme Vs Vendor Register - Accepted Only</title>
+        <style>
+          th { background-color: #000000; color: #ffffff; }
+          td, th { border: 1px solid #ddd; padding: 8px; }
+          table { border-collapse: collapse; width: 100%; }
+        </style>
+      </head>
+      <body>
+        <h2>SCHEME VS VENDOR - ACCEPTED ONLY</h2>
+        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>Filter:</strong> Column 11 = "ACCEPTED"</p>
+        <p><strong>Total Records:</strong> ${acceptedCount} | <strong>Columns Shown:</strong> ${DESIRED_COLUMNS.join(', ')}</p>
+        ${currentTableHTML || generateTableHTML()}
+      </body>
+      </html>
+    `;
+    return html;
+  }
+
+  // Generate HTML optimized for PDF printing
+  function generateHTMLForPDF() {
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Scheme Vs Vendor Register - Accepted Only</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+          }
+          h2 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+          }
+          .info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 3px solid #2e7d32;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+          }
+          th {
+            background: #000000;
+            color: #ffffff;
+            padding: 10px;
+            border: 1px solid #ddd;
+          }
+          td {
+            padding: 8px;
+            border: 1px solid #ddd;
+          }
+          @media print {
+            body { margin: 0; padding: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h2>SCHEME VS VENDOR - ACCEPTED ONLY</h2>
+        <div class="info">
+          <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
+          <strong>Filter:</strong> Column 11 = "ACCEPTED"<br>
+          <strong>Total Records:</strong> ${acceptedCount}<br>
+          <strong>Columns Shown:</strong> ${DESIRED_COLUMNS.join(', ')}
+        </div>
+        ${currentTableHTML || generateTableHTML()}
+        <div class="no-print" style="margin-top: 30px; text-align: center; font-size: 10px; color: #999;">
+          Generated from Central Register Hub
+        </div>
+      </body>
+      </html>
+    `;
+    return html;
+  }
+
+  // Generate table HTML from current data
+  function generateTableHTML() {
+    if (!filteredAcceptedData || filteredAcceptedData.length < 2) {
+      return '<p>No data available</p>';
+    }
+    
+    const headersRow = filteredAcceptedData[0];
+    const dataRows = filteredAcceptedData.slice(1);
+    const colIndices = DESIRED_COLUMNS.map(col => col - 1);
+    
+    let html = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+    
+    // Header row
+    html += '<thead><tr>';
+    for (let i = 0; i < colIndices.length; i++) {
+      const colIdx = colIndices[i];
+      let headerText = (headersRow && headersRow[colIdx] !== undefined && headersRow[colIdx] !== null) 
+                        ? headersRow[colIdx] : `Column ${DESIRED_COLUMNS[i]}`;
+      html += `<th style="background-color: #000000; color: #ffffff;">${escapeHtml(headerText)}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+    
+    // Data rows
+    for (let r = 0; r < dataRows.length; r++) {
+      const row = dataRows[r];
+      html += '<tr>';
+      for (let c = 0; c < colIndices.length; c++) {
+        const colIdx = colIndices[c];
+        let cellVal = (row && row[colIdx] !== undefined && row[colIdx] !== null) ? row[colIdx] : '';
+        html += `<td>${escapeHtml(cellVal)}</td>`;
+      }
+      html += '</tr>';
+    }
+    
+    html += '</tbody></table>';
+    return html;
+  }
+
+  // Direct export fallback (when not in iframe)
+  function directExport(format) {
+    if (format === 'excel') {
+      const excelHTML = generateExcelHTML();
+      const blob = new Blob([excelHTML], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = `Scheme_Vs_Vendor_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showMessage('Excel export complete!', 'success');
+    } else if (format === 'pdf') {
+      window.print();
+    }
+  }
 
   // Helper: escape HTML to prevent injection
   function escapeHtml(str) {
@@ -378,7 +646,6 @@
       statsSpan.innerHTML = `✅ ${acceptedCount} accepted / ${totalRows} total · col11="ACCEPTED"`;
     }
     
-    // Convert desired columns to zero-based indices
     const colIndices = DESIRED_COLUMNS.map(col => col - 1);
     
     let tableHtml = '<table class="earnest-table" cellspacing="0">';
@@ -405,6 +672,7 @@
     }
     tableHtml += '</tbody></table>';
     
+    currentTableHTML = tableHtml;
     container.innerHTML = tableHtml;
     
     // Update print date attribute for footer
@@ -414,7 +682,7 @@
   }
   
   // Show loading indicator
-  function showLoading(message = "Loading earnest money data & filtering ACCEPTED entries...") {
+  function showLoading(message = "Loading scheme vs vendor data & filtering ACCEPTED entries...") {
     const container = document.getElementById('tableContainer');
     if (container) {
       container.innerHTML = `<div class="loading-state">⏳ ${escapeHtml(message)}</div>`;
@@ -448,7 +716,6 @@
       
       const jsonData = await response.json();
       
-      // Validate data structure
       if (!jsonData || !Array.isArray(jsonData) || jsonData.length === 0) {
         originalFullData = null;
         filteredAcceptedData = null;
@@ -465,87 +732,70 @@
       const dataRows = originalFullData.slice(1);
       totalRows = dataRows.length;
       
-      // FILTER: Column 11 (index 10) must equal "ACCEPTED" after trim
+      // FILTER: Column 11 (index 10) must equal "ACCEPTED"
       const acceptedRows = dataRows.filter(row => {
         if (!row || row.length <= ACCEPTED_COLUMN_INDEX) return false;
         const cellValue = row[ACCEPTED_COLUMN_INDEX];
         if (cellValue === undefined || cellValue === null) return false;
         const strValue = String(cellValue).trim();
-        // Strict match: exactly "ACCEPTED" (case-sensitive per spec)
         return strValue === "ACCEPTED";
       });
       
-      // Build filtered dataset: headers + accepted rows
       filteredAcceptedData = [headers, ...acceptedRows];
       acceptedCount = acceptedRows.length;
       
-      // Render based on results
+      // Show iframe status and notify parent
+      if (isInIframe()) {
+        const infoPanel = document.getElementById('infoPanel');
+        if (infoPanel) infoPanel.classList.add('iframe-warning');
+        window.parent.postMessage({ type: 'REPORT_LOADED', report: 'scheme_vs_vendor' }, '*');
+      }
+      
       if (acceptedRows.length === 0) {
         showEmptyAccepted();
       } else {
         renderAcceptedTable();
+        showMessage(`Loaded ${acceptedCount} accepted records`, 'success');
       }
       
     } catch (err) {
-      console.error("Earnest money fetch error:", err);
+      console.error("Scheme vs Vendor fetch error:", err);
       showError(err.message || "Network / CORS issue. Ensure Google Apps Script returns JSON.");
       filteredAcceptedData = null;
     }
   }
   
-  // Refresh data handler
   function refreshData() {
     loadEarnestData();
   }
   
-  // ========== PRINT MODULE: PRINTS ONLY THE GENERATED CONTENT ==========
-  // This function triggers print with optimized settings.
-  // The CSS @media print ensures all UI elements are hidden,
-  // only the table inside .table-wrapper prints.
-  function printOnlyContent() {
-    // Brief visual feedback (optional)
-    const printBtn = document.querySelector('.btn-primary');
-    const originalText = printBtn ? printBtn.innerText : 'Print';
-    if (printBtn) {
-      printBtn.innerText = '🖨️ Preparing print...';
-      setTimeout(() => { printBtn.innerText = originalText; }, 1000);
+  // Listen for messages from parent
+  window.addEventListener('message', function(event) {
+    if (event.data.type === 'REQUEST_REFRESH') {
+      refreshData();
+    } else if (event.data.type === 'REQUEST_EXPORT') {
+      requestExport(event.data.format);
+    } else if (event.data.type === 'REQUEST_PRINT') {
+      requestPrint();
     }
-    
-    // Ensure print date is updated
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    document.body.setAttribute('data-print-date', dateStr);
-    
-    // If no data loaded, show a small warning but still allow print attempt
-    if (!filteredAcceptedData || filteredAcceptedData.length < 2) {
-      const shouldPrint = confirm("No accepted records found. Print empty register?");
-      if (!shouldPrint) return;
-    }
-    
-    // Trigger browser print - CSS media print handles hiding UI and showing only table
-    window.print();
-  }
+  });
   
-  // Expose functions globally for button onclick handlers
+  // Expose functions globally
   window.refreshData = refreshData;
-  window.printOnlyContent = printOnlyContent;
+  window.requestExport = requestExport;
+  window.requestPrint = requestPrint;
   
   // Initialize on page load
   window.addEventListener('DOMContentLoaded', () => {
     loadEarnestData();
     
-    // Optional: Add keyboard shortcut Ctrl+P / Cmd+P to use same print behavior
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault();
-        printOnlyContent();
+        requestPrint();
       }
     });
   });
-  
-  // Additional: ensure that if any dynamic changes happen, print remains clean
-  // The CSS media print already guarantees that .screen-header, .info-panel, buttons are hidden
-  // So when user clicks print, ONLY the table inside .table-wrapper appears on paper.
 </script>
 </body>
 </html>
