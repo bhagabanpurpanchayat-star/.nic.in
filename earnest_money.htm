@@ -82,16 +82,6 @@
       background: #155a34;
     }
     
-    .export-pdf {
-      background: #dc3545;
-      color: white;
-      border-color: #dc3545;
-    }
-    
-    .export-pdf:hover {
-      background: #bb2d3b;
-    }
-    
     .print-btn {
       background: #1a1a1a;
       color: white;
@@ -126,16 +116,8 @@
       color: #495057;
     }
     
-    .iframe-warning {
-      background: #fff3cd;
-      border-left-color: #ffc107;
-      color: #856404;
-    }
-    
-    /* CRITICAL: Table styles for proper text display */
     .table-container {
       overflow-x: auto;
-      overflow-y: visible;
       width: 100%;
       border: 1px solid #e0e0e0;
       border-radius: 4px;
@@ -146,7 +128,6 @@
       border-collapse: collapse;
       width: 100%;
       font-size: 12px;
-      table-layout: auto;
     }
     
     th {
@@ -160,7 +141,6 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      white-space: nowrap;
     }
     
     td {
@@ -169,20 +149,11 @@
       text-align: left;
       color: #000000;
       font-weight: 400;
-      /* CRITICAL: Allow full text display with wrapping */
-      white-space: normal !important;
-      word-wrap: break-word !important;
-      word-break: break-word !important;
-      overflow-wrap: break-word !important;
-      max-width: 400px;
-      min-width: 100px;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
       vertical-align: top;
       line-height: 1.5;
-    }
-    
-    /* Allow certain columns to be wider if needed */
-    td:nth-child(1), td:nth-child(2), td:nth-child(3) {
-      min-width: 120px;
     }
     
     tr:hover {
@@ -215,7 +186,6 @@
       font-size: 13px;
       font-weight: 500;
       animation: slideIn 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
     @keyframes slideIn {
@@ -229,6 +199,7 @@
       }
     }
     
+    /* Print styles - Landscape with full data */
     @media print {
       body {
         background: white;
@@ -241,6 +212,7 @@
         margin: 0;
         box-shadow: none;
         background: white;
+        max-width: 100%;
       }
       
       .header {
@@ -263,12 +235,7 @@
       table {
         width: 100%;
         border-collapse: collapse;
-      }
-      
-      td {
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        border: 1px solid #000;
+        font-size: 10px;
       }
       
       th {
@@ -277,6 +244,15 @@
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         border: 1px solid #000;
+        padding: 8px;
+      }
+      
+      td {
+        border: 1px solid #000;
+        color: #000;
+        padding: 6px;
+        white-space: normal;
+        word-wrap: break-word;
       }
       
       @page {
@@ -300,43 +276,35 @@
         padding: 4px 10px;
         font-size: 11px;
       }
-      td {
-        max-width: 250px;
-      }
     }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h2>📋 EARNEST MONEY REGISTER</h2>
+    <h2>EARNEST MONEY REGISTER</h2>
     <div class="button-group">
-      <button onclick="refreshData()">⟳ Refresh</button>
-      <button class="print-btn" onclick="printPage()">🖨️ Print</button>
+      <button onclick="refreshData()">Refresh</button>
+      <button class="print-btn" onclick="printPage()">Print</button>
     </div>
     <div class="export-group">
-      <button class="export-excel" onclick="requestExport('excel')">📊 Export Excel</button>
-      <button class="export-pdf" onclick="requestExport('pdf')">📄 Export PDF</button>
+      <button class="export-excel" onclick="exportToExcel()">Export Excel</button>
     </div>
   </div>
   <div class="info" id="info">
-    <span>🔄 Loading data...</span>
+    <span>Loading data...</span>
     <span class="columns-badge" id="columns-badge">Columns: -</span>
   </div>
   <div id="data">
-    <div class="loading">📊 Loading data from server...</div>
+    <div class="loading">Loading data from server...</div>
   </div>
 </div>
 
 <script>
 var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
-
-// Column numbers to display (1-indexed)
 var DESIRED_COLUMNS = [3,4,5,6,7,8,9,10,11,12,13];
-
 var currentData = null;
 
-// Check if we're in an iframe
 function isInIframe() {
   try {
     return window.self !== window.top;
@@ -345,170 +313,65 @@ function isInIframe() {
   }
 }
 
-// Show toast message
 function showMessage(msg, type) {
-  const existingToast = document.querySelector('.toast-message');
+  var existingToast = document.querySelector('.toast-message');
   if (existingToast) existingToast.remove();
   
-  const toast = document.createElement('div');
+  var toast = document.createElement('div');
   toast.className = 'toast-message';
   toast.innerHTML = msg;
   document.body.appendChild(toast);
   
-  setTimeout(() => {
+  setTimeout(function() {
     toast.remove();
   }, 3000);
 }
 
-// Request export
-function requestExport(format) {
+function exportToExcel() {
   if (!currentData || currentData.length === 0) {
-    showMessage('❌ No data to export', 'error');
+    showMessage('No data to export', 'error');
     return;
   }
   
-  showMessage(`📁 Preparing ${format.toUpperCase()} export...`, 'info');
-  
-  if (isInIframe()) {
-    const exportData = generateExportData(format);
-    window.parent.postMessage({
-      type: 'EXPORT_REQUEST',
-      format: format,
-      data: exportData.data,
-      filename: `Earnest_Money_Register_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}`,
-      mimeType: exportData.mimeType,
-      htmlContent: format === 'pdf' ? generatePrintHTML() : null
-    }, '*');
-    showMessage(`✅ ${format.toUpperCase()} export requested`, 'success');
-  } else {
-    directExport(format);
-  }
-}
-
-// Generate export data
-function generateExportData(format) {
-  if (format === 'excel') {
-    return {
-      data: generateExcelHTML(),
-      mimeType: 'application/vnd.ms-excel'
-    };
-  } else if (format === 'pdf') {
-    return {
-      data: generatePrintHTML(),
-      mimeType: 'text/html'
-    };
-  }
-  return null;
-}
-
-// Generate Excel HTML
-function generateExcelHTML() {
-  return `
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Earnest Money Register</title>
-      <style>
-        th { background: #000000; color: #ffffff; padding: 10px; }
-        td, th { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
-        table { border-collapse: collapse; width: 100%; }
-        td { white-space: normal; word-wrap: break-word; }
-      </style>
-    </head>
-    <body>
-      <h2>EARNEST MONEY REGISTER</h2>
-      <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
-      <p><strong>Total Records:</strong> ${currentData.length - 1}</p>
-      ${generateFullTableHTML()}
-    </body>
-    </html>
-  `;
-}
-
-// Generate Print/PDF HTML
-function generatePrintHTML() {
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Earnest Money Register</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { color: #1a1a1a; margin-bottom: 20px; }
-        .info { margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-left: 3px solid #2ecc71; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #000000; color: #ffffff; padding: 10px; border: 1px solid #ddd; }
-        td { padding: 8px; border: 1px solid #ddd; white-space: normal; word-wrap: break-word; }
-        @media print { body { margin: 0; padding: 0; } }
-      </style>
-    </head>
-    <body>
-      <h2>EARNEST MONEY REGISTER</h2>
-      <div class="info">
-        <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
-        <strong>Total Records:</strong> ${currentData.length - 1}<br>
-        <strong>Columns:</strong> ${DESIRED_COLUMNS.join(', ')}
-      </div>
-      ${generateFullTableHTML()}
-    </body>
-    </html>
-  `;
-}
-
-// Generate complete table HTML with proper text handling
-function generateFullTableHTML() {
-  if (!currentData || currentData.length === 0) return '<p>No data available</p>';
-  
   var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
-  var html = '<div class="table-container"><table>';
+  var html = '<html><head><meta charset="UTF-8"><title>Earnest Money Register</title>';
+  html += '<style>th{background:#000;color:#fff;padding:10px}td,th{border:1px solid #ddd;padding:8px}table{border-collapse:collapse}</style>';
+  html += '</head><body><h2>EARNEST MONEY REGISTER</h2>';
+  html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+  html += '<p>Total Records: ' + (currentData.length - 1) + '</p>';
+  html += '<table border="1" cellpadding="8" cellspacing="0">';
   
   for (var i = 0; i < currentData.length; i++) {
     html += '<tr>';
-    
     for (var j = 0; j < colIndices.length; j++) {
       var colIndex = colIndices[j];
       var cellValue = (currentData[i][colIndex] !== undefined && currentData[i][colIndex] !== null) ? currentData[i][colIndex] : '';
-      var cellText = String(cellValue);
-      var escapedText = escapeHtml(cellText);
-      
       if (i === 0) {
-        html += '<th>' + escapedText + '</th>';
+        html += '<th>' + escapeHtml(String(cellValue)) + '</th>';
       } else {
-        // Full text without truncation
-        html += '<td style="white-space: normal; word-wrap: break-word;">' + escapedText + '</td>';
+        html += '<td>' + escapeHtml(String(cellValue)) + '</td>';
       }
     }
-    
     html += '</tr>';
   }
   
-  html += '</table></div>';
-  return html;
+  html += '</table></body></html>';
+  
+  var blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+  var link = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = 'Earnest_Money_Register_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.xls';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  showMessage('Excel export complete!', 'success');
 }
 
-// Direct export fallback
-function directExport(format) {
-  if (format === 'excel') {
-    const blob = new Blob([generateExcelHTML()], { type: 'application/vnd.ms-excel' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.download = `Earnest_Money_Register_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    showMessage('✅ Excel export complete!', 'success');
-  } else if (format === 'pdf') {
-    window.print();
-  }
-}
-
-// Escape HTML
 function escapeHtml(text) {
   if (!text) return '';
-  const map = {
+  var map = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -518,43 +381,32 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
-// Load data
 function loadData() {
-  document.getElementById('data').innerHTML = '<div class="loading">📊 Loading data from server...</div>';
+  document.getElementById('data').innerHTML = '<div class="loading">Loading data from server...</div>';
   document.getElementById('columns-badge').textContent = 'Columns: ' + DESIRED_COLUMNS.join(', ');
   
-  if (isInIframe()) {
-    document.getElementById('info').classList.add('iframe-warning');
-    window.parent.postMessage({ type: 'REPORT_LOADED', report: 'earnest_money' }, '*');
-  }
-  
   fetch(WEB_APP_URL)
-    .then(response => response.json())
-    .then(data => {
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
       if (!data || data.length === 0) {
-        document.getElementById('data').innerHTML = '<div class="empty-state">📭 No data found</div>';
-        document.getElementById('info').innerHTML = '<span>📭 No data found</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+        document.getElementById('data').innerHTML = '<div class="empty-state">No data found</div>';
+        document.getElementById('info').innerHTML = '<span>No data found</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
         return;
       }
       
       currentData = data;
       displayTable(data);
       
-      document.getElementById('info').innerHTML = `
-        <span>✅ Loaded ${data.length - 1} records | ${data[0].length} total columns</span>
-        <span class="columns-badge">📊 Showing columns: ${DESIRED_COLUMNS.join(', ')}</span>
-      `;
-      
-      showMessage(`✅ Loaded ${data.length - 1} records successfully`, 'success');
+      document.getElementById('info').innerHTML = '<span>Loaded ' + (data.length - 1) + ' records | ' + data[0].length + ' total columns</span><span class="columns-badge">Showing columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+      showMessage('Loaded ' + (data.length - 1) + ' records successfully', 'success');
     })
-    .catch(error => {
-      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">❌ Error: ' + error.message + '</div>';
-      document.getElementById('info').innerHTML = '<span>❌ Failed to load data</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
-      showMessage('❌ Failed to load data: ' + error.message, 'error');
+    .catch(function(error) {
+      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">Error: ' + error.message + '</div>';
+      document.getElementById('info').innerHTML = '<span>Failed to load data</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+      showMessage('Failed to load data: ' + error.message, 'error');
     });
 }
 
-// Display table with full text
 function displayTable(data) {
   if (!data || data.length === 0) return;
   
@@ -568,14 +420,12 @@ function displayTable(data) {
     for (var j = 0; j < colIndices.length; j++) {
       var colIndex = colIndices[j];
       var cellValue = (data[i][colIndex] !== undefined && data[i][colIndex] !== null) ? data[i][colIndex] : '';
-      var cellText = String(cellValue);
-      var escapedText = escapeHtml(cellText);
+      var escapedText = escapeHtml(String(cellValue));
       
       if (i === 0) {
         html += '<th>' + escapedText + '</th>';
       } else {
-        // Display full text without any truncation
-        html += '<td style="white-space: normal; word-wrap: break-word; word-break: break-word;">' + escapedText + '</td>';
+        html += '<td>' + escapedText + '</td>';
       }
     }
     
@@ -591,29 +441,9 @@ function refreshData() {
 }
 
 function printPage() {
-  if (isInIframe()) {
-    window.parent.postMessage({
-      type: 'PRINT_REQUEST',
-      htmlContent: generatePrintHTML()
-    }, '*');
-    showMessage('🖨️ Print dialog requested', 'info');
-  } else {
-    window.print();
-  }
+  window.print();
 }
 
-// Listen for messages
-window.addEventListener('message', function(event) {
-  if (event.data.type === 'REQUEST_REFRESH') {
-    refreshData();
-  } else if (event.data.type === 'REQUEST_EXPORT') {
-    requestExport(event.data.format);
-  } else if (event.data.type === 'REQUEST_PRINT') {
-    printPage();
-  }
-});
-
-// Initialize on load
 window.onload = loadData;
 </script>
 </body>
