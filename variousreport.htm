@@ -87,7 +87,6 @@
             z-index: 10;
         }
 
-        /* NEW: Header with integrated selection menu - same row as Central Register Hub */
         .glass-header {
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(12px);
@@ -142,7 +141,6 @@
             gap: 12px;
         }
         
-        /* Integrated selection panel - same row */
         .header-selector-area {
             display: flex;
             align-items: flex-end;
@@ -211,7 +209,6 @@
             background: linear-gradient(105deg, #2c7da0 0%, #1a6685 100%);
         }
 
-        /* Quick stats row removed - everything integrated in header */
         .iframe-palace {
             background: #f9fdfe;
             border-radius: 1.8rem;
@@ -267,6 +264,42 @@
             background: #e6f4fc;
             border-color: #1f6e8c;
         }
+        
+        /* Export buttons styling */
+        .export-buttons-group {
+            display: flex;
+            gap: 8px;
+        }
+        .export-btn {
+            background: none;
+            border: 1px solid #cce1ec;
+            padding: 5px 12px;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .export-excel-btn {
+            color: #1e6f3f;
+            border-color: #c3e0d0;
+        }
+        .export-excel-btn:hover {
+            background: #e8f5ef;
+            border-color: #1e6f3f;
+        }
+        .export-pdf-btn {
+            color: #dc3545;
+            border-color: #f5cfd3;
+        }
+        .export-pdf-btn:hover {
+            background: #ffe6e8;
+            border-color: #dc3545;
+        }
+        
         .iframe-container {
             position: relative;
             background: #ffffff;
@@ -320,6 +353,27 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
         .grace-footer {
             margin-top: 1rem;
             text-align: center;
@@ -333,7 +387,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Responsive: stack header content on mobile */
         @media (max-width: 900px) {
             body { padding: 1rem; }
             .header-row {
@@ -363,6 +416,10 @@
             .launch-btn-compact {
                 width: 100%;
             }
+            .export-buttons-group {
+                width: 100%;
+                justify-content: center;
+            }
         }
         
         iframe {
@@ -388,7 +445,6 @@
 <div class="particle-field" id="particleField"></div>
 
 <div class="dashboard">
-    <!-- Header with integrated selection menu in the SAME ROW as Central Register Hub -->
     <div class="glass-header">
         <div class="header-row">
             <div class="brand">
@@ -402,7 +458,6 @@
                 </div>
             </div>
             
-            <!-- Selection menu right beside the brand, same row -->
             <div class="header-selector-area">
                 <div class="selector-group-compact">
                     <div class="input-label-compact">
@@ -432,7 +487,15 @@
             <div class="report-indicator" id="reportTitleIndicator">
                 <i class="fas fa-file-alt"></i> <span id="activeReportName">No active report</span>
             </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <div class="export-buttons-group" id="exportButtonsGroup" style="display: none;">
+                    <button id="exportExcelBtn" class="export-btn export-excel-btn">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                    <button id="exportPdfBtn" class="export-btn export-pdf-btn">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                </div>
                 <div class="badge-live" id="connectionBadge">
                     <i class="fas fa-circle" style="font-size: 0.5rem; color: #10b981;"></i> Standby
                 </div>
@@ -450,7 +513,7 @@
                     <i class="fas fa-folder-open"></i> earnest_money.htm &nbsp;|&nbsp; security_money.htm &nbsp;|&nbsp; asset.htm
                 </div>
             </div>
-            <iframe id="reportFrame" style="display: none;" title="Register Report Viewer" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-popups-to-escape-sandbox"></iframe>
+            <iframe id="reportFrame" style="display: none;" title="Register Report Viewer"></iframe>
         </div>
     </div>
     <div class="grace-footer">
@@ -487,9 +550,30 @@
     const activeReportSpan = document.getElementById('activeReportName');
     const refreshBtn = document.getElementById('refreshFrameBtn');
     const connectionBadge = document.getElementById('connectionBadge');
+    const exportButtonsGroup = document.getElementById('exportButtonsGroup');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
     
     let currentModuleId = null;
     let isLoading = false;
+    
+    function showToast(message, type = 'success') {
+        const existingToast = document.querySelector('.toast-notification');
+        if(existingToast) existingToast.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+        const color = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#f59e0b');
+        toast.style.borderLeft = `4px solid ${color}`;
+        toast.innerHTML = `<i class="fas ${icon}" style="color: ${color};"></i><span>${message}</span>`;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
     
     function setBadge(status, isError = false) {
         if(isError) {
@@ -514,6 +598,86 @@
         const overlay = document.querySelector('.loading-spinner-overlay');
         if(overlay) overlay.remove();
     }
+    
+    // Handle export requests from iframe
+    function handleExport(exportData) {
+        const { format, data, filename, mimeType, htmlContent } = exportData;
+        
+        try {
+            if (format === 'pdf') {
+                // For PDF, open in new window with print dialog
+                const printWindow = window.open('', '_blank');
+                if (printWindow) {
+                    printWindow.document.write(htmlContent || data);
+                    printWindow.document.close();
+                    printWindow.print();
+                    showToast(`PDF export prepared - use print dialog to save as PDF`, 'success');
+                } else {
+                    showToast('Popup blocked! Please allow popups for this site', 'error');
+                }
+            } else {
+                // Handle Excel and other formats
+                const blob = new Blob([data], { type: mimeType || 'application/vnd.ms-excel' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename || `report_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.${format === 'excel' ? 'xls' : format}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showToast(`${format.toUpperCase()} export successful!`, 'success');
+            }
+        } catch (error) {
+            console.error('Export failed:', error);
+            showToast(`Export failed: ${error.message}`, 'error');
+        }
+    }
+    
+    function handlePrint(printData) {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.write(printData.htmlContent);
+            printWindow.document.close();
+            printWindow.print();
+            showToast('Print dialog opened', 'success');
+        } else {
+            showToast('Popup blocked! Please allow popups for this site', 'error');
+        }
+    }
+    
+    // Request export from iframe
+    function requestIframeExport(format) {
+        if (!currentModuleId) {
+            showToast('No active report to export', 'error');
+            return;
+        }
+        
+        if (iframe.contentWindow) {
+            showToast(`Requesting ${format.toUpperCase()} export...`, 'info');
+            iframe.contentWindow.postMessage({
+                type: 'REQUEST_EXPORT',
+                format: format
+            }, '*');
+        } else {
+            showToast('Cannot communicate with report', 'error');
+        }
+    }
+    
+    // Listen for messages from iframe
+    window.addEventListener('message', function(event) {
+        const data = event.data;
+        
+        if (data.type === 'EXPORT_REQUEST') {
+            handleExport(data);
+        } else if (data.type === 'PRINT_REQUEST') {
+            handlePrint(data);
+        } else if (data.type === 'REPORT_LOADED') {
+            console.log('Report loaded:', data.report);
+            setBadge(`Active: ${data.report}`, false);
+            showToast(`${FRIENDLY_NAMES[data.report] || data.report} loaded successfully`, 'success');
+        }
+    });
     
     function loadReport(moduleId) {
         if(!moduleId) {
@@ -545,6 +709,7 @@
             setBadge("Loaded");
             activeReportSpan.innerHTML = `<i class="fas fa-check-circle" style="color:#1f6e8c;"></i> ${FRIENDLY_NAMES[moduleId] || moduleId}`;
             refreshBtn.style.display = 'inline-flex';
+            exportButtonsGroup.style.display = 'flex';
             connectionBadge.innerHTML = `<i class="fas fa-circle" style="font-size:0.5rem; color:#10b981;"></i> Active · ${FRIENDLY_NAMES[moduleId]?.split(' ')[0] || 'Report'}`;
             connectionBadge.style.background = "#e0f2e9";
         };
@@ -557,6 +722,7 @@
             setBadge("File not found", true);
             activeReportSpan.innerText = "Error: file missing";
             refreshBtn.style.display = 'none';
+            exportButtonsGroup.style.display = 'none';
             
             emptyState.innerHTML = `
                 <i class="fas fa-file-exclamation" style="color:#c44536;"></i>
@@ -602,6 +768,7 @@
         `;
         activeReportSpan.innerText = "No active report";
         refreshBtn.style.display = "none";
+        exportButtonsGroup.style.display = "none";
         setBadge("Standby");
         currentModuleId = null;
     }
@@ -618,10 +785,12 @@
                 activeReportSpan.innerHTML = `<i class="fas fa-sync-alt"></i> ${FRIENDLY_NAMES[currentModuleId] || currentModuleId}`;
                 connectionBadge.innerHTML = `<i class="fas fa-circle" style="font-size:0.5rem; color:#10b981;"></i> Active · ${FRIENDLY_NAMES[currentModuleId]?.split(' ')[0] || 'Report'}`;
                 connectionBadge.style.background = "#e0f2e9";
+                showToast('Report refreshed', 'success');
             };
             iframe.onerror = () => {
                 hideLoadingOverlay();
                 setBadge("Refresh failed", true);
+                showToast('Refresh failed', 'error');
             };
             iframe.src = url;
         } else {
@@ -643,6 +812,7 @@
             `;
             activeReportSpan.innerText = "Awaiting selection";
             refreshBtn.style.display = "none";
+            exportButtonsGroup.style.display = "none";
             return;
         }
         loadReport(selectedVal);
@@ -650,6 +820,8 @@
     
     launchBtn.addEventListener('click', launchFromDropdown);
     refreshBtn.addEventListener('click', refreshCurrentReport);
+    exportExcelBtn.addEventListener('click', () => requestIframeExport('excel'));
+    exportPdfBtn.addEventListener('click', () => requestIframeExport('pdf'));
     
     function generateParticles() {
         const container = document.getElementById('particleField');
@@ -672,6 +844,7 @@
     emptyState.style.display = 'flex';
     iframe.style.display = 'none';
     refreshBtn.style.display = 'none';
+    exportButtonsGroup.style.display = 'none';
     activeReportSpan.innerText = "Ready";
     setBadge("Standby");
     
