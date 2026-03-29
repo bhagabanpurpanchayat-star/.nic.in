@@ -468,10 +468,11 @@
                         <option value="earnest_money">💰 Earnest Money Register</option>
                         <option value="security_money">🔒 Security Money Register</option>
                         <option value="asset">🏭 Asset Register (ACCEPTED Only)</option>
-                        <option value="nit">📄 NIT Register</option>
+                        <option value="nitregister">📄 NIT Register</option>
                         <option value="scheme_vs_vendor">📑 Scheme Vs Vendor Register</option>
                         <option value="scheme_vs_fund">💸 Scheme Vs Fund Register</option>
                         <option value="nit_vs_participant">📑 NIT VS PARTICIPANT</option>
+                        <option value="report">📑 NIT Vs Vendor Summary</option>
                     </select>
                 </div>
                 <button id="viewLaunchBtn" class="launch-btn-compact">
@@ -526,20 +527,22 @@
         'earnest_money': 'earnest_money.htm',
         'security_money': 'security_money.htm',
         'asset': 'asset.htm',
-        'nit': 'nit.htm',
+        'nitregister': 'nitregister.htm',
         'scheme_vs_vendor': 'scheme_vs_vendor.htm',
         'scheme_vs_fund': 'scheme_vs_fund.htm',
         'nit_vs_participant': 'nit_vs_participant.htm'
+        'report': 'report.htm'
     };
     
     const FRIENDLY_NAMES = {
         'earnest_money': 'Earnest Money Register',
         'security_money': 'Security Money Register',
         'asset': 'Asset Register (ACCEPTED)',
-        'nit': 'NIT Register',
+        'nitregister': 'NIT Register',
         'scheme_vs_vendor': 'Scheme Vs Vendor Register',
         'scheme_vs_fund': 'Scheme Vs Fund Register',
         'nit_vs_participant': 'NIT VS PARTICIPANT'
+        'report': 'NIT Vs Vendor Summary'
     };
     
     const selectEl = document.getElementById('registerSelect');
