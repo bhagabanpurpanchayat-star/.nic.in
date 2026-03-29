@@ -92,16 +92,6 @@
       background: #155a34;
     }
     
-    .export-pdf {
-      background: #dc3545;
-      color: white;
-      border-color: #dc3545;
-    }
-    
-    .export-pdf:hover {
-      background: #bb2d3b;
-    }
-    
     .info {
       background: #f8f9fa;
       padding: 8px 12px;
@@ -126,13 +116,6 @@
       color: #495057;
     }
     
-    .iframe-warning {
-      background: #fff3cd;
-      border-left-color: #ffc107;
-      color: #856404;
-    }
-    
-    /* Enhanced table styles for better text handling */
     .data-table-wrapper {
       overflow-x: auto;
       max-width: 100%;
@@ -151,15 +134,14 @@
     th {
       background: #000000;
       color: #ffffff;
-      padding: 10px 8px;
+      padding: 12px 10px;
       text-align: left;
-      font-weight: 600;
-      border: 1px solid #ddd;
-      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid #333;
+      font-size: 12px;
       position: sticky;
       top: 0;
       z-index: 10;
-      background-color: #000000;
     }
     
     td {
@@ -168,50 +150,20 @@
       text-align: left;
       color: #000000;
       font-weight: 400;
-      /* Critical: Allow text wrapping and preserve content */
       word-wrap: break-word;
       word-break: break-word;
       white-space: normal;
-      max-width: 350px;
+      max-width: 400px;
       min-width: 80px;
       vertical-align: top;
+      line-height: 1.4;
     }
     
-    /* Handle long text in specific columns */
-    td.long-text {
-      word-break: break-all;
-      white-space: normal;
-    }
-    
-    /* Add tooltip for truncated content */
-    td[data-fulltext] {
-      cursor: help;
-      position: relative;
-    }
-    
-    td[data-fulltext]:hover::after {
-      content: attr(data-fulltext);
-      position: absolute;
-      left: 0;
-      top: 100%;
-      background: #333;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      white-space: normal;
+    td:nth-child(7) {
+      max-width: 350px;
       word-wrap: break-word;
-      max-width: 450px;
-      min-width: 200px;
-      z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      pointer-events: none;
-    }
-    
-    /* Different positioning for right-aligned columns */
-    td[data-fulltext][data-align="right"]:hover::after {
-      left: auto;
-      right: 0;
+      word-break: break-word;
+      white-space: normal;
     }
     
     tr:hover {
@@ -236,13 +188,12 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: white;
-      padding: 10px 16px;
+      background: #333;
+      color: white;
+      padding: 12px 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 13px;
       animation: slideIn 0.3s ease;
     }
     
@@ -255,32 +206,6 @@
         transform: translateX(0);
         opacity: 1;
       }
-    }
-    
-    /* Scrollbar styling */
-    .data-table-wrapper::-webkit-scrollbar {
-      height: 8px;
-      width: 8px;
-    }
-    
-    .data-table-wrapper::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-    
-    .data-table-wrapper::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 4px;
-    }
-    
-    .data-table-wrapper::-webkit-scrollbar-thumb:hover {
-      background: #555;
-    }
-    
-    /* Number columns alignment */
-    td.number-cell {
-      text-align: right;
-      font-family: monospace;
     }
     
     @media print {
@@ -298,34 +223,30 @@
         overflow-x: visible;
       }
       
-      .header {
-        display: none;
-      }
-      
-      .info {
-        display: none;
-      }
-      
-      button {
-        display: none;
+      .header, .info, button, .button-group, .export-group, .toast-message {
+        display: none !important;
       }
       
       .data-table-wrapper {
         overflow-x: visible;
         border: none;
+        padding: 0;
+        margin: 0;
       }
       
       table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 10px;
+        font-size: 9pt;
+        margin: 0;
       }
       
-      td {
-        word-wrap: break-word;
-        word-break: break-word;
-        white-space: normal;
-        border: 1px solid #000;
+      thead {
+        display: table-header-group;
+      }
+      
+      tr {
+        page-break-inside: avoid;
       }
       
       th {
@@ -334,20 +255,20 @@
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         border: 1px solid #000;
+        padding: 8px 6px;
       }
       
       td {
         border: 1px solid #000;
         color: #000;
-      }
-      
-      td[data-fulltext]:hover::after {
-        display: none;
+        padding: 6px;
+        white-space: normal;
+        word-wrap: break-word;
       }
       
       @page {
         size: landscape;
-        margin: 0.5in;
+        margin: 0.25in;
       }
     }
     
@@ -366,12 +287,6 @@
         padding: 4px 10px;
         font-size: 11px;
       }
-      .button-group, .export-group {
-        flex-wrap: wrap;
-      }
-      td {
-        max-width: 200px;
-      }
     }
   </style>
 </head>
@@ -381,12 +296,11 @@
     <h2>SECURITY MONEY REGISTER</h2>
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
       <div class="button-group">
-        <button onclick="refreshData()">🔄 Refresh</button>
-        <button class="print-btn" onclick="requestPrint()">🖨️ Print</button>
+        <button onclick="refreshData()">Refresh</button>
+        <button class="print-btn" onclick="printReport()">Print</button>
       </div>
       <div class="export-group">
-        <button class="export-excel" onclick="requestExport('excel')">📊 Export Excel</button>
-        <button class="export-pdf" onclick="requestExport('pdf')">📄 Export PDF</button>
+        <button class="export-excel" onclick="exportToExcel()">Export Excel</button>
       </div>
     </div>
   </div>
@@ -401,15 +315,10 @@
 
 <script>
 var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
-
-// CHANGE THESE NUMBERS - Column numbers you want (1,2,3 etc)
 var DESIRED_COLUMNS = [3,4,5,6,7,8,14,15,16,19,25,29,31];
-
 var currentData = null;
 var filteredData = null;
-var currentTableHTML = null;
 
-// Check if we're in an iframe
 function isInIframe() {
   try {
     return window.self !== window.top;
@@ -418,267 +327,224 @@ function isInIframe() {
   }
 }
 
-// Show temporary message
-function showMessage(msg, type = 'info') {
-  const existingToast = document.querySelector('.toast-message');
+function showMessage(msg, type) {
+  var existingToast = document.querySelector('.toast-message');
   if (existingToast) existingToast.remove();
   
-  const toast = document.createElement('div');
+  var toast = document.createElement('div');
   toast.className = 'toast-message';
-  const color = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : '#17a2b8');
-  toast.style.borderLeft = `3px solid ${color}`;
   toast.innerHTML = msg;
   document.body.appendChild(toast);
   
-  setTimeout(() => {
+  setTimeout(function() {
     toast.remove();
   }, 3000);
 }
 
-// Request export from parent or handle directly
-function requestExport(format) {
+function printReport() {
+  if (isInIframe()) {
+    window.parent.postMessage({
+      type: 'PRINT_REQUEST',
+      htmlContent: generatePrintHTML()
+    }, '*');
+  } else {
+    window.print();
+  }
+}
+
+function generatePrintHTML() {
+  if (!filteredData || filteredData.length === 0) {
+    return '<html><body>No data available</body></html>';
+  }
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  
+  var html = '<!DOCTYPE html>\n';
+  html += '<html>\n';
+  html += '<head>\n';
+  html += '<meta charset="UTF-8">\n';
+  html += '<title>Security Money Register</title>\n';
+  html += '<style>\n';
+  html += '* { margin: 0; padding: 0; box-sizing: border-box; }\n';
+  html += 'body { font-family: Arial, sans-serif; margin: 0; padding: 0; }\n';
+  html += 'table { width: 100%; border-collapse: collapse; font-size: 9pt; }\n';
+  html += 'th { background: #000000; color: #ffffff; padding: 8px 6px; border: 1px solid #000; text-align: left; font-weight: bold; }\n';
+  html += 'td { padding: 6px; border: 1px solid #000; white-space: normal; word-wrap: break-word; vertical-align: top; }\n';
+  html += 'thead { display: table-header-group; }\n';
+  html += 'tr { page-break-inside: avoid; }\n';
+  html += '@page { size: landscape; margin: 0.2in; }\n';
+  html += '</style>\n';
+  html += '</head>\n';
+  html += '<body>\n';
+  html += '<table>\n';
+  html += '<thead>\n';
+  html += '<tr>\n';
+  
+  for (var j = 0; j < colIndices.length; j++) {
+    var colIndex = colIndices[j];
+    var headerValue = (filteredData[0][colIndex] !== undefined && filteredData[0][colIndex] !== null) ? filteredData[0][colIndex] : '';
+    html += '<th>' + escapeHtml(String(headerValue)) + '</th>\n';
+  }
+  html += '</tr>\n';
+  html += '</thead>\n';
+  html += '<tbody>\n';
+  
+  for (var i = 1; i < filteredData.length; i++) {
+    html += '<tr>\n';
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (filteredData[i][colIndex] !== undefined && filteredData[i][colIndex] !== null) ? filteredData[i][colIndex] : '';
+      html += '<td>' + escapeHtml(String(cellValue)) + '</td>\n';
+    }
+    html += '</tr>\n';
+  }
+  
+  html += '</tbody>\n';
+  html += '</table>\n';
+  html += '</body>\n';
+  html += '</html>';
+  
+  return html;
+}
+
+// FIXED: Proper Excel Export without Chinese characters
+function exportToExcel() {
   if (!filteredData || filteredData.length === 0) {
     showMessage('No data to export', 'error');
     return;
   }
   
-  showMessage(`Preparing ${format.toUpperCase()} export...`, 'info');
-  
-  if (isInIframe()) {
-    // Send export request to parent window
-    const exportData = generateExportData(format);
-    
-    window.parent.postMessage({
-      type: 'EXPORT_REQUEST',
-      format: format,
-      data: exportData.data,
-      filename: `Security_Money_Register_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}`,
-      mimeType: exportData.mimeType,
-      htmlContent: format === 'pdf' ? generateHTMLForPDF() : null
-    }, '*');
-    
-    showMessage(`${format.toUpperCase()} export requested. Check downloads folder.`, 'success');
-  } else {
-    // Fallback: direct export
-    directExport(format);
-  }
-}
-
-// Request print from parent or handle directly
-function requestPrint() {
-  if (isInIframe()) {
-    window.parent.postMessage({
-      type: 'PRINT_REQUEST',
-      htmlContent: generateHTMLForPDF()
-    }, '*');
-    showMessage('Print dialog requested', 'info');
-  } else {
-    window.print();
-  }
-}
-
-// Generate data for export
-function generateExportData(format) {
-  if (format === 'excel') {
-    const excelHTML = generateExcelHTML();
-    return {
-      data: excelHTML,
-      mimeType: 'application/vnd.ms-excel'
-    };
-  } else if (format === 'pdf') {
-    const pdfHTML = generateHTMLForPDF();
-    return {
-      data: pdfHTML,
-      mimeType: 'text/html'
-    };
-  }
-  return null;
-}
-
-// Generate Excel-compatible HTML with proper text wrapping
-function generateExcelHTML() {
-  const totalRecords = filteredData ? filteredData.length - 1 : 0;
-  const hiddenCount = currentData ? (currentData.length - 1) - totalRecords : 0;
-  
-  let html = `
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Security Money Register</title>
-      <style>
-        th { 
-          background-color: #000000; 
-          color: #ffffff; 
-          padding: 10px;
-        }
-        td, th { 
-          border: 1px solid #ddd; 
-          padding: 8px; 
-          vertical-align: top;
-          word-wrap: break-word;
-          white-space: normal;
-        }
-        table { 
-          border-collapse: collapse; 
-          width: 100%; 
-        }
-        body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-        }
-      </style>
-    </head>
-    <body>
-      <h2>SECURITY MONEY REGISTER</h2>
-      <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
-      <p><strong>Total Records:</strong> ${totalRecords} | <strong>Columns Shown:</strong> ${DESIRED_COLUMNS.join(', ')}</p>
-      ${hiddenCount > 0 ? `<p><strong>Note:</strong> ${hiddenCount} empty rows were hidden (Column 25 empty)</p>` : ''}
-      ${currentTableHTML || generateTableHTML()}
-    </body>
-    </html>
-  `;
-  return html;
-}
-
-// Generate HTML optimized for PDF printing with proper text wrapping
-function generateHTMLForPDF() {
-  const totalRecords = filteredData ? filteredData.length - 1 : 0;
-  const hiddenCount = currentData ? (currentData.length - 1) - totalRecords : 0;
-  
-  let html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Security Money Register</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-          padding: 20px;
-        }
-        h2 {
-          color: #1a1a1a;
-          margin-bottom: 20px;
-        }
-        .info {
-          margin-bottom: 20px;
-          padding: 10px;
-          background: #f8f9fa;
-          border-left: 3px solid #2ecc71;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 20px;
-        }
-        th {
-          background: #000000;
-          color: #ffffff;
-          padding: 10px;
-          border: 1px solid #ddd;
-        }
-        td {
-          padding: 8px;
-          border: 1px solid #ddd;
-          word-wrap: break-word;
-          word-break: break-word;
-          white-space: normal;
-        }
-        @media print {
-          body { margin: 0; padding: 0; }
-          .no-print { display: none; }
-          table {
-            page-break-inside: avoid;
-          }
-          tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-          }
-        }
-      </style>
-    </head>
-    <body>
-      <h2>SECURITY MONEY REGISTER</h2>
-      <div class="info">
-        <strong>Generated:</strong> ${new Date().toLocaleString()}<br>
-        <strong>Total Records:</strong> ${totalRecords}<br>
-        <strong>Columns Shown:</strong> ${DESIRED_COLUMNS.join(', ')}<br>
-        ${hiddenCount > 0 ? `<strong>Note:</strong> ${hiddenCount} empty rows were hidden (Column 25 empty)` : ''}
-      </div>
-      ${currentTableHTML || generateTableHTML()}
-      <div class="no-print" style="margin-top: 30px; text-align: center; font-size: 10px; color: #999;">
-        Generated from Central Register Hub
-      </div>
-    </body>
-    </html>
-  `;
-  return html;
-}
-
-// Generate table HTML from current data with enhanced text handling
-function generateTableHTML() {
-  if (!filteredData || filteredData.length === 0) return '<p>No data available</p>';
-  
   var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
-  var html = '<div class="data-table-wrapper"><table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
   
-  for (var i = 0; i < filteredData.length; i++) {
-    html += '<tr>';
-    
+  // Create workbook data
+  var excelData = [];
+  
+  // Add headers
+  var headers = [];
+  for (var j = 0; j < colIndices.length; j++) {
+    var colIndex = colIndices[j];
+    var headerValue = (filteredData[0][colIndex] !== undefined && filteredData[0][colIndex] !== null) ? filteredData[0][colIndex] : '';
+    headers.push(String(headerValue));
+  }
+  excelData.push(headers);
+  
+  // Add data rows
+  for (var i = 1; i < filteredData.length; i++) {
+    var row = [];
     for (var j = 0; j < colIndices.length; j++) {
       var colIndex = colIndices[j];
       var cellValue = (filteredData[i][colIndex] !== undefined && filteredData[i][colIndex] !== null) ? filteredData[i][colIndex] : '';
-      var cellText = cellValue.toString();
-      var escapedText = escapeHtml(cellText);
-      
-      if (i === 0) {
-        html += '<th style="background-color: #000000; color: #ffffff;">' + escapedText + '</th>';
-      } else {
-        // Check if text is long (more than 80 characters)
-        var longTextClass = cellText.length > 80 ? 'long-text' : '';
-        // Check if it might be a number (for alignment)
-        var isNumber = /^[\d\s,.-]+$/.test(cellText.trim()) && cellText.trim().length > 0;
-        var alignClass = isNumber ? 'number-cell' : '';
-        // Add data-fulltext attribute for tooltip if text is very long
-        var tooltipAttr = cellText.length > 100 ? ` data-fulltext="${escapeHtml(cellText).replace(/"/g, '&quot;')}"` : '';
-        var alignAttr = isNumber ? ` data-align="right"` : '';
-        
-        html += `<td class="${longTextClass} ${alignClass}"${tooltipAttr}${alignAttr} style="color: #000000; word-wrap: break-word; word-break: break-word; white-space: normal;">${escapedText}`;
-        html += ' </td>';
-      }
+      row.push(String(cellValue));
     }
-    
-    html += ' </tr>';
+    excelData.push(row);
   }
   
-  html += '</table></div>';
-  return html;
+  // Convert to CSV format (better than HTML for Excel)
+  var csvContent = excelData.map(function(row) {
+    return row.map(function(cell) {
+      // Handle cells with commas, quotes, or newlines
+      if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+        cell = cell.replace(/"/g, '""');
+        return '"' + cell + '"';
+      }
+      return cell;
+    }).join(',');
+  }).join('\n');
+  
+  // Add BOM for UTF-8 to handle special characters
+  var blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+  var link = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = 'Security_Money_Register_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  showMessage('Excel (CSV) export complete!', 'success');
 }
 
-// Direct export fallback (when not in iframe)
-function directExport(format) {
-  if (format === 'excel') {
-    const excelHTML = generateExcelHTML();
-    const blob = new Blob([excelHTML], { type: 'application/vnd.ms-excel' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.download = `Security_Money_Register_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    showMessage('Excel export complete!', 'success');
-  } else if (format === 'pdf') {
-    window.print();
+// Alternative: XLSX format using SheetJS if needed
+function exportToXLSX() {
+  if (!filteredData || filteredData.length === 0) {
+    showMessage('No data to export', 'error');
+    return;
   }
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  
+  // Prepare data array
+  var exportData = [];
+  
+  // Headers
+  var headers = [];
+  for (var j = 0; j < colIndices.length; j++) {
+    var colIndex = colIndices[j];
+    var headerValue = (filteredData[0][colIndex] !== undefined && filteredData[0][colIndex] !== null) ? filteredData[0][colIndex] : '';
+    headers.push(String(headerValue));
+  }
+  exportData.push(headers);
+  
+  // Data rows
+  for (var i = 1; i < filteredData.length; i++) {
+    var row = [];
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (filteredData[i][colIndex] !== undefined && filteredData[i][colIndex] !== null) ? filteredData[i][colIndex] : '';
+      row.push(String(cellValue));
+    }
+    exportData.push(row);
+  }
+  
+  // Create HTML table for Excel
+  var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+  html += '<head><meta charset="UTF-8"><title>Security Money Register</title>';
+  html += '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+  html += '<x:Name>Security Money Register</x:Name>';
+  html += '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>';
+  html += '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->';
+  html += '<style>';
+  html += 'th { background: #000000; color: #ffffff; }';
+  html += 'td, th { border: 1px solid #ddd; padding: 8px; }';
+  html += 'table { border-collapse: collapse; width: 100%; }';
+  html += '</style>';
+  html += '</head><body>';
+  html += '<h2>SECURITY MONEY REGISTER</h2>';
+  html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+  html += '<p>Total Records: ' + (filteredData.length - 1) + '</p>';
+  html += '<table>';
+  
+  for (var i = 0; i < exportData.length; i++) {
+    html += '<tr>';
+    for (var j = 0; j < exportData[i].length; j++) {
+      if (i === 0) {
+        html += '<th>' + escapeHtml(exportData[i][j]) + '</th>';
+      } else {
+        html += '<td>' + escapeHtml(exportData[i][j]) + '</td>';
+      }
+    }
+    html += '</tr>';
+  }
+  
+  html += '</table></body></html>';
+  
+  var blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+  var link = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = 'Security_Money_Register_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.xls';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  showMessage('Excel export complete!', 'success');
 }
 
-// Helper function to escape HTML special characters
 function escapeHtml(text) {
   if (!text) return '';
-  const map = {
+  var map = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -688,23 +554,13 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
-window.onload = loadData;
-
 function loadData() {
   document.getElementById('data').innerHTML = '<div class="loading">Loading data...</div>';
   document.getElementById('columns-badge').textContent = 'Columns: ' + DESIRED_COLUMNS.join(', ');
   
-  // Show iframe status
-  if (isInIframe()) {
-    const infoDiv = document.getElementById('info');
-    infoDiv.classList.add('iframe-warning');
-    // Notify parent that report is loaded
-    window.parent.postMessage({ type: 'REPORT_LOADED', report: 'security_money' }, '*');
-  }
-  
   fetch(WEB_APP_URL)
-    .then(response => response.json())
-    .then(data => {
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
       if (!data || data.length === 0) {
         document.getElementById('data').innerHTML = '<div class="empty-state">No data found</div>';
         document.getElementById('info').innerHTML = '<span>No data found</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
@@ -725,15 +581,12 @@ function loadData() {
       displayTable(filteredData);
       
       var hiddenCount = (data.length - 1) - filteredRows.length;
-      document.getElementById('info').innerHTML = `
-        <span>✅ Loaded ${filteredRows.length} records | ${filteredData[0].length} total columns | 🗑️ Hidden ${hiddenCount} empty rows</span>
-        <span class="columns-badge">📊 Showing columns: ${DESIRED_COLUMNS.join(', ')}</span>
-      `;
+      document.getElementById('info').innerHTML = '<span>Loaded ' + filteredRows.length + ' records | ' + filteredData[0].length + ' total columns | Hidden ' + hiddenCount + ' empty rows</span><span class="columns-badge">Showing columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
       
-      showMessage(`Loaded ${filteredRows.length} records successfully`, 'success');
+      showMessage('Loaded ' + filteredRows.length + ' records successfully', 'success');
     })
-    .catch(error => {
-      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">❌ Error: ' + error.message + '</div>';
+    .catch(function(error) {
+      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">Error: ' + error.message + '</div>';
       document.getElementById('info').innerHTML = '<span>Failed to load data</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
       showMessage('Failed to load data: ' + error.message, 'error');
     });
@@ -748,50 +601,38 @@ function displayTable(data) {
   
   var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
   
-  var html = '<div class="data-table-wrapper"><table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+  var html = '<div class="data-table-wrapper">\n';
+  html += '<table>\n';
+  html += '<thead>\n';
+  html += '<tr>\n';
   
-  for (var i = 0; i < data.length; i++) {
-    html += '<tr>';
-    
+  for (var j = 0; j < colIndices.length; j++) {
+    var colIndex = colIndices[j];
+    var headerValue = (data[0][colIndex] !== undefined && data[0][colIndex] !== null) ? data[0][colIndex] : '';
+    html += '<th>' + escapeHtml(String(headerValue)) + '</th>\n';
+  }
+  html += '</tr>\n';
+  html += '</thead>\n';
+  html += '<tbody>\n';
+  
+  for (var i = 1; i < data.length; i++) {
+    html += '<tr>\n';
     for (var j = 0; j < colIndices.length; j++) {
       var colIndex = colIndices[j];
       var cellValue = (data[i][colIndex] !== undefined && data[i][colIndex] !== null) ? data[i][colIndex] : '';
-      var cellText = cellValue.toString();
-      var escapedText = escapeHtml(cellText);
-      
-      if (i === 0) {
-        html += '<th style="background-color: #000000; color: #ffffff;">' + escapedText + '</th>';
-      } else {
-        // Add tooltip for long text
-        var longTextClass = cellText.length > 80 ? 'long-text' : '';
-        var isNumber = /^[\d\s,.-]+$/.test(cellText.trim()) && cellText.trim().length > 0;
-        var alignClass = isNumber ? 'number-cell' : '';
-        var tooltipAttr = cellText.length > 100 ? ` data-fulltext="${escapeHtml(cellText).replace(/"/g, '&quot;')}"` : '';
-        var alignAttr = isNumber ? ` data-align="right"` : '';
-        
-        html += `<td class="${longTextClass} ${alignClass}"${tooltipAttr}${alignAttr} style="color: #000000; word-wrap: break-word; word-break: break-word; white-space: normal;">${escapedText} `;
-        html += '</td>';
-      }
+      html += '<td>' + escapeHtml(String(cellValue)) + '</td>\n';
     }
-    
-    html += ' </tr>';
+    html += '</tr>\n';
   }
   
-  html += '</table></div>';
-  currentTableHTML = html;
+  html += '</tbody>\n';
+  html += '</table>\n';
+  html += '</div>';
+  
   document.getElementById('data').innerHTML = html;
 }
 
-// Listen for messages from parent (optional)
-window.addEventListener('message', function(event) {
-  if (event.data.type === 'REQUEST_REFRESH') {
-    refreshData();
-  } else if (event.data.type === 'REQUEST_EXPORT') {
-    requestExport(event.data.format);
-  } else if (event.data.type === 'REQUEST_PRINT') {
-    requestPrint();
-  }
-});
+window.onload = loadData;
 </script>
 </body>
 </html>
