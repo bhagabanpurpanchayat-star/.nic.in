@@ -184,6 +184,19 @@
     .close-btn { background: #dc3545; color: #fff; }
     .save-btn { background: #28a745; color: #fff; }
 
+    /* Read-only tender status styling */
+    .readonly-status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      min-width: 80px;
+    }
+    .status-accepted { background: #28a745; color: white; }
+    .status-rejected { background: #dc3545; color: white; }
+    .status-disqualify { background: #ffc107; color: #000; }
+    .status-empty { background: #6c757d; color: white; }
+
     @media (max-width: 520px) {
       .modal input, .modal select { max-width: 90px; font-size: 11px; }
       .toolbar input { width: 100%; }
@@ -191,7 +204,7 @@
   </style>
 </head>
 <body>
-  <h2>Acceptance & EMD Return ( Disqualify Concept Included)</h2>
+  <h2>Acceptance & EMD Return (Disqualify Concept Included) - <span style="font-size: 14px;">Tender Status READ ONLY</span></h2>
   <div class="summary">
     <span class="badge green" id="paidCount">PAID: ₹0</span>
     <span class="badge red" id="unpaidCount">UNPAID: ₹0</span>
@@ -215,7 +228,7 @@
         <th>VENDOR</th>
         <th>EARNEST MONEY</th>
         <th>Payment Status</th>
-        <th>Tender Status</th>
+        <th>Tender Status <span style="font-size: 11px;">(read only)</span></th>
         <th>Cheque No</th>
         <th>Date</th>
         <th>Action</th>
@@ -242,7 +255,7 @@
             <th>NIT DATE</th>
             <th>EARNEST MONEY</th>
             <th>Payment</th>
-            <th>Tender Status</th>
+            <th>Tender Status <span style="font-size: 11px;">(view only)</span></th>
             <th>Cheque No</th>
             <th>Date</th>
           </tr>
@@ -301,6 +314,29 @@
       return d.toISOString().split('T')[0];
     }
 
+    // Helper function to render tender status as read-only badge
+    function renderTenderStatus(status) {
+      let statusClass = 'status-empty';
+      let displayText = 'Not Set';
+      
+      if (status === 'ACCEPTED') {
+        statusClass = 'status-accepted';
+        displayText = 'ACCEPTED';
+      } else if (status === 'REJECTED') {
+        statusClass = 'status-rejected';
+        displayText = 'REJECTED';
+      } else if (status === 'DISQUALIFY') {
+        statusClass = 'status-disqualify';
+        displayText = 'DISQUALIFY';
+      } else if (status === '') {
+        displayText = '—';
+      } else {
+        displayText = status;
+      }
+      
+      return `<span class="readonly-status ${statusClass}">${displayText}</span>`;
+    }
+
     async function refreshData(){
       const btn=document.getElementById("refreshBtn");
       btn.innerHTML=`<span class="spinner"></span> Refreshing...`;
@@ -339,6 +375,9 @@
         const i = item.idx;
         let tr = document.createElement("tr");
 
+        // Tender status is now rendered as READ-ONLY badge instead of dropdown
+        const tenderStatusHtml = renderTenderStatus(row[8]);
+
         tr.innerHTML = `
           <td>${formatTimestamp(row[0])}</td>
           <td>${row[1]||""}</td>
@@ -351,19 +390,13 @@
             <option value="PAID" ${row[7]==="PAID"?"selected":""}>PAID</option>
             <option value="UNPAID" ${row[7]==="UNPAID"?"selected":""}>UNPAID</option>
           </select></td>
-          <td><select id="status_${i}" onchange="toggleButton(${i})">
-            <option value="" ${row[8]===""?"selected":""}></option>
-            <option value="ACCEPTED" ${row[8]==="ACCEPTED"?"selected":""}>ACCEPTED</option>
-            <option value="REJECTED" ${row[8]==="REJECTED"?"selected":""}>REJECTED</option>
-            <option value="DISQUALIFY" ${row[8]==="DISQUALIFY"?"selected":""}>DISQUALIFY</option>
-          </select></td>
+          <td>${tenderStatusHtml}</td>
           <td><input type="text" id="cheque_${i}" value="${row[9]||''}" oninput="onChequeChange(${i})"></td>
           <td><input type="date" id="date_${i}" value="${parseDateForInput(row[10])}" oninput="toggleButton(${i})"></td>
           <td><button class="action-btn" id="btn_${i}" onclick="updateRow(${i})">Save</button></td>
         `;
 
         tbody.appendChild(tr);
-        updateTenderColor(i);
         onChequeChange(i);
         toggleButton(i);
       });
@@ -376,16 +409,6 @@
       payment.value = cheque ? "PAID" : "UNPAID";
       toggleButton(i);
       updateSummary();
-    }
-
-    function updateTenderColor(i){
-      const status = document.getElementById(`status_${i}`);
-      if(status){
-        if(status.value === "ACCEPTED") status.style.color = "green";
-        else if(status.value === "REJECTED") status.style.color = "red";
-        else if(status.value === "DISQUALIFY") status.style.color = "orange";
-        else status.style.color = "black";
-      }
     }
 
     function toggleButton(i){
@@ -413,11 +436,12 @@
       btn.classList.add('saving');
       btn.disabled = true;
       
+      // IMPORTANT: tenderStatus is NOT changed - it remains as original from tableData
       const payload = {
         action:"updateEarnestMoney",
         rowIndex:i,
         paymentStatus:document.getElementById(`payment_${i}`).value,
-        tenderStatus:document.getElementById(`status_${i}`).value,
+        tenderStatus:tableData[i][8], // Using original tender status from data (read-only)
         chequeNo:document.getElementById(`cheque_${i}`).value,
         dateVal:document.getElementById(`date_${i}`).value
       };
@@ -429,6 +453,11 @@
         });
         const data = await res.json();
         if(data.success) {
+          // Update local data
+          tableData[i][7] = payload.paymentStatus;
+          tableData[i][9] = payload.chequeNo;
+          tableData[i][10] = payload.dateVal;
+          
           showMessage(`Row ${i+1} updated ✅`,"success");
           btn.textContent = "Saved";
           btn.classList.remove('saving');
@@ -483,6 +512,10 @@
         if(row[5] !== vendor || row[7] === "PAID") return;
         modalRows.push(i);
         const tr = document.createElement("tr");
+        
+        // Tender status in modal is also READ-ONLY (display only, no dropdown)
+        const tenderStatusHtml = renderTenderStatus(row[8]);
+        
         tr.innerHTML = `
           <td>${row[2]}</td>
           <td>${row[3]}</td>
@@ -492,12 +525,7 @@
             <option value="PAID" ${row[7]==="PAID"?"selected":""}>PAID</option>
             <option value="UNPAID" ${row[7]==="UNPAID"?"selected":""}>UNPAID</option>
           </select></td>
-          <td><select id="mStatus_${i}">
-            <option value="" ${row[8]===""?"selected":""}></option>
-            <option value="ACCEPTED" ${row[8]==="ACCEPTED"?"selected":""}>ACCEPTED</option>
-            <option value="REJECTED" ${row[8]==="REJECTED"?"selected":""}>REJECTED</option>
-            <option value="DISQUALIFY" ${row[8]==="DISQUALIFY"?"selected":""}>DISQUALIFY</option>
-          </select></td>
+          <td>${tenderStatusHtml}</td>
           <td><input type="text" id="mCheque_${i}" value="${row[9]||''}" oninput="onModalChequeChange(${i})"></td>
           <td><input type="date" id="mDate_${i}" value="${parseDateForInput(row[10])}"></td>
         `;
@@ -546,7 +574,7 @@
         const item = {
           rowIndex: i,
           paymentStatus: document.getElementById(`mPayment_${i}`).value,
-          tenderStatus: document.getElementById(`mStatus_${i}`).value,
+          tenderStatus: tableData[i][8], // Original tender status from data (read-only, not changed)
           chequeNo: document.getElementById(`mCheque_${i}`).value,
           dateVal: document.getElementById(`mDate_${i}`).value
         };
@@ -560,6 +588,13 @@
         });
         const data = await res.json();
         if(data.success){
+          // Update local data
+          payload.data.forEach(item => {
+            tableData[item.rowIndex][7] = item.paymentStatus;
+            tableData[item.rowIndex][9] = item.chequeNo;
+            tableData[item.rowIndex][10] = item.dateVal;
+          });
+          
           showMessage("Modal data saved ✅","success");
           btn.textContent = "Saved";
           setTimeout(() => {
