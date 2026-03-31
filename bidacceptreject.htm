@@ -2,1235 +2,952 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Vendor Bid Entry – Auto Status (Complete/Incomplete)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bid Management | Violet Theme | Excel Style</title>
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #1e1e1e; color: #eee; margin: 0; padding: 15px; font-size: 13px; }
-    h2 { color: #fff; font-size: 20px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 12px; }
-    .toolbar { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .toolbar input { padding: 6px 10px; border-radius: 4px; border: 1px solid #555; width: 260px; background: #3b3b3b; color: #fff; }
-    .toolbar button { padding: 6px 16px; background: #28a745; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; color: white; }
-    .toolbar button:hover { background: #218838; }
-    .spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
-
-    .table-container { height: calc(100vh - 170px); overflow-y: auto; border: 1px solid #444; border-radius: 6px; background: #252525; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th, td { border: 1px solid #444; padding: 8px 6px; text-align: left; white-space: nowrap; }
-    thead th { position: sticky; top: 0; background: #0a2f44; color: #fff; font-weight: 600; z-index: 2; }
-    tbody tr:hover { background: #2a3a4a; }
-    td a { color: #7abaff; text-decoration: none; font-weight: 500; }
-    td a:hover { text-decoration: underline; color: #a0c8ff; cursor: pointer; }
-    td input { width: 100%; padding: 6px; background: #3b3b3b; border: 1px solid #5a6b7a; color: white; border-radius: 4px; font-size: 12px; }
-    td input:focus { outline: 2px solid #0d6efd; background: #4a4a4a; }
-    td input:hover { border-color: #7abaff; }
-    #message { margin-bottom: 12px; padding: 10px; display: none; border-radius: 5px; font-weight: 500; text-align: center; }
-    #message.success { background: #28a745; color: white; }
-    #message.error { background: #dc3545; color: white; }
-    #message.loading { background: #0d6efd; color: white; }
-
-    /* MODERN MODAL – VENDOR LIST STYLE */
-    .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
-    .modal-content { background: #2b2b2b; margin: 20px auto; padding: 0; border-radius: 12px; width: 900px; max-width: 96%; color: #eee; box-shadow: 0 15px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; max-height: 85vh; }
-    .modal-header { background: #1e3a5f; padding: 15px 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
-    .modal-header h3 { margin: 0; font-size: 18px; color: white; font-weight: 500; }
-    .modal-header .close-btn { background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; line-height: 1; padding: 0 5px; }
-    .modal-header .close-btn:hover { color: #ffc107; }
-    .modal-body { padding: 15px 20px; overflow-y: auto; background: #2b2b2b; max-height: calc(85vh - 130px); }
-    
-    /* Fixed summary section - no overlap */
-    .nit-summary { 
-      background: #1e3a3a; 
-      padding: 12px 15px; 
-      border-radius: 8px; 
-      margin-bottom: 15px; 
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 15px; 
-      border-left: 5px solid #17a2b8;
-      position: relative;
-      z-index: 5;
-    }
-    .summary-item { 
-      min-width: 180px; 
-      font-size: 12px;
-    }
-    .summary-item strong { 
-      color: #b0d4ff; 
-      display: inline-block; 
-      width: 90px; 
-    }
-    .summary-item span { 
-      color: #fff; 
-      font-weight: 500; 
-    }
-    .completion-badge { 
-      background: #ffc107; 
-      color: #333; 
-      padding: 2px 8px; 
-      border-radius: 12px; 
-      font-size: 11px; 
-      margin-left: 8px; 
-      display: inline-block;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    /* Vendor table in modal */
-    .vendor-table-container {
-      max-height: 350px;
-      overflow-y: auto;
-      border: 1px solid #3a4a5a;
-      border-radius: 6px;
-    }
-    
-    .vendor-table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      background: #1e1e1e; 
-      font-size: 12px;
-    }
-    .vendor-table th { 
-      background: #0d3d4c; 
-      color: white; 
-      padding: 10px 8px; 
-      font-weight: 500; 
-      text-align: left; 
-      position: sticky; 
-      top: 0; 
-      z-index: 10; 
-    }
-    .vendor-table td { 
-      padding: 10px 8px; 
-      border-bottom: 1px solid #3a4a5a; 
-      color: #ddd; 
-    }
-    .vendor-table tr:last-child td { 
-      border-bottom: none; 
-    }
-    .vendor-table tr:hover { 
-      background: #2a3d4a; 
-    }
-    .vendor-table input { 
-      width: 100%; 
-      padding: 6px 8px; 
-      background: #333; 
-      border: 1px solid #5a6b7a; 
-      color: white; 
-      border-radius: 4px; 
-      font-size: 12px; 
-    }
-    .vendor-table input:focus { 
-      outline: 2px solid #0d6efd; 
-      background: #3d3d3d; 
-    }
-    .vendor-table input:hover { 
-      border-color: #7abaff; 
-    }
-    
-    .status-badge { 
-      padding: 4px 8px; 
-      border-radius: 12px; 
-      font-size: 11px; 
-      font-weight: 600; 
-      display: inline-block; 
-      text-align: center;
-      min-width: 100px;
-    }
-    .status-accepted { 
-      background: #28a745; 
-      color: white; 
-    }
-    .status-rejected { 
-      background: #dc3545; 
-      color: white; 
-    }
-    .status-incomplete { 
-      background: #ffc107; 
-      color: #333; 
-    }
-    
-    .action-btn { 
-      padding: 6px 14px; 
-      background: #0d6efd; 
-      border: none; 
-      border-radius: 4px; 
-      color: white; 
-      font-weight: 600; 
-      cursor: pointer; 
-      font-size: 12px; 
-      white-space: nowrap;
-    }
-    .action-btn:hover { 
-      background: #0b5ed7; 
-    }
-    .action-btn.small { 
-      padding: 4px 8px; 
-      font-size: 11px; 
-    }
-    
-    .modal-footer { 
-      background: #222; 
-      padding: 12px 20px; 
-      border-radius: 0 0 12px 12px; 
-      display: flex; 
-      justify-content: flex-end; 
-      gap: 12px; 
-      border-top: 1px solid #444; 
-      position: sticky; 
-      bottom: 0; 
-      z-index: 10; 
-    }
-    
-    .btn-secondary { 
-      background: #6c757d; 
-      color: white; 
-      border: none; 
-      padding: 6px 18px; 
-      border-radius: 4px; 
-      cursor: pointer; 
-      font-size: 12px;
-    }
-    .btn-secondary:hover { 
-      background: #5a6268; 
-    }
-    .btn-primary { 
-      background: #28a745; 
-      color: white; 
-      border: none; 
-      padding: 6px 20px; 
-      border-radius: 4px; 
-      cursor: pointer; 
-      font-weight: 600; 
-      font-size: 12px;
-    }
-    .btn-primary:hover { 
-      background: #218838; 
-    }
-    .btn-warning { 
-      background: #ffc107; 
-      color: #333; 
-      border: none; 
-      padding: 6px 18px; 
-      border-radius: 4px; 
-      cursor: pointer; 
-      font-weight: 600; 
-      font-size: 12px;
-    }
-    .btn-warning:hover { 
-      background: #e0a800; 
-    }
-
-    /* Toast notification */
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #28a745;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 1000;
-      display: none;
-      animation: slideIn 0.3s ease;
+    body {
+      font-family: 'Segoe UI', 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+      background: #1a0f2e;
+      color: #e2d6f0;
+      margin: 0;
+      padding: 20px;
       font-size: 13px;
     }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+
+    /* main container with violet glassmorphism */
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      background: #2a1a45;
+      border-radius: 24px;
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(156, 102, 255, 0.2);
+      overflow: hidden;
+      backdrop-filter: blur(0px);
     }
 
-    /* Lowest bidder highlight */
-    .lowest-bidder { background-color: #1e4a2a !important; }
-    .lowest-badge { background: #ffd700; color: #333; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-left: 5px; display: inline-block; }
+    /* header */
+    .header-section {
+      padding: 20px 28px 12px 28px;
+      background: #311f55;
+      border-bottom: 1px solid #4a3270;
+    }
 
-    /* Loading overlay */
+    h2 {
+      font-size: 1.65rem;
+      font-weight: 600;
+      color: #e9d9ff;
+      margin: 0;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h2:before {
+      content: "📋";
+      font-size: 1.7rem;
+    }
+
+    .toolbar {
+      margin-top: 18px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 360px;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      border-radius: 40px;
+      border: 1px solid #5e3f8a;
+      background: #1f1436;
+      color: #f0eaff;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .search-wrapper input:focus {
+      outline: none;
+      border-color: #a07eff;
+      box-shadow: 0 0 0 3px rgba(160, 126, 255, 0.2);
+      background: #281c42;
+    }
+
+    .search-wrapper::before {
+      content: "🔍";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #b395ff;
+    }
+
+    .btn-primary {
+      background: #6c3fd9;
+      border: none;
+      padding: 8px 24px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 13px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary:hover {
+      background: #835eff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(108, 63, 217, 0.3);
+    }
+
+    /* table container - excel style with thin dotted borders */
+    .table-container {
+      overflow-x: auto;
+      background: #22173b;
+      border-radius: 0 0 20px 20px;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      min-width: 1350px;
+      background: #22173b;
+    }
+
+    /* ALL CELLS: thin dotted border like excel */
+    th, td {
+      border: 1px dotted #5a4780;
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #341f5a;
+      color: #e5d5ff;
+      font-weight: 600;
+      font-size: 12.5px;
+      letter-spacing: 0.3px;
+      border-bottom: 2px dotted #7c5eb3;
+    }
+
+    tbody tr:hover {
+      background: #2e1f4e;
+      transition: 0.1s;
+    }
+
+    td a {
+      color: #c2a0ff;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px dashed #7a5bb5;
+    }
+
+    td a:hover {
+      color: #e2caff;
+      border-bottom: 1px solid #a27eff;
+    }
+
+    td input {
+      width: 130px;
+      padding: 7px 10px;
+      background: #1f1436;
+      border: 1px solid #5c4190;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #f2eaff;
+      transition: 0.15s;
+    }
+
+    td input:focus {
+      outline: none;
+      border-color: #a07eff;
+      box-shadow: 0 0 0 2px rgba(160, 126, 255, 0.3);
+      background: #2c1e48;
+    }
+
+    .action-btn {
+      background: #42346b;
+      border: none;
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 11px;
+      color: #e7dcff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #5f44a3;
+      color: white;
+      transform: scale(0.96);
+    }
+
+    /* Status badges - violet theme */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .status-accepted {
+      background: #1f543e;
+      color: #bbf0d9;
+      border-left: 3px solid #58d68d;
+    }
+
+    .status-rejected {
+      background: #6a2e2a;
+      color: #ffc9c5;
+      border-left: 3px solid #e67e72;
+    }
+
+    .status-disqualify {
+      background: #6e4a2b;
+      color: #ffdfb3;
+      border-left: 3px solid #f5b041;
+    }
+
+    .lowest-bidder {
+      background-color: #382b5a !important;
+      box-shadow: inset 0 0 0 1px #9a7cdb;
+    }
+
+    .lowest-badge {
+      background: #e2b642;
+      color: #1f113a;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 30px;
+      font-size: 9px;
+      margin-left: 8px;
+    }
+
+    /* modal - violet elevated */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #2c1c49;
+      border-radius: 28px;
+      width: 1000px;
+      max-width: 94%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px #6e4db3;
+      animation: modalPop 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    @keyframes modalPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.94) translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-header {
+      background: #38255f;
+      padding: 18px 24px;
+      border-bottom: 1px solid #5d468a;
+      border-radius: 28px 28px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-weight: 600;
+      color: #ede2ff;
+      font-size: 1.3rem;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #bfabff;
+      transition: 0.1s;
+    }
+
+    .close-btn:hover {
+      color: #ffb7a4;
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      background: #261b40;
+    }
+
+    .nit-summary {
+      background: #352857;
+      border-radius: 20px;
+      padding: 14px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      border: 1px dotted #7e64b0;
+    }
+
+    .summary-item {
+      font-size: 12px;
+      background: #241d3d;
+      padding: 6px 14px;
+      border-radius: 30px;
+      color: #dbceff;
+    }
+
+    .summary-item strong {
+      color: #c7aeff;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .vendor-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #1f173a;
+    }
+
+    .vendor-table th, .vendor-table td {
+      border: 1px dotted #6a5495;
+      padding: 10px 10px;
+    }
+
+    .vendor-table th {
+      background: #34225c;
+      color: #e2d2ff;
+    }
+
+    .vendor-table input {
+      background: #281e45;
+      border: 1px solid #6c51a3;
+      color: #f2ecff;
+      border-radius: 12px;
+      padding: 7px;
+      width: 100%;
+    }
+
+    .spinner-small {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #b59eff;
+      border-top: 2px solid #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .modal-footer {
+      background: #2c1e4a;
+      padding: 16px 24px;
+      border-top: 1px solid #5b4582;
+      display: flex;
+      justify-content: flex-end;
+      gap: 14px;
+      border-radius: 0 0 28px 28px;
+    }
+
+    .btn-secondary {
+      background: #3e2c64;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #e2d5ff;
+    }
+
+    .btn-warning {
+      background: #735a32;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #ffecb3;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #553d93;
+      padding: 12px 24px;
+      border-radius: 60px;
+      color: white;
+      font-weight: 600;
+      z-index: 2100;
+      display: none;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      font-size: 13px;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid #bd9eff;
+    }
+
     .loading-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(20, 10, 35, 0.85);
+      backdrop-filter: blur(5px);
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 2000;
+      z-index: 3000;
     }
+
     .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #fff;
-      border-top: 4px solid transparent;
+      width: 50px;
+      height: 50px;
+      border: 4px solid #9a7edb;
+      border-top: 4px solid #ffffff;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      animation: spin 0.9s linear infinite;
     }
   </style>
 </head>
 <body>
-  <h2>📋 Vendor Bid Entry – Auto Status (Complete/Incomplete)</h2>
-  <div id="message"></div>
-  <div class="toast" id="toast">✓ Saved Successfully</div>
-
-  <div class="toolbar">
-    <input type="text" id="searchInput" placeholder="🔍 Search by UNIQUE NIT, NIT, Vendor..." oninput="filterTable()" />
-    <button id="refreshBtn" onclick="refreshData()">⟳ Refresh</button>
+<div class="app-container">
+  <div class="header-section">
+    <h2>Tender Bid Manager </h2>
+    <div class="toolbar">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Search by UNIQUE NIT, NIT, Vendor..." oninput="filterTable()">
+      </div>
+      <button class="btn-primary" id="refreshBtn" onclick="refreshData()">⟳ Refresh Data</button>
+    </div>
   </div>
-
   <div class="table-container">
     <table id="dataTable">
       <thead>
         <tr>
-          <th>Timestamp</th>
-          <th>UNIQUE NIT (click)</th>
-          <th>NIT</th>
-          <th>SL</th>
-          <th>NIT DATE</th>
-          <th>VENDOR</th>
-          <th>Name of the work</th>
-          <th>Source of Fund</th>
-          <th>ESTIMATE VALUE</th>
-          <th>Bid Amount</th>
-          <th>Action</th>
-          <th>Tender Status</th>
+          <th>Timestamp</th><th>UNIQUE NIT</th><th>NIT</th><th>SL</th><th>NIT DATE (IST)</th><th>VENDOR</th>
+          <th>Work Name</th><th>Source of Fund</th><th>ESTIMATE VALUE</th>
+          <th>TENDER STATUS</th><th>Bid Amount (₹)</th><th>Action</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
+</div>
+<div id="toastMsg" class="toast">✓ Saved</div>
+<div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div></div>
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="loading-overlay">
-    <div class="loading-spinner"></div>
-  </div>
-
-  <!-- DETAIL MODAL: appears when UNIQUE NIT clicked -->
-  <div id="nitModal" class="modal" onclick="if(event.target === this) closeModal()">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalNitDisplay">NIT Details</h3>
-        <button class="close-btn" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body" id="modalBody">
-        <!-- filled dynamically -->
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal()">Close</button>
-        <button class="btn-warning" id="modalRecalculateBtn" onclick="recalculateStatuses()">⟳ Check Completion</button>
-        <button class="btn-primary" id="modalUpdateAllBtn" onclick="updateAllVendorBids()">Update all changed</button>
-      </div>
+<!-- MODAL for NIT details -->
+<div id="nitModal" class="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📌 Vendor Bids (NIT Details)</h3>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn-warning" id="modalRecalcBtn" onclick="recalculateTenderStatusGroup()">⟳ Recalc Status</button>
+      <button class="btn-primary" id="modalUpdateAllBtn" onclick="updateAllModalBids()">💾 Save All Changes</button>
     </div>
   </div>
+</div>
 
-  <script>
-    // IMPORTANT: Replace this URL with your Google Apps Script Web App URL
-    const scriptURL = "https://script.google.com/macros/s/AKfycbx6H1lpIMAKf1dWnZu1frzZho0T-0THp0WDAa09abwoWrtus1XuW5hXfmYuYci2iIG3RQ/exec";
+<script>
+  // ======================== CONFIGURATION ==========================
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyr_2i6n9_9TgNTeUNvTknF52PsOPblarY2C_XPSE9Ls85v07ZmUK2cQbh0rZBLbTDM/exec";
+  
+  let masterRows = [];          // { originalIndex, data[] }
+  let currentModalNit = null;
+  
+  // Column indices based on sheet structure
+  const IDX = {
+    UNIQUE_NIT: 1,
+    NIT: 2,
+    VENDOR: 7,
+    WORK_NAME: 6,
+    SOURCE_FUND: 13,
+    ESTIMATE: 16,
+    BID_AMOUNT: 29,
+    TENDER_STATUS: 10,
+    RAW_DATE: 4      // NIT_DATE column index
+  };
+
+  // =============== INDIAN STANDARD TIME FORMAT (DD/MM/YYYY) ===============
+  function formatIndianDate(dateValue) {
+    if (!dateValue) return "";
+    try {
+      let dateObj = null;
+      if (dateValue instanceof Date) {
+        dateObj = dateValue;
+      } else if (typeof dateValue === 'string' && dateValue.includes('GMT')) {
+        // handle "Thu Mar 19 2026 05:30:00 GMT+0530 (India Standard Time)"
+        dateObj = new Date(dateValue);
+      } else if (typeof dateValue === 'string') {
+        dateObj = new Date(dateValue);
+        if (isNaN(dateObj.getTime())) {
+          // fallback: try to parse as yyyy-mm-dd
+          const parts = dateValue.split('T')[0].split('-');
+          if (parts.length === 3) dateObj = new Date(parts[0], parts[1]-1, parts[2]);
+        }
+      } else if (typeof dateValue === 'number') {
+        dateObj = new Date(dateValue);
+      }
+      if (!dateObj || isNaN(dateObj.getTime())) return String(dateValue);
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const year = dateObj.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch(e) {
+      return String(dateValue);
+    }
+  }
+
+  function formatTimestamp(timestampVal) {
+    if (!timestampVal) return "";
+    try {
+      let d = new Date(timestampVal);
+      if (isNaN(d.getTime())) return String(timestampVal);
+      const day = String(d.getDate()).padStart(2,'0');
+      const month = String(d.getMonth()+1).padStart(2,'0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch(e) { return String(timestampVal); }
+  }
+
+  // Helpers
+  function setLoading(show) {
+    document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+  }
+  
+  function showToast(msg, type='success') {
+    const toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.style.backgroundColor = type === 'error' ? '#b84c4c' : '#553d93';
+    toast.style.display = 'flex';
+    setTimeout(() => toast.style.display = 'none', 2200);
+  }
+
+  // =============== STATUS LOGIC (ACCEPTED / REJECTED / DISQUALIFY) ===============
+  function computeTenderStatusForGroup(uniqueNit) {
+    const groupItems = masterRows.filter(item => String(item.data[IDX.UNIQUE_NIT]) === String(uniqueNit));
+    if (groupItems.length === 0) return;
     
-    let tableData = [];        // array of {originalIndex, data: rowArray}
-    let allData = [];          // raw rows from sheet
-    let currentModalUniqueNit = null;  // store NIT for which modal is open
-    let modalVendorRows = [];  // holds {vendor, bidAmount, status, rowIndex, originalRow} for modal table
-    let typingTimer = null;    // Timer for debouncing
-    let modalTypingTimer = null; // Timer for modal debouncing
-
-    function showLoading(show) {
-      document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
-    }
-
-    async function refreshData() {
-      const btn = document.getElementById("refreshBtn");
-      btn.innerHTML = `<span class="spinner"></span> Refreshing...`;
-      btn.disabled = true;
-      showMessage("Refreshing...", "loading");
-      showLoading(true);
-      await loadData();
-      btn.innerHTML = `⟳ Refresh`;
-      btn.disabled = false;
-      showLoading(false);
-      showMessage("Data loaded ✅", "success");
-    }
-
-    async function loadData() {
-      try {
-        // Add cache-busting parameter
-        const url = scriptURL + "?action=getBillPaymentData&t=" + new Date().getTime();
-        
-        const res = await fetch(url);
-        const result = await res.json();
-        
-        console.log('API Response:', result); // Debug log
-        
-        if (!result.success) {
-          throw new Error(result.error || 'Unknown error loading data');
-        }
-        
-        if (!result.data || !Array.isArray(result.data)) {
-          console.error('Invalid data format:', result);
-          throw new Error('Invalid data format received from server');
-        }
-        
-        allData = result.data.slice(1); // Skip header row
-        tableData = allData.map((row, idx) => ({ 
-          originalIndex: idx, 
-          data: row 
-        }));
-        
-        // Initialize statuses: Incomplete for all
-        initializeStatuses();
-        
-        renderTable(tableData);
-        showMessage(`Loaded ${tableData.length} records ✅`, "success");
-        
-      } catch (error) {
-        console.error('Load error:', error);
-        showMessage("Error loading data: " + error.message, "error");
-        // Show empty table
-        renderTable([]);
-      } finally {
-        showLoading(false);
+    let validBids = [];
+    groupItems.forEach(item => {
+      const bidRaw = item.data[IDX.BID_AMOUNT];
+      let bidValue = null;
+      if (bidRaw !== undefined && bidRaw !== null && bidRaw.toString().trim() !== "") {
+        const num = parseFloat(bidRaw);
+        if (!isNaN(num) && num > 0) bidValue = num;
       }
-    }
-
-    function formatDateToDDMMYYYY(dv) {
-      if (!dv) return "";
-      try {
-        if (typeof dv === 'string' && dv.includes('T')) {
-          const d = new Date(dv);
-          if (!isNaN(d)) return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-        }
-        if (dv instanceof Date) {
-          return `${String(dv.getDate()).padStart(2,'0')}/${String(dv.getMonth()+1).padStart(2,'0')}/${dv.getFullYear()}`;
-        }
-        if (typeof dv === 'string' && dv.match(/^\d{4}-\d{2}-\d{2}/)) {
-          const [y,m,d] = dv.split('T')[0].split('-');
-          return `${d}/${m}/${y}`;
-        }
-        return dv;
-      } catch { return dv; }
-    }
-
-    // Initialize all statuses as INCOMPLETE
-    function initializeStatuses() {
-      tableData.forEach(item => {
-        // Tender Status is at index 10 (Column K) in the data array
-        // But we'll use index 23 in our local array for status
-        item.data[23] = 'INCOMPLETE';
-      });
-    }
-
-    // Check if all bids for a UNIQUE NIT are complete (non-empty)
-    function areAllBidsComplete(uniqueNit) {
-      const items = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
-      
-      // Check if every vendor has a non-empty bid amount
-      return items.every(item => {
-        const bid = item.data[22]; // Bid Amount at index 22 (Column AD)
-        return bid && bid.toString().trim() !== '' && !isNaN(parseFloat(bid)) && parseFloat(bid) > 0;
-      });
-    }
-
-    // Calculate status for a group ONLY when all bids are complete
-    function calculateStatusForNitGroup(uniqueNit) {
-      const items = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
-      
-      // First check if all bids are complete
-      const allComplete = items.every(item => {
-        const bid = item.data[22];
-        return bid && bid.toString().trim() !== '' && !isNaN(parseFloat(bid)) && parseFloat(bid) > 0;
-      });
-      
-      if (!allComplete) {
-        // If any bid is incomplete, set all to INCOMPLETE
-        items.forEach(item => {
-          item.data[23] = 'INCOMPLETE';
-        });
-        return false;
+      if (bidValue === null || bidValue <= 0) {
+        item.data[IDX.TENDER_STATUS] = "DISQUALIFY";
+      } else {
+        validBids.push({ item, bidValue });
       }
-      
-      // All bids are complete - calculate ACCEPTED/REJECTED
-      // Find minimum bid amount
+    });
+    
+    if (validBids.length > 0) {
       let minBid = Infinity;
-      items.forEach(item => {
-        const bid = parseFloat(item.data[22]);
-        if (!isNaN(bid) && bid > 0 && bid < minBid) {
-          minBid = bid;
-        }
-      });
-      
-      // Set statuses
-      items.forEach(item => {
-        const bid = parseFloat(item.data[22]);
-        if (Math.abs(bid - minBid) < 0.01) {
-          item.data[23] = 'ACCEPTED';
+      validBids.forEach(v => { if (v.bidValue < minBid) minBid = v.bidValue; });
+      validBids.forEach(v => {
+        if (Math.abs(v.bidValue - minBid) < 0.01) {
+          v.item.data[IDX.TENDER_STATUS] = "ACCEPTED";
         } else {
-          item.data[23] = 'REJECTED';
+          v.item.data[IDX.TENDER_STATUS] = "REJECTED";
         }
       });
-      
-      return true;
     }
+  }
 
-    // Update status displays without re-rendering entire table
-    function updateStatusDisplays(uniqueNit) {
-      const rows = document.querySelectorAll(`tr[data-unique-nit="${uniqueNit}"]`);
-      const items = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
+  function recomputeAllTenderStatuses() {
+    const uniqueNits = new Set();
+    masterRows.forEach(item => {
+      const nitVal = item.data[IDX.UNIQUE_NIT];
+      if (nitVal) uniqueNits.add(String(nitVal));
+    });
+    for (let nit of uniqueNits) computeTenderStatusForGroup(nit);
+  }
+
+  function getStatusBadge(status) {
+    if (status === "ACCEPTED") return '<span class="status-badge status-accepted">✅ ACCEPTED</span>';
+    if (status === "REJECTED") return '<span class="status-badge status-rejected">❌ REJECTED</span>';
+    return '<span class="status-badge status-disqualify">⚠️ DISQUALIFY</span>';
+  }
+
+  function updateTableRowStatusAndHighlight(originalIdx) {
+    const rowElement = document.querySelector(`tr[data-row-idx='${originalIdx}']`);
+    if (!rowElement) return;
+    const item = masterRows.find(r => r.originalIndex == originalIdx);
+    if (!item) return;
+    const status = item.data[IDX.TENDER_STATUS] || "DISQUALIFY";
+    const statusCell = rowElement.querySelector('.status-cell');
+    if (statusCell) statusCell.innerHTML = getStatusBadge(status);
+    
+    rowElement.classList.remove('lowest-bidder');
+    const uniqueNit = String(item.data[IDX.UNIQUE_NIT]);
+    const group = masterRows.filter(i => String(i.data[IDX.UNIQUE_NIT]) === uniqueNit);
+    const acceptedValid = group.filter(i => i.data[IDX.TENDER_STATUS] === "ACCEPTED" && parseFloat(i.data[IDX.BID_AMOUNT]) > 0);
+    if (acceptedValid.length) {
+      let minAcc = Infinity;
+      acceptedValid.forEach(i => { let b = parseFloat(i.data[IDX.BID_AMOUNT]); if(b < minAcc) minAcc = b; });
+      const bidAmt = parseFloat(item.data[IDX.BID_AMOUNT]);
+      if (!isNaN(bidAmt) && bidAmt > 0 && Math.abs(bidAmt - minAcc) < 0.01 && item.data[IDX.TENDER_STATUS] === "ACCEPTED") {
+        rowElement.classList.add('lowest-bidder');
+        let badgeSpan = rowElement.querySelector('.l1-badge');
+        if (!badgeSpan && statusCell && !statusCell.innerHTML.includes('L1')) {
+          statusCell.innerHTML += '<span class="lowest-badge l1-badge">L1</span>';
+        }
+      } else {
+        const badgeSpan = rowElement.querySelector('.l1-badge');
+        if(badgeSpan) badgeSpan.remove();
+      }
+    } else {
+      const badgeSpan = rowElement.querySelector('.l1-badge');
+      if(badgeSpan) badgeSpan.remove();
+    }
+  }
+
+  // Render table with thin dotted borders + indian date format
+  function renderMainTable(filteredArray) {
+    const tbody = document.querySelector("#dataTable tbody");
+    tbody.innerHTML = "";
+    if (!filteredArray.length) {
+      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 48px;">✨ No matching records</td></tr>';
+      return;
+    }
+    filteredArray.forEach(item => {
+      const row = item.data;
+      const origIdx = item.originalIndex;
+      const uniqueNit = row[IDX.UNIQUE_NIT] ? String(row[IDX.UNIQUE_NIT]) : "";
+      const nit = row[IDX.NIT] || "";
+      const sl = row[3] || "";
+      // NIT DATE using Indian format (IST)
+      const nitDateRaw = row[IDX.RAW_DATE];
+      const nitDateDisplay = formatIndianDate(nitDateRaw);
+      const vendor = row[IDX.VENDOR] || "";
+      const workName = row[IDX.WORK_NAME] || "";
+      const fund = row[IDX.SOURCE_FUND] || "";
+      const estimate = row[IDX.ESTIMATE] || "";
+      const bidAmount = row[IDX.BID_AMOUNT] !== undefined ? row[IDX.BID_AMOUNT] : "";
+      const status = row[IDX.TENDER_STATUS] || "DISQUALIFY";
       
-      // Find lowest bidder if all complete
-      const allComplete = areAllBidsComplete(uniqueNit);
-      let minBid = Infinity;
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-unique-nit', uniqueNit);
+      tr.setAttribute('data-row-idx', origIdx);
       
-      if (allComplete) {
-        items.forEach(item => {
-          const bid = parseFloat(item.data[22]);
-          if (!isNaN(bid) && bid > 0 && bid < minBid) {
-            minBid = bid;
+      // compute lowest accepted highlight
+      const groupMin = (() => {
+        const groupAll = masterRows.filter(r => String(r.data[IDX.UNIQUE_NIT]) === uniqueNit);
+        const acc = groupAll.filter(r => r.data[IDX.TENDER_STATUS] === "ACCEPTED" && parseFloat(r.data[IDX.BID_AMOUNT]) > 0);
+        if (!acc.length) return null;
+        let minV = Infinity;
+        acc.forEach(r => { let b = parseFloat(r.data[IDX.BID_AMOUNT]); if(b < minV) minV = b; });
+        return minV;
+      })();
+      const bidNum = parseFloat(bidAmount);
+      const isLowestAccepted = (status === "ACCEPTED" && groupMin !== null && !isNaN(bidNum) && bidNum > 0 && Math.abs(bidNum - groupMin) < 0.01);
+      if (isLowestAccepted) tr.classList.add('lowest-bidder');
+      
+      tr.appendChild(createCell(formatTimestamp(row[0])));
+      const tdNit = document.createElement('td');
+      const link = document.createElement('a');
+      link.href = "#";
+      link.textContent = uniqueNit || "-";
+      link.onclick = (e) => { e.preventDefault(); openNitModal(uniqueNit); };
+      tdNit.appendChild(link);
+      tr.appendChild(tdNit);
+      tr.appendChild(createCell(nit));
+      tr.appendChild(createCell(sl));
+      tr.appendChild(createCell(nitDateDisplay));   // Indian format date
+      tr.appendChild(createCell(vendor));
+      tr.appendChild(createCell(workName));
+      tr.appendChild(createCell(fund));
+      tr.appendChild(createCell(estimate));
+      
+      const tdStatus = document.createElement('td');
+      tdStatus.className = 'status-cell';
+      tdStatus.innerHTML = getStatusBadge(status);
+      if (isLowestAccepted) tdStatus.innerHTML += '<span class="lowest-badge l1-badge">L1</span>';
+      tr.appendChild(tdStatus);
+      
+      const tdBid = document.createElement('td');
+      const bidInput = document.createElement('input');
+      bidInput.type = 'number';
+      bidInput.step = '0.01';
+      bidInput.value = bidAmount;
+      bidInput.setAttribute('data-row-idx', origIdx);
+      bidInput.setAttribute('data-nit', uniqueNit);
+      bidInput.addEventListener('input', function(e) {
+        const newVal = e.target.value;
+        const rowIdx = parseInt(this.getAttribute('data-row-idx'));
+        const nitVal = this.getAttribute('data-nit');
+        const targetItem = masterRows.find(r => r.originalIndex === rowIdx);
+        if (targetItem) {
+          targetItem.data[IDX.BID_AMOUNT] = newVal;
+          computeTenderStatusForGroup(nitVal);
+          const sameNitRows = masterRows.filter(r => String(r.data[IDX.UNIQUE_NIT]) === nitVal);
+          sameNitRows.forEach(r => updateTableRowStatusAndHighlight(r.originalIndex));
+          if (currentModalNit === nitVal) refreshModalContent(nitVal);
+        }
+      });
+      tdBid.appendChild(bidInput);
+      tr.appendChild(tdBid);
+      
+      const tdAction = document.createElement('td');
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'UPDATE';
+      saveBtn.className = 'action-btn';
+      saveBtn.onclick = async () => await updateSingleBid(origIdx);
+      tdAction.appendChild(saveBtn);
+      tr.appendChild(tdAction);
+      tbody.appendChild(tr);
+    });
+  }
+  
+  function createCell(txt) { const td = document.createElement('td'); td.textContent = txt || ''; return td; }
+  
+  async function updateSingleBid(origIdx, showToastMsg = true) {
+    const btn = document.querySelector(`button[onclick*="updateSingleBid(${origIdx})"]`);
+    if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
+    try {
+      const item = masterRows.find(r => r.originalIndex === origIdx);
+      if (!item) throw new Error("Row missing");
+      const uniqueNit = item.data[IDX.UNIQUE_NIT];
+      const vendor = item.data[IDX.VENDOR];
+      const bidAmount = item.data[IDX.BID_AMOUNT];
+      const tenderStatus = item.data[IDX.TENDER_STATUS];
+      const formData = new FormData();
+      formData.append("action", "updateBillPayment");
+      formData.append("uniqueNit", String(uniqueNit));
+      formData.append("vendor", String(vendor));
+      formData.append("col11", bidAmount);
+      formData.append("col23", tenderStatus);
+      const res = await fetch(scriptURL, { method: "POST", body: formData });
+      const result = await res.json();
+      if (result.success) {
+        if(showToastMsg) showToast(`Saved: ${vendor}`);
+        if (btn) { btn.textContent = "✓"; setTimeout(() => { if(btn) {btn.textContent="UPDATE"; btn.disabled=false;}}, 1000);}
+        computeTenderStatusForGroup(String(uniqueNit));
+        updateTableRowStatusAndHighlight(origIdx);
+        if (currentModalNit === String(uniqueNit)) refreshModalContent(currentModalNit);
+      } else throw new Error(result.error || "Update failed");
+    } catch(err) {
+      showToast(err.message, 'error');
+      if(btn) { btn.textContent = "RETRY"; btn.disabled = false; }
+    }
+  }
+  
+  // =============== MODAL (with animation & saving feedback) ===============
+  async function openNitModal(uniqueNit) {
+    currentModalNit = uniqueNit;
+    refreshModalContent(uniqueNit);
+    document.getElementById('nitModal').style.display = 'flex';
+  }
+  
+  function refreshModalContent(uniqueNit) {
+    const group = masterRows.filter(r => String(r.data[IDX.UNIQUE_NIT]) === String(uniqueNit));
+    if (!group.length) return;
+    const firstRow = group[0].data;
+    const workName = firstRow[IDX.WORK_NAME] || "";
+    const fund = firstRow[IDX.SOURCE_FUND] || "";
+    const estimate = firstRow[IDX.ESTIMATE] || "";
+    const nitNo = firstRow[IDX.NIT] || "";
+    const nitDateDisplay = formatIndianDate(firstRow[IDX.RAW_DATE]);
+    let minAccepted = null;
+    const acceptedBids = group.filter(g => g.data[IDX.TENDER_STATUS] === "ACCEPTED" && parseFloat(g.data[IDX.BID_AMOUNT]) > 0);
+    if (acceptedBids.length) {
+      let minVal = Infinity;
+      acceptedBids.forEach(g => { let b = parseFloat(g.data[IDX.BID_AMOUNT]); if(b < minVal) minVal = b; });
+      minAccepted = minVal;
+    }
+    let html = `<div class="nit-summary">
+      <div class="summary-item"><strong>UNIQUE NIT:</strong> ${uniqueNit}</div>
+      <div class="summary-item"><strong>NIT No.:</strong> ${nitNo}</div>
+      <div class="summary-item"><strong>NIT Date (IST):</strong> ${nitDateDisplay}</div>
+      <div class="summary-item"><strong>Estimate:</strong> ₹${estimate}</div>
+      <div class="summary-item"><strong>Lowest Bid:</strong> ${minAccepted ? '₹'+minAccepted : '—'}</div>
+      <div class="summary-item"><strong>Work:</strong> ${workName}</div><div class="summary-item"><strong>Fund:</strong> ${fund}</div>
+    </div><div style="overflow-x:auto"><table class="vendor-table"><thead><tr><th>VENDOR</th><th>BID AMOUNT (₹)</th><th>TENDER STATUS</th><th>ACTION</th></tr></thead><tbody>`;
+    group.forEach(g => {
+      const vendor = g.data[IDX.VENDOR] || "";
+      const bid = g.data[IDX.BID_AMOUNT] !== undefined ? g.data[IDX.BID_AMOUNT] : "";
+      const status = g.data[IDX.TENDER_STATUS] || "DISQUALIFY";
+      const isLowest = (status === "ACCEPTED" && minAccepted !== null && parseFloat(bid) === minAccepted);
+      const rowClass = isLowest ? 'lowest-bidder' : '';
+      html += `<tr id="modalRow_${g.originalIndex}" class="${rowClass}">
+        <td>${vendor} ${isLowest ? '<span class="lowest-badge">L1</span>' : ''}</td>
+        <td><input type="number" step="0.01" id="modalBid_${g.originalIndex}" data-row-idx="${g.originalIndex}" value="${bid}"></td>
+        <td id="modalStatus_${g.originalIndex}">${getStatusBadge(status)}</td>
+        <td><button class="action-btn modal-save-btn" data-idx="${g.originalIndex}">UPDATE</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('modalBody').innerHTML = html;
+    // attach input & button events
+    group.forEach(g => {
+      const inp = document.getElementById(`modalBid_${g.originalIndex}`);
+      if (inp) {
+        inp.addEventListener('input', (e) => {
+          const newVal = e.target.value;
+          const rowIdx = parseInt(inp.getAttribute('data-row-idx'));
+          const target = masterRows.find(r => r.originalIndex === rowIdx);
+          if (target) {
+            target.data[IDX.BID_AMOUNT] = newVal;
+            computeTenderStatusForGroup(uniqueNit);
+            const statusSpan = document.getElementById(`modalStatus_${rowIdx}`);
+            if (statusSpan) statusSpan.innerHTML = getStatusBadge(target.data[IDX.TENDER_STATUS]);
+            updateTableRowStatusAndHighlight(rowIdx);
+            refreshModalContent(uniqueNit);
           }
         });
       }
-      
-      rows.forEach(row => {
-        const rowIdx = row.getAttribute('data-row-idx');
-        const item = items.find(it => it.originalIndex == rowIdx);
-        if (!item) return;
-        
-        // Update status cell
-        const statusCell = row.querySelector('td:last-child');
-        if (statusCell) {
-          const bid = parseFloat(item.data[22]);
-          const isLowest = allComplete && !isNaN(bid) && bid > 0 && Math.abs(bid - minBid) < 0.01;
-          
-          let statusHtml = getStatusBadge(item.data[23]);
-          if (isLowest) {
-            statusHtml += '<span class="lowest-badge">L1</span>';
-          }
-          statusCell.innerHTML = statusHtml;
-        }
-        
-        // Update row highlighting
-        if (allComplete && minBid !== Infinity) {
-          const bid = parseFloat(item.data[22]);
-          const isLowest = !isNaN(bid) && bid > 0 && Math.abs(bid - minBid) < 0.01;
-          if (isLowest) {
-            row.classList.add('lowest-bidder');
-          } else {
-            row.classList.remove('lowest-bidder');
-          }
-        } else {
-          row.classList.remove('lowest-bidder');
-        }
-      });
-      
-      // Update completion badges
-      const nitLinks = document.querySelectorAll(`a[onclick*="${uniqueNit}"]`);
-      nitLinks.forEach(link => {
-        const parentTd = link.parentElement;
-        const existingBadge = parentTd.querySelector('.completion-badge');
-        if (existingBadge) {
-          existingBadge.remove();
-        }
-        
-        const completion = getNITCompletionStatus(uniqueNit);
-        const badge = document.createElement('span');
-        badge.className = 'completion-badge';
-        badge.textContent = `${completion.completedBids}/${completion.totalVendors}`;
-        parentTd.appendChild(badge);
-      });
-    }
-
-    // Update modal status displays
-    function updateModalStatusDisplays(uniqueNit) {
-      if (!uniqueNit) return;
-      
-      const items = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
-      const allComplete = areAllBidsComplete(uniqueNit);
-      
-      // Find minimum bid
-      let minBid = Infinity;
-      if (allComplete) {
-        items.forEach(item => {
-          const bid = parseFloat(item.data[22]);
-          if (!isNaN(bid) && bid > 0 && bid < minBid) {
-            minBid = bid;
-          }
-        });
-      }
-      
-      // Update each modal row
-      items.forEach(item => {
-        const rowIdx = item.originalIndex;
-        const statusDisplay = document.getElementById(`statusDisplay_${rowIdx}`);
-        const modalRow = document.getElementById(`modal-row-${rowIdx}`);
-        
-        if (statusDisplay) {
-          statusDisplay.innerHTML = getStatusBadge(item.data[23]);
-        }
-        
-        if (modalRow) {
-          const bid = parseFloat(item.data[22]);
-          const isLowest = allComplete && !isNaN(bid) && bid > 0 && Math.abs(bid - minBid) < 0.01;
-          
-          if (isLowest) {
-            modalRow.classList.add('lowest-bidder');
-            // Add L1 badge if not present
-            const vendorCell = modalRow.querySelector('td:first-child');
-            if (vendorCell && !vendorCell.innerHTML.includes('L1')) {
-              vendorCell.innerHTML = vendorCell.innerHTML.replace(' <span class="lowest-badge">L1</span>', '');
-              vendorCell.innerHTML += ' <span class="lowest-badge">L1</span>';
-            }
-          } else {
-            modalRow.classList.remove('lowest-bidder');
-            const vendorCell = modalRow.querySelector('td:first-child');
-            if (vendorCell) {
-              vendorCell.innerHTML = vendorCell.innerHTML.replace(' <span class="lowest-badge">L1</span>', '');
-            }
-          }
-        }
-      });
-      
-      // Update summary with new lowest bid
-      const summaryDiv = document.querySelector('.nit-summary');
-      if (summaryDiv) {
-        const lowestBidSpan = summaryDiv.querySelector('.summary-item:nth-child(5) span');
-        if (lowestBidSpan) {
-          lowestBidSpan.textContent = minBid && minBid !== Infinity ? '₹' + minBid : 'Not complete';
-        }
-      }
-    }
-
-    // Debounced status update for main table
-    function debouncedStatusUpdate(uniqueNit) {
-      // Clear existing timer
-      if (typingTimer) {
-        clearTimeout(typingTimer);
-      }
-      
-      // Set new timer
-      typingTimer = setTimeout(() => {
-        // Check if all bids for this NIT are now complete
-        const allComplete = areAllBidsComplete(uniqueNit);
-        
-        if (allComplete) {
-          // All bids are complete - calculate ACCEPTED/REJECTED
-          calculateStatusForNitGroup(uniqueNit);
-        } else {
-          // Still incomplete - set all to INCOMPLETE
-          const items = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
-          items.forEach(item => {
-            item.data[23] = 'INCOMPLETE';
-          });
-        }
-        
-        // Update only the status displays, not the whole table
-        updateStatusDisplays(uniqueNit);
-        
-        // If modal is open for this NIT, update modal too
-        if (currentModalUniqueNit === uniqueNit) {
-          updateModalStatusDisplays(uniqueNit);
-        }
-        
-        typingTimer = null;
-      }, 500); // Wait 500ms after last keystroke
-    }
-
-    // Debounced status update for modal
-    function debouncedModalStatusUpdate(uniqueNit) {
-      // Clear existing modal timer
-      if (modalTypingTimer) {
-        clearTimeout(modalTypingTimer);
-      }
-      
-      // Set new timer
-      modalTypingTimer = setTimeout(() => {
-        // Check if all bids for this NIT are now complete
-        const allComplete = areAllBidsComplete(uniqueNit);
-        
-        if (allComplete) {
-          // All bids are complete - calculate ACCEPTED/REJECTED
-          calculateStatusForNitGroup(uniqueNit);
-        } else {
-          // Still incomplete - set all to INCOMPLETE
-          const items = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
-          items.forEach(item => {
-            item.data[23] = 'INCOMPLETE';
-          });
-        }
-        
-        // Update modal displays
-        updateModalStatusDisplays(uniqueNit);
-        
-        // Also update main table displays
-        updateStatusDisplays(uniqueNit);
-        
-        modalTypingTimer = null;
-      }, 500); // Wait 500ms after last keystroke
-    }
-
-    function getStatusBadge(status) {
-      if (!status || status === 'INCOMPLETE') {
-        return '<span class="status-badge status-incomplete">INCOMPLETE</span>';
-      }
-      if (status === 'ACCEPTED') {
-        return '<span class="status-badge status-accepted">ACCEPTED</span>';
-      }
-      if (status === 'REJECTED') {
-        return '<span class="status-badge status-rejected">REJECTED</span>';
-      }
-      return '<span class="status-badge status-incomplete">INCOMPLETE</span>';
-    }
-
-    function renderTable(dataArray) {
-      const tbody = document.querySelector("#dataTable tbody");
-      tbody.innerHTML = "";
-      if (dataArray.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="12" style="text-align:center; padding:20px;">No records</td>`;
-        tbody.appendChild(tr);
-        return;
-      }
-
-      // Group by UNIQUE NIT to find completion status
-      const nitCompletion = {};
-      const lowestBidders = new Set();
-      
-      dataArray.forEach(item => {
-        const uniqueNit = item.data[1];
-        if (!uniqueNit) return;
-        if (!nitCompletion[uniqueNit]) {
-          nitCompletion[uniqueNit] = getNITCompletionStatus(uniqueNit);
-        }
-      });
-      
-      // Find lowest bidders only for completed NITs
-      Object.keys(nitCompletion).forEach(uniqueNit => {
-        if (nitCompletion[uniqueNit].allComplete) {
-          const items = dataArray.filter(item => String(item.data[1]) === String(uniqueNit));
-          let minBid = Infinity;
-          let minItem = null;
-          
-          items.forEach(item => {
-            const bid = parseFloat(item.data[22]);
-            if (!isNaN(bid) && bid > 0 && bid < minBid) {
-              minBid = bid;
-              minItem = item;
-            }
-          });
-          
-          if (minItem) {
-            lowestBidders.add(minItem.originalIndex);
-          }
-        }
-      });
-
-      dataArray.forEach(item => {
-        const row = item.data;
-        const originalIdx = item.originalIndex;
-        const uniqueNit = row[1] ? row[1].toString() : '';
-        const nit = row[2] ? row[2].toString() : '';
-        const sl = row[3] ? row[3].toString() : '';
-        const nitDate = formatDateToDDMMYYYY(row[4]);
-        const vendor = row[7] ? row[7].toString() : ''; // Vendor at index 7 (Column H)
-        const workName = row[6] ? row[6].toString() : ''; // Work Name at index 6 (Column G)
-        const fund = row[13] ? row[13].toString() : ''; // Source of Fund at index 13 (Column N)
-        const estimate = row[16] ? row[16].toString() : ''; // Estimate Value at index 16 (Column Q)
-        const bidAmount = row[29] ? row[29].toString() : ''; // Bid Amount at index 29 (Column AD)
-        const tenderStatus = row[23] || 'INCOMPLETE'; // Tender Status at our local index 23
-
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-unique-nit', uniqueNit);
-        tr.setAttribute('data-vendor', vendor);
-        tr.setAttribute('data-row-idx', originalIdx);
-        
-        // Highlight lowest bidder row only if NIT is complete
-        if (nitCompletion[uniqueNit]?.allComplete && lowestBidders.has(originalIdx)) {
-          tr.classList.add('lowest-bidder');
-        }
-
-        // Timestamp
-        tr.appendChild(createCell(formatDateToDDMMYYYY(row[0])));
-        
-        // UNIQUE NIT as hyperlink with completion badge
-        const tdNitLink = document.createElement('td');
-        const link = document.createElement('a');
-        link.href = "#";
-        link.textContent = uniqueNit || '(blank)';
-        link.onclick = (e) => { 
-          e.preventDefault(); 
-          openModalForNit(uniqueNit); 
-        };
-        tdNitLink.appendChild(link);
-        
-        // Add completion badge
-        if (nitCompletion[uniqueNit]) {
-          const badge = document.createElement('span');
-          badge.className = 'completion-badge';
-          badge.textContent = `${nitCompletion[uniqueNit].completedBids}/${nitCompletion[uniqueNit].totalVendors}`;
-          tdNitLink.appendChild(badge);
-        }
-        tr.appendChild(tdNitLink);
-
-        // NIT, SL, NIT DATE
-        tr.appendChild(createCell(nit));
-        tr.appendChild(createCell(sl));
-        tr.appendChild(createCell(nitDate));
-        
-        // VENDOR
-        tr.appendChild(createCell(vendor));
-        
-        // Name of the work
-        tr.appendChild(createCell(workName));
-        
-        // Source of Fund
-        tr.appendChild(createCell(fund));
-        
-        // ESTIMATE VALUE
-        tr.appendChild(createCell(estimate));
-
-        // BID AMOUNT editable with debounced update
-        const td10 = document.createElement('td');
-        const bidInput = document.createElement('input');
-        bidInput.type = 'number';
-        bidInput.step = '0.01';
-        bidInput.value = bidAmount;
-        bidInput.id = `bid_${originalIdx}`;
-        bidInput.setAttribute('data-unique-nit', uniqueNit);
-        bidInput.setAttribute('data-row-idx', originalIdx);
-        
-        // Add input event listener with debouncing
-        bidInput.addEventListener('input', function(e) {
-          const val = e.target.value;
-          const nit = this.getAttribute('data-unique-nit');
-          const idx = this.getAttribute('data-row-idx');
-          
-          // Update data immediately
-          const item = tableData.find(it => it.originalIndex == idx);
-          if (item) {
-            item.data[22] = val; // Update bid amount at index 22
-          }
-          
-          // Debounce status update
-          debouncedStatusUpdate(nit);
-        });
-        
-        td10.appendChild(bidInput);
-        tr.appendChild(td10);
-
-        // Action button
-        const td11 = document.createElement('td');
-        const actionBtn = document.createElement('button');
-        actionBtn.className = 'action-btn';
-        actionBtn.id = `btn_${originalIdx}`;
-        actionBtn.textContent = 'UPDATE';
-        actionBtn.onclick = function() { updateSingleBid(originalIdx); };
-        td11.appendChild(actionBtn);
-        tr.appendChild(td11);
-
-        // Tender Status with badge
-        const td12 = document.createElement('td');
-        td12.innerHTML = getStatusBadge(tenderStatus);
-        if (nitCompletion[uniqueNit]?.allComplete && lowestBidders.has(originalIdx)) {
-          td12.innerHTML += '<span class="lowest-badge">L1</span>';
-        }
-        tr.appendChild(td12);
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    function createCell(text) {
-      const td = document.createElement('td');
-      td.textContent = text || '';
-      return td;
-    }
-
-    // Filter
-    function filterTable() {
-      const search = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = tableData.filter(item => {
-        const r = item.data;
-        return (r[1] && r[1].toString().toLowerCase().includes(search)) ||
-               (r[2] && r[2].toString().toLowerCase().includes(search)) ||
-               (r[7] && r[7].toString().toLowerCase().includes(search));
-      });
-      renderTable(filtered);
-    }
-
-    // Get completion status for a UNIQUE NIT
-    function getNITCompletionStatus(uniqueNit) {
-      const items = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
-      const totalVendors = items.length;
-      const completedBids = items.filter(item => {
-        const bid = item.data[22];
-        return bid && bid.toString().trim() !== '' && !isNaN(parseFloat(bid)) && parseFloat(bid) > 0;
-      }).length;
-      
-      return { totalVendors, completedBids, allComplete: totalVendors === completedBids };
-    }
-
-    // Toast notification
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.style.background = type === 'success' ? '#28a745' : '#dc3545';
-      toast.style.display = 'block';
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 2000);
-    }
-
-    // ---- MODAL FUNCTIONS ----
-    function openModalForNit(uniqueNit) {
-      if (!uniqueNit) return;
-      currentModalUniqueNit = uniqueNit;
-
-      // Gather all rows with this UNIQUE NIT
-      const matchingItems = tableData.filter(item => String(item.data[1]) === String(uniqueNit));
-      if (matchingItems.length === 0) {
-        showMessage("No vendors for this NIT", "error");
-        return;
-      }
-
-      // Check if all bids are complete
-      const allComplete = areAllBidsComplete(uniqueNit);
-
-      // Use first row to get scheme/fund details (they should be same)
-      const first = matchingItems[0].data;
-      const workName = first[6] ? first[6].toString() : '';
-      const fund = first[13] ? first[13].toString() : '';
-      const estimate = first[16] ? first[16].toString() : '';
-      const nitNo = first[2] ? first[2].toString() : '';
-      const nitDate = formatDateToDDMMYYYY(first[4]);
-
-      // Build vendor list for modal
-      modalVendorRows = matchingItems.map(item => {
-        return {
-          vendor: item.data[7] ? item.data[7].toString() : '', // Vendor at index 7
-          bidAmount: item.data[22] ? item.data[22].toString() : '', // Bid Amount at index 22
-          status: item.data[23] || 'INCOMPLETE', // Status at index 23
-          rowIndex: item.originalIndex,
-          originalRow: item.data
-        };
-      });
-
-      // Find lowest bid amount (only if all complete)
-      let minBid = null;
-      if (allComplete) {
-        const bids = modalVendorRows.map(v => parseFloat(v.bidAmount)).filter(b => !isNaN(b) && b > 0);
-        minBid = bids.length > 0 ? Math.min(...bids) : null;
-      }
-
-      // Render modal body
-      const modalBody = document.getElementById('modalBody');
-      let html = `
-        <div class="nit-summary">
-          <div class="summary-item"><strong>UNIQUE NIT:</strong> <span>${uniqueNit}</span></div>
-          <div class="summary-item"><strong>NIT No.:</strong> <span>${nitNo}</span></div>
-          <div class="summary-item"><strong>NIT Date:</strong> <span>${nitDate}</span></div>
-          <div class="summary-item"><strong>Estimate:</strong> <span>₹${estimate}</span></div>
-          <div class="summary-item"><strong>Lowest Bid:</strong> <span style="color: #ffd700;">${minBid ? '₹' + minBid : 'Not complete'}</span></div>
-          <div class="summary-item" style="flex:1 1 100%;"><strong>Work:</strong> <span>${workName}</span></div>
-          <div class="summary-item" style="flex:1 1 100%;"><strong>Fund:</strong> <span>${fund}</span></div>
-        </div>
-        <div class="vendor-table-container">
-          <table class="vendor-table" id="modalVendorTable">
-            <thead>
-              <tr>
-                <th>VENDOR</th>
-                <th>BID AMOUNT (₹)</th>
-                <th>TENDER STATUS</th>
-                <th>ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-
-      modalVendorRows.forEach((v) => {
-        const bidValue = parseFloat(v.bidAmount);
-        const isLowest = allComplete && minBid && !isNaN(bidValue) && bidValue > 0 && Math.abs(bidValue - minBid) < 0.01;
-        const rowClass = isLowest ? 'lowest-bidder' : '';
-        
-        html += `<tr id="modal-row-${v.rowIndex}" class="${rowClass}">
-          <td>${v.vendor} ${isLowest ? '<span class="lowest-badge">L1</span>' : ''}</td>
-          <td><input type="number" step="0.01" value="${v.bidAmount}" id="modalBid_${v.rowIndex}" data-unique-nit="${uniqueNit}" data-row-idx="${v.rowIndex}" /></td>
-          <td id="statusDisplay_${v.rowIndex}">${getStatusBadge(v.status)}</td>
-          <td><button class="action-btn" id="modalBtn_${v.rowIndex}" onclick="updateSingleBidFromModal(${v.rowIndex})">UPDATE</button></td>
-        </tr>`;
-      });
-
-      html += `</tbody></table></div>`;
-      modalBody.innerHTML = html;
-      
-      // Add event listeners to modal inputs after they're created
-      modalVendorRows.forEach(v => {
-        const input = document.getElementById(`modalBid_${v.rowIndex}`);
-        if (input) {
-          input.addEventListener('input', function(e) {
-            const val = e.target.value;
-            const nit = this.getAttribute('data-unique-nit');
-            const rowIdx = parseInt(this.getAttribute('data-row-idx'));
-            
-            // Update data immediately
-            const item = tableData.find(it => it.originalIndex === rowIdx);
-            if (item) {
-              item.data[22] = val; // Update bid amount at index 22
-            }
-            
-            // Mark row as changed
-            markModalRowChanged(rowIdx);
-            
-            // Debounce modal status update
-            debouncedModalStatusUpdate(nit);
-          });
-        }
-      });
-      
-      document.getElementById('nitModal').style.display = 'flex';
-    }
-
-    // mark row as changed (visually)
-    function markModalRowChanged(rowIdx) {
-      const btn = document.getElementById(`modalBtn_${rowIdx}`);
+      const btn = document.querySelector(`.modal-save-btn[data-idx='${g.originalIndex}']`);
       if (btn) {
-        btn.textContent = "UPDATE";
-        btn.style.background = "#0d6efd";
+        btn.onclick = async () => {
+          const orig = g.originalIndex;
+          const originalHtml = btn.innerHTML;
+          btn.innerHTML = '<span class="spinner-small"></span> Saving';
+          btn.disabled = true;
+          await updateSingleBid(orig, false);
+          btn.innerHTML = '✓ Saved';
+          setTimeout(() => { btn.innerHTML = 'UPDATE'; btn.disabled = false; }, 1000);
+          refreshModalContent(uniqueNit);
+          showToast('Bid updated', 'success');
+        };
       }
+    });
+  }
+  
+  async function updateAllModalBids() {
+    if (!currentModalNit) return;
+    const group = masterRows.filter(r => String(r.data[IDX.UNIQUE_NIT]) === currentModalNit);
+    const btnAll = document.getElementById('modalUpdateAllBtn');
+    const originalText = btnAll.innerHTML;
+    btnAll.innerHTML = '<span class="spinner-small"></span> Saving all...';
+    btnAll.disabled = true;
+    let updated = 0;
+    for(let g of group) {
+      const fd = new FormData();
+      fd.append("action", "updateBillPayment");
+      fd.append("uniqueNit", String(g.data[IDX.UNIQUE_NIT]));
+      fd.append("vendor", String(g.data[IDX.VENDOR]));
+      fd.append("col11", g.data[IDX.BID_AMOUNT]);
+      fd.append("col23", g.data[IDX.TENDER_STATUS]);
+      const res = await fetch(scriptURL, { method: "POST", body: fd });
+      const resj = await res.json();
+      if(resj.success) updated++;
     }
-
-    // Recalculate statuses for current NIT group
-    function recalculateStatuses() {
-      if (!currentModalUniqueNit) return;
-      
-      // Check if all bids are complete
-      const allComplete = areAllBidsComplete(currentModalUniqueNit);
-      
-      if (allComplete) {
-        calculateStatusForNitGroup(currentModalUniqueNit);
-        showToast('All bids complete - Status calculated!', 'success');
-      } else {
-        const items = tableData.filter(item => String(item.data[1]) === String(currentModalUniqueNit));
-        items.forEach(item => {
-          item.data[23] = 'INCOMPLETE';
-        });
-        showToast('Bids incomplete - Status set to INCOMPLETE', 'warning');
-      }
-      
-      // Update displays without full re-render
-      updateStatusDisplays(currentModalUniqueNit);
-      updateModalStatusDisplays(currentModalUniqueNit);
+    btnAll.innerHTML = originalText;
+    btnAll.disabled = false;
+    showToast(`✅ ${updated} vendor(s) saved`);
+    refreshModalContent(currentModalNit);
+    recomputeAllTenderStatuses();
+    renderMainTable(masterRows);
+  }
+  
+  function recalculateTenderStatusGroup() {
+    if(currentModalNit) {
+      computeTenderStatusForGroup(currentModalNit);
+      refreshModalContent(currentModalNit);
+      masterRows.filter(r => String(r.data[IDX.UNIQUE_NIT]) === currentModalNit).forEach(r => updateTableRowStatusAndHighlight(r.originalIndex));
+      showToast("Status recalculated (ACC/REJ/DISQ)", "success");
     }
-
-    // update one vendor from modal
-    async function updateSingleBidFromModal(rowIdx) {
-      const btn = document.getElementById(`modalBtn_${rowIdx}`);
-      const bidInput = document.getElementById(`modalBid_${rowIdx}`);
-      if (!btn || !bidInput) return;
-
-      const newBid = bidInput.value;
-      btn.disabled = true;
-      btn.textContent = "Saving...";
-
-      try {
-        const item = tableData.find(it => it.originalIndex === rowIdx);
-        if (!item) throw new Error("row not found");
-        const row = item.data;
-        const uniqueNit = row[1];
-        const vendor = row[7]; // Vendor at index 7
-
-        // Save the bid amount and status
-        const formData = new FormData();
-        formData.append("action", "updateBillPayment");
-        formData.append("uniqueNit", String(uniqueNit));
-        formData.append("vendor", String(vendor));
-        formData.append("col11", newBid); // Bid amount
-        formData.append("col23", row[23]); // Send the current status
-
-        const res = await fetch(scriptURL, { method: "POST", body: formData });
-        const result = await res.json();
-
-        if (result.success) {
-          // Update local data
-          row[22] = newBid; // Update bid amount at index 22
-          
-          // Recalculate status based on completion
-          const allComplete = areAllBidsComplete(uniqueNit);
-          if (allComplete) {
-            calculateStatusForNitGroup(uniqueNit);
-          } else {
-            const items = tableData.filter(it => String(it.data[1]) === String(uniqueNit));
-            items.forEach(it => {
-              it.data[23] = 'INCOMPLETE';
-            });
-          }
-          
-          // Update displays
-          updateStatusDisplays(uniqueNit);
-          updateModalStatusDisplays(uniqueNit);
-          
-          btn.textContent = "Saved ✔";
-          btn.style.background = "green";
-          
-          showToast('Bid amount saved!');
-        } else {
-          throw new Error(result.error || "update failed");
-        }
-      } catch (err) {
-        btn.textContent = "Error";
-        btn.style.background = "red";
-        showMessage(err.message, "error");
-        btn.disabled = false;
-      }
-    }
-
-    // update all changed rows in modal
-    async function updateAllVendorBids() {
-      const updateBtn = document.getElementById('modalUpdateAllBtn');
-      const originalText = updateBtn.textContent;
-      updateBtn.textContent = "Updating...";
-      updateBtn.disabled = true;
-
-      let successCount = 0;
-      let errorCount = 0;
-      let hasChanges = false;
-
-      for (const v of modalVendorRows) {
-        const rowIdx = v.rowIndex;
-        const bidInput = document.getElementById(`modalBid_${rowIdx}`);
-        if (!bidInput) continue;
-        
-        const newBid = bidInput.value;
-        const oldBid = v.bidAmount;
-        
-        if (newBid !== oldBid) { // changed
-          hasChanges = true;
-          try {
-            const item = tableData.find(it => it.originalIndex === rowIdx);
-            if (!item) continue;
-            const row = item.data;
-            const formData = new FormData();
-            formData.append("action", "updateBillPayment");
-            formData.append("uniqueNit", String(row[1]));
-            formData.append("vendor", String(row[7])); // Vendor at index 7
-            formData.append("col11", newBid);
-            formData.append("col23", row[23]); // Send the current status
-
-            const res = await fetch(scriptURL, { method: "POST", body: formData });
-            const result = await res.json();
-            if (result.success) {
-              row[22] = newBid; // Update bid amount at index 22
-              successCount++;
-            } else {
-              errorCount++;
-            }
-          } catch {
-            errorCount++;
-          }
-        }
-      }
-
-      // After all updates, recalculate statuses
-      if (hasChanges && currentModalUniqueNit) {
-        const allComplete = areAllBidsComplete(currentModalUniqueNit);
-        if (allComplete) {
-          calculateStatusForNitGroup(currentModalUniqueNit);
-        } else {
-          const items = tableData.filter(it => String(it.data[1]) === String(currentModalUniqueNit));
-          items.forEach(it => {
-            it.data[23] = 'INCOMPLETE';
-          });
-        }
-        
-        // Update displays
-        updateStatusDisplays(currentModalUniqueNit);
-        updateModalStatusDisplays(currentModalUniqueNit);
-      }
-
-      updateBtn.textContent = originalText;
-      updateBtn.disabled = false;
-      
-      if (hasChanges) {
-        showToast(`${successCount} bid${successCount !== 1 ? 's' : ''} updated successfully!`);
-      } else {
-        showToast('No changes detected', 'info');
-      }
-    }
-
-    // standalone update from main table
-    async function updateSingleBid(originalIdx) {
-      const btn = document.getElementById(`btn_${originalIdx}`);
-      if (!btn) return;
-      btn.disabled = true;
-      btn.textContent = "Saving...";
-
-      try {
-        const item = tableData.find(it => it.originalIndex === originalIdx);
-        if (!item) throw new Error("no row");
-        const row = item.data;
-        const uniqueNit = row[1];
-        const vendor = row[7]; // Vendor at index 7
-        const bidInput = document.getElementById(`bid_${originalIdx}`);
-        const newBid = bidInput ? bidInput.value : '';
-
-        const formData = new FormData();
-        formData.append("action", "updateBillPayment");
-        formData.append("uniqueNit", String(uniqueNit));
-        formData.append("vendor", String(vendor));
-        formData.append("col11", newBid);
-        formData.append("col23", row[23]); // Send the current status
-
-        const res = await fetch(scriptURL, { method: "POST", body: formData });
-        const result = await res.json();
-
-        if (result.success) {
-          row[22] = newBid; // Update bid amount at index 22
-          
-          // Recalculate status based on completion
-          const allComplete = areAllBidsComplete(uniqueNit);
-          if (allComplete) {
-            calculateStatusForNitGroup(uniqueNit);
-          } else {
-            const items = tableData.filter(it => String(it.data[1]) === String(uniqueNit));
-            items.forEach(it => {
-              it.data[23] = 'INCOMPLETE';
-            });
-          }
-          
-          // Update displays without full re-render
-          updateStatusDisplays(uniqueNit);
-          
-          btn.textContent = "Saved ✔";
-          btn.style.background = "green";
-          showToast('Bid amount saved!');
-          setTimeout(() => {
-            if (btn) {
-              btn.textContent = "UPDATE";
-              btn.style.background = "#0d6efd";
-              btn.disabled = false;
-            }
-          }, 1500);
-        } else {
-          throw new Error(result.error || "update failed");
-        }
-      } catch (err) {
-        btn.textContent = "Error";
-        btn.style.background = "red";
-        showMessage(err.message, "error");
-        btn.disabled = false;
-      }
-    }
-
-    function closeModal() {
-      document.getElementById('nitModal').style.display = 'none';
-      currentModalUniqueNit = null;
-    }
-
-    function showMessage(text, type) {
-      const msg = document.getElementById('message');
-      msg.textContent = text;
-      msg.className = type;
-      msg.style.display = 'block';
-      setTimeout(() => msg.style.display = 'none', 3000);
-    }
-
-    // initial load
-    loadData();
-  </script>
+  }
+  
+  function closeModal() { document.getElementById('nitModal').style.display = 'none'; currentModalNit = null; }
+  
+  // Load data from backend
+  async function loadData() {
+    setLoading(true);
+    try {
+      const url = scriptURL + "?action=getBillPaymentData&t=" + Date.now();
+      const resp = await fetch(url);
+      const json = await resp.json();
+      if (!json.success) throw new Error(json.error);
+      if (!json.data || !json.data.length) throw new Error("Empty data");
+      const rows = json.data.slice(1);
+      masterRows = rows.map((row, idx) => ({ originalIndex: idx, data: row }));
+      recomputeAllTenderStatuses();
+      renderMainTable(masterRows);
+      showToast(`Loaded ${masterRows.length} records`, "success");
+    } catch(err) { showToast("Error: "+err.message, "error"); console.error(err); }
+    finally { setLoading(false); }
+  }
+  
+  function filterTable() {
+    const term = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = masterRows.filter(item => {
+      const row = item.data;
+      return (row[IDX.UNIQUE_NIT] && String(row[IDX.UNIQUE_NIT]).toLowerCase().includes(term)) ||
+             (row[IDX.NIT] && String(row[IDX.NIT]).toLowerCase().includes(term)) ||
+             (row[IDX.VENDOR] && String(row[IDX.VENDOR]).toLowerCase().includes(term));
+    });
+    renderMainTable(filtered);
+  }
+  async function refreshData() { await loadData(); }
+  
+  window.filterTable = filterTable;
+  window.refreshData = refreshData;
+  window.openNitModal = openNitModal;
+  window.closeModal = closeModal;
+  window.updateSingleBid = updateSingleBid;
+  window.updateAllModalBids = updateAllModalBids;
+  window.recalculateTenderStatusGroup = recalculateTenderStatusGroup;
+  
+  loadData();
+</script>
 </body>
 </html>
