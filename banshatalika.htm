@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Genealogy Certificate | Bhagabanpur Gram Panchayat</title>
+    <!-- html2pdf library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * {
             margin: 0;
@@ -12,7 +14,7 @@
         }
 
         body {
-            background: #d4d4d4;
+            background: linear-gradient(135deg, #1a5c2a 0%, #0d3b1a 100%);
             font-family: 'Segoe UI', 'Roboto', 'Times New Roman', serif;
             padding: 25px 20px;
             display: flex;
@@ -23,46 +25,48 @@
         .app-container {
             max-width: 1200px;
             width: 100%;
-            background: #f0f0f0;
+            background: #f5f5dc;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
 
         .header {
-            background: #1e1e1e;
-            color: white;
+            background: linear-gradient(135deg, #2d6a3b 0%, #1a4a28 100%);
+            color: #f9f3d9;
             text-align: center;
             padding: 1rem;
+            border-bottom: 3px solid #d4a843;
         }
-        .header h1 { font-size: 1.5rem; font-weight: 500; }
+        .header h1 { font-size: 1.5rem; font-weight: 500; letter-spacing: 1px; }
 
         /* Input Section */
         .input-section {
-            background: #eaeaea;
+            background: #e8e0c8;
             padding: 20px;
-            border-bottom: 2px solid #bbb;
+            border-bottom: 2px solid #c4b896;
         }
         .section-title {
             font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 15px;
-            color: #1e1e1e;
-            border-left: 4px solid #444;
+            color: #1a4a28;
+            border-left: 4px solid #2d6a3b;
             padding-left: 10px;
         }
         .generation-input {
-            background: white;
+            background: #fffef7;
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 20px;
-            border: 1px solid #aaa;
+            border: 1px solid #c4b896;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .gen-header {
             font-weight: bold;
             font-size: 1rem;
             margin-bottom: 10px;
-            color: #333;
+            color: #2d6a3b;
         }
         .members-container {
             display: flex;
@@ -73,8 +77,8 @@
             overflow-y: auto;
         }
         .member-input-card {
-            background: #f9f9f9;
-            border: 1px solid #ccc;
+            background: #f9f5e8;
+            border: 1px solid #c4b896;
             border-radius: 8px;
             padding: 8px 12px;
             display: flex;
@@ -83,13 +87,14 @@
         }
         .member-input-card input {
             padding: 5px 8px;
-            border: 1px solid #999;
+            border: 1px solid #b8a87c;
             border-radius: 4px;
             font-size: 0.85rem;
             width: 140px;
+            background: #fff;
         }
         .btn-remove {
-            background: #8b3c2c;
+            background: #8b5a3c;
             color: white;
             border: none;
             padding: 3px 8px;
@@ -98,7 +103,7 @@
             font-size: 0.7rem;
         }
         .btn-add {
-            background: #444;
+            background: #2d6a3b;
             color: white;
             border: none;
             padding: 5px 12px;
@@ -107,8 +112,9 @@
             font-size: 0.75rem;
             margin-top: 5px;
         }
+        .btn-add:hover { background: #1a4a28; }
         .btn-primary {
-            background: #1e1e1e;
+            background: #2d6a3b;
             color: white;
             border: none;
             padding: 8px 20px;
@@ -117,47 +123,49 @@
             border-radius: 40px;
             cursor: pointer;
             margin-right: 10px;
+            transition: 0.2s;
         }
-        .btn-primary:hover { background: #3a3a3a; }
+        .btn-primary:hover { background: #1a4a28; transform: scale(1.02); }
         
         .dropdown-select {
             margin: 15px 0;
             padding: 10px;
-            background: #fff8e0;
+            background: #f5efdf;
             border-radius: 8px;
-            border-left: 4px solid #ff9800;
+            border-left: 4px solid #d4a843;
         }
         .dropdown-select label {
             font-weight: bold;
             margin-right: 10px;
+            color: #2d6a3b;
         }
         .dropdown-select select {
             padding: 5px 10px;
             font-size: 0.9rem;
             border-radius: 5px;
-            border: 1px solid #999;
+            border: 1px solid #c4b896;
+            background: white;
         }
 
         /* Certificate Panel */
         .certificate-panel {
-            background: #e0e0e0;
+            background: #ddd0b0;
             padding: 24px 20px;
             display: flex;
             justify-content: center;
         }
         .certificate-wrapper {
             background: white;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             width: 100%;
             max-width: 1000px;
         }
         .certificate {
-            background: white;
+            background: #fffef7;
             color: black;
             font-family: 'Times New Roman', 'Georgia', serif;
-            padding: 1.5rem 2rem;
-            border: 2px solid #000;
-            box-shadow: 0 0 0 6px white, 0 0 0 8px #222;
+            padding: 1.2rem 1.5rem;
+            border: 2px solid #2d6a3b;
             position: relative;
             overflow-x: auto;
             overflow-y: visible;
@@ -171,10 +179,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" opacity="0.08"><rect width="800" height="600" fill="%23f5f0e0"/><circle cx="200" cy="150" r="60" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="200" cy="145" r="15" fill="%23806040"/><circle cx="180" cy="140" r="4" fill="%23806040"/><circle cx="220" cy="140" r="4" fill="%23806040"/><path d="M180 160 Q200 175 220 160" stroke="%23806040" fill="none" stroke-width="2"/><rect x="170" y="170" width="60" height="50" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="400" cy="200" r="70" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="400" cy="195" r="18" fill="%23806040"/><circle cx="375" cy="188" r="5" fill="%23806040"/><circle cx="425" cy="188" r="5" fill="%23806040"/><path d="M375 215 Q400 235 425 215" stroke="%23806040" fill="none" stroke-width="2"/><rect x="365" y="230" width="70" height="55" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="600" cy="150" r="55" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="600" cy="145" r="14" fill="%23806040"/><circle cx="580" cy="140" r="4" fill="%23806040"/><circle cx="620" cy="140" r="4" fill="%23806040"/><path d="M580 158 Q600 170 620 158" stroke="%23806040" fill="none" stroke-width="2"/><rect x="570" y="168" width="60" height="48" fill="none" stroke="%23806040" stroke-width="2"/><text x="400" y="520" font-size="40" fill="%23806040" font-family="serif" text-anchor="middle" opacity="0.4">☦</text><text x="400" y="560" font-size="20" fill="%23806040" font-family="serif" text-anchor="middle" opacity="0.3">Family Heritage</text></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" opacity="0.06"><rect width="800" height="600" fill="%23f5f0e0"/><circle cx="200" cy="150" r="60" fill="none" stroke="%232d6a3b" stroke-width="2"/><circle cx="200" cy="145" r="15" fill="%232d6a3b"/><circle cx="180" cy="140" r="4" fill="%232d6a3b"/><circle cx="220" cy="140" r="4" fill="%232d6a3b"/><path d="M180 160 Q200 175 220 160" stroke="%232d6a3b" fill="none" stroke-width="2"/><rect x="170" y="170" width="60" height="50" fill="none" stroke="%232d6a3b" stroke-width="2"/><circle cx="400" cy="200" r="70" fill="none" stroke="%232d6a3b" stroke-width="2"/><circle cx="400" cy="195" r="18" fill="%232d6a3b"/><circle cx="375" cy="188" r="5" fill="%232d6a3b"/><circle cx="425" cy="188" r="5" fill="%232d6a3b"/><path d="M375 215 Q400 235 425 215" stroke="%232d6a3b" fill="none" stroke-width="2"/><rect x="365" y="230" width="70" height="55" fill="none" stroke="%232d6a3b" stroke-width="2"/><circle cx="600" cy="150" r="55" fill="none" stroke="%232d6a3b" stroke-width="2"/><circle cx="600" cy="145" r="14" fill="%232d6a3b"/><circle cx="580" cy="140" r="4" fill="%232d6a3b"/><circle cx="620" cy="140" r="4" fill="%232d6a3b"/><path d="M580 158 Q600 170 620 158" stroke="%232d6a3b" fill="none" stroke-width="2"/><rect x="570" y="168" width="60" height="48" fill="none" stroke="%232d6a3b" stroke-width="2"/><text x="400" y="520" font-size="40" fill="%232d6a3b" font-family="serif" text-anchor="middle" opacity="0.4">🌿</text><text x="400" y="560" font-size="18" fill="%232d6a3b" font-family="serif" text-anchor="middle" opacity="0.25">Family Heritage</text></svg>');
             background-repeat: repeat;
             background-size: 200px 180px;
-            opacity: 0.12;
+            opacity: 0.1;
             pointer-events: none;
             z-index: 0;
         }
@@ -186,124 +194,114 @@
         
         .certificate-header {
             text-align: center;
-            margin-bottom: 1.2rem;
-            border-bottom: 2px solid #000;
-            padding-bottom: 0.8rem;
-            background: rgba(255,255,255,0.85);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #2d6a3b;
+            padding-bottom: 0.6rem;
+            background: rgba(255,254,247,0.85);
         }
-        .office-title { font-size: 1rem; letter-spacing: 1px; }
-        .panchayat-name { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; margin: 4px 0; }
-        .address-line { font-size: 0.8rem; margin-bottom: 6px; }
-        .cert-title { font-size: 1.6rem; font-weight: bold; margin: 10px 0 4px; text-decoration: underline; }
+        .office-title { font-size: 0.9rem; letter-spacing: 2px; color: #2d6a3b; }
+        .panchayat-name { font-size: 1.4rem; font-weight: bold; text-transform: uppercase; margin: 4px 0; color: #1a4a28; }
+        .address-line { font-size: 0.7rem; margin-bottom: 4px; color: #5a4a2a; }
+        .cert-title { font-size: 1.5rem; font-weight: bold; margin: 8px 0 2px; text-decoration: underline; color: #1a4a28; }
         .cert-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-style: italic;
-            margin-top: 4px;
-            color: #333;
+            margin-top: 3px;
+            color: #2d6a3b;
         }
 
-        /* Date line - placed before First Generation */
         .date-line {
             text-align: right;
-            font-size: 0.85rem;
-            font-family: 'Times New Roman', serif;
-            margin-bottom: 15px;
-            color: #333;
-            font-weight: normal;
-            background: rgba(255,255,255,0.7);
-            padding: 4px 8px;
+            font-size: 0.75rem;
+            margin-bottom: 12px;
+            color: #4a3a1a;
+            background: rgba(255,254,247,0.7);
+            padding: 3px 8px;
             display: inline-block;
             width: 100%;
         }
 
-        /* Tree styles - ALL MEMBERS IN SINGLE ROW (no wrap) */
         .tree-container {
-            margin: 20px 0;
-            background: rgba(255,255,255,0.75);
-            padding: 10px;
+            margin: 15px 0;
+            background: rgba(255,254,247,0.7);
+            padding: 8px;
             border-radius: 8px;
         }
         
         .gen-row {
-            margin: 15px 0;
+            margin: 12px 0;
             text-align: center;
         }
         
         .gen-label {
-            font-size: 0.75rem;
-            color: #555;
-            margin-bottom: 8px;
+            font-size: 0.7rem;
+            color: #2d6a3b;
+            margin-bottom: 6px;
             font-weight: bold;
         }
         
-        /* CRITICAL: Members row - NO WRAP, horizontal scroll if needed */
         .members-row {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-            margin: 10px 0;
+            gap: 6px;
+            margin: 8px 0;
             overflow-x: auto;
             overflow-y: visible;
-            padding-bottom: 8px;
+            padding-bottom: 5px;
         }
         
-        /* For WebKit scrollbar styling */
         .members-row::-webkit-scrollbar {
-            height: 6px;
+            height: 4px;
         }
         .members-row::-webkit-scrollbar-track {
-            background: #ddd;
-            border-radius: 3px;
+            background: #ddd0b0;
+            border-radius: 2px;
         }
         .members-row::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 3px;
+            background: #2d6a3b;
+            border-radius: 2px;
         }
         
-        /* Dynamic member card - auto adjusts based on count */
         .member-card {
-            border: 2px solid #000;
-            background: rgba(255,255,255,0.95);
+            border: 1.5px solid #2d6a3b;
+            background: rgba(255,255,245,0.98);
             text-align: center;
-            padding: 8px 10px;
+            padding: 6px 8px;
             flex: 0 0 auto;
-            min-width: 80px;
-            max-width: 130px;
+            min-width: 70px;
+            max-width: 110px;
             transition: all 0.1s ease;
-            box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.08);
+            border-radius: 4px;
         }
         
-        /* Font size automatically reduces when many members */
         .member-name {
             font-weight: bold;
-            font-size: clamp(0.6rem, 1.8vw, 0.9rem);
+            font-size: clamp(0.55rem, 1.6vw, 0.85rem);
             word-break: break-word;
-            line-height: 1.3;
+            line-height: 1.25;
+            color: #1a3a1a;
         }
         
-        /* Arrow container */
         .arrow-container {
             text-align: center;
-            margin: 5px 0;
+            margin: 3px 0;
         }
         
         .arrow-symbol {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            color: #000;
+            color: #2d6a3b;
         }
         
-        /* Parent highlight */
         .has-children {
-            background: #e8e0c8;
-            border: 2px solid #000;
-            position: relative;
+            background: #e8f0e0;
+            border: 1.5px solid #d4a843;
         }
         
-        /* Individual member wrapper for arrow placement */
         .member-wrapper {
             display: flex;
             flex-direction: column;
@@ -312,38 +310,42 @@
         }
         
         .signature-area {
-            margin-top: 35px;
+            margin-top: 25px;
             text-align: right;
-            border-top: 1px dashed #333;
-            padding-top: 18px;
-            background: rgba(255,255,255,0.8);
+            border-top: 1px dashed #2d6a3b;
+            padding-top: 12px;
+            background: rgba(255,254,247,0.8);
+            font-size: 0.8rem;
         }
         .footer-note {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             text-align: center;
-            margin-top: 18px;
-            color: #444;
-            background: rgba(255,255,255,0.7);
-            padding: 4px;
+            margin-top: 12px;
+            color: #5a4a2a;
+            background: rgba(255,254,247,0.7);
+            padding: 3px;
         }
         .print-actions {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: flex-end;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
-        .btn-print, .btn-word {
-            background: #2c2c2c;
-            color: white;
+        .btn-print, .btn-word, .btn-pdf {
+            background: #2d6a3b;
+            color: #f9f3d9;
             border: none;
-            padding: 6px 18px;
+            padding: 6px 16px;
             border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            transition: 0.2s;
         }
+        .btn-print:hover, .btn-word:hover, .btn-pdf:hover { background: #1a4a28; transform: scale(1.02); }
+        .btn-pdf { background: #8b5a3c; }
+        .btn-pdf:hover { background: #6b3a1c; }
 
-        /* Limit max members warning */
         .max-warning {
             color: #c0392b;
             font-size: 0.7rem;
@@ -351,7 +353,7 @@
             display: none;
         }
 
-        /* PRINT STYLES */
+        /* PRINT STYLES - A4 Landscape, fits on one page */
         @media print {
             body {
                 background: white;
@@ -374,7 +376,8 @@
             .header,
             .action-buttons,
             .btn-print,
-            .btn-word {
+            .btn-word,
+            .btn-pdf {
                 display: none !important;
             }
             
@@ -393,9 +396,9 @@
             }
             
             .certificate {
-                border: 2px solid black;
+                border: 1.5px solid #2d6a3b;
                 box-shadow: none;
-                padding: 0.4in;
+                padding: 0.3in 0.25in;
                 margin: 0;
                 page-break-inside: avoid;
                 break-inside: avoid;
@@ -403,21 +406,22 @@
             }
             
             .certificate::before {
-                opacity: 0.05;
+                opacity: 0.04;
             }
             
+            /* A4 Landscape */
             @page {
-                size: landscape;
-                margin: 0.4in;
+                size: A4 landscape;
+                margin: 0.3in;
             }
             
             .member-card {
-                border: 1px solid black;
+                border: 1px solid #2d6a3b;
                 background: white;
             }
             
             .has-children {
-                background: #f0f0f0;
+                background: #f0f5ea;
             }
             
             .gen-row {
@@ -428,19 +432,34 @@
             .members-row {
                 overflow-x: visible;
                 flex-wrap: nowrap;
+                gap: 5px;
             }
+            
+            .member-name {
+                font-size: 0.7rem;
+            }
+            
+            .certificate-header {
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.4rem;
+            }
+            
+            .panchayat-name { font-size: 1.2rem; }
+            .cert-title { font-size: 1.3rem; }
+            .tree-container { margin: 8px 0; }
+            .signature-area { margin-top: 15px; }
         }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="header">
-        <h1>📜 Genealogy Certificate | Bhagabanpur Gram Panchayat</h1>
+        <h1>🌿 Genealogy Certificate | Bhagabanpur Gram Panchayat 🌿</h1>
     </div>
 
     <!-- Input Section -->
     <div class="input-section">
-        <div class="section-title">📝 Edit Family Tree Data (Max 10 members per generation - all in one row)</div>
+        <div class="section-title">📝 Edit Family Tree Data (Max 10 members per generation)</div>
         
         <div class="generation-input">
             <div class="gen-header">🌟 Generation 1 (Root Ancestor - Single Name)</div>
@@ -452,21 +471,21 @@
         </div>
 
         <div class="generation-input">
-            <div class="gen-header">🌿 Generation 2 (Children of Gen 1) <span id="gen2-count" style="font-size:0.7rem; color:#666;"></span></div>
+            <div class="gen-header">🌿 Generation 2 <span id="gen2-count" style="font-size:0.7rem; color:#2d6a3b;"></span></div>
             <div class="members-container" id="gen2-input-container"></div>
             <button class="btn-add" id="addGen2Btn" onclick="addGen2Member()">+ Add Child</button>
             <div id="gen2-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
         </div>
 
         <div class="generation-input">
-            <div class="gen-header">🌺 Generation 3 <span id="gen3-count" style="font-size:0.7rem; color:#666;"></span></div>
+            <div class="gen-header">🌺 Generation 3 <span id="gen3-count" style="font-size:0.7rem; color:#2d6a3b;"></span></div>
             <div class="members-container" id="gen3-input-container"></div>
             <button class="btn-add" id="addGen3Btn" onclick="addGen3Member()">+ Add Member</button>
             <div id="gen3-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
         </div>
 
         <div class="generation-input">
-            <div class="gen-header">🍃 Generation 4 <span id="gen4-count" style="font-size:0.7rem; color:#666;"></span></div>
+            <div class="gen-header">🍃 Generation 4 <span id="gen4-count" style="font-size:0.7rem; color:#2d6a3b;"></span></div>
             <div class="members-container" id="gen4-input-container"></div>
             <button class="btn-add" id="addGen4Btn" onclick="addGen4Member()">+ Add Member</button>
             <div id="gen4-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
@@ -492,8 +511,9 @@
     <div class="certificate-panel">
         <div style="width:100%; max-width:1000px;">
             <div class="print-actions">
-                <button class="btn-print" id="printBtn">🖨️ Print Certificate</button>
+                <button class="btn-print" id="printBtn">🖨️ Print (A4 Landscape)</button>
                 <button class="btn-word" id="wordBtn">📄 Export to Word</button>
+                <button class="btn-pdf" id="pdfBtn">📑 Save as PDF</button>
             </div>
             <div class="certificate-wrapper">
                 <div class="certificate" id="certificate">
@@ -513,7 +533,7 @@
                         <div style="font-weight:bold;">(Signature)</div>
                         <div>Prodhan</div>
                         <div>Bhagabanpur Gram Panchayat</div>
-                        <div style="font-size:0.7rem;">[Seal]</div>
+                        <div style="font-size:0.65rem;">[Seal]</div>
                     </div>
                     <div class="footer-note">This certificate verifies the ancestral lineage of four generations as per records.</div>
                 </div>
@@ -534,9 +554,9 @@
     }
     
     let gen1Name = "Ram Chandra Mondal";
-    let gen2 = ["Bishwanath Mondal", "Lakshmi Mondal", "Gobinda Mondal", "Sarala Mondal", "Niranjan Mondal", "Kalpana Mondal"];
-    let gen3 = ["Gouranga Mondal", "Mamata Mondal", "Sushanta Mondal", "Anita Mondal", "Ratan Mondal", "Kalyani Mondal", "Tapan Mondal", "Mithun Mondal"];
-    let gen4 = ["Sourav Mondal", "Priyanka Mondal", "Rohan Mondal", "Megha Mondal", "Arjun Mondal", "Tanushree Mondal", "Debashis Mondal", "Rimpa Mondal", "Sukanta Mondal"];
+    let gen2 = ["Bishwanath", "Lakshmi", "Gobinda", "Sarala", "Niranjan", "Kalpana", "Haripada", "Malati", "Sukumar", "Arati"];
+    let gen3 = ["Gouranga", "Mamata", "Sushanta", "Anita", "Ratan", "Kalyani", "Tapan", "Mithun", "Rekha", "Subrata"];
+    let gen4 = ["Sourav", "Priyanka", "Rohan", "Megha", "Arjun", "Tanushree", "Debashis", "Rimpa", "Sukanta", "Moumita"];
     
     let selectedGen2Parent = 0;
     let selectedGen3Parent = 0;
@@ -652,100 +672,76 @@
     function removeGen4(idx) { gen4.splice(idx, 1); renderInputs(); }
     
     function calculateFontSize(count) {
-        if (count <= 4) return '0.95rem';
-        if (count <= 6) return '0.85rem';
-        if (count <= 8) return '0.75rem';
-        return '0.65rem';
+        if (count <= 4) return '0.85rem';
+        if (count <= 6) return '0.75rem';
+        if (count <= 8) return '0.68rem';
+        return '0.6rem';
     }
     
     function calculatePadding(count) {
-        if (count <= 4) return '8px 14px';
-        if (count <= 6) return '6px 10px';
-        if (count <= 8) return '5px 8px';
-        return '4px 6px';
+        if (count <= 4) return '6px 10px';
+        if (count <= 6) return '5px 7px';
+        if (count <= 8) return '4px 6px';
+        return '3px 5px';
     }
     
     function generateCertificate() {
         let html = `<div class="tree-container">`;
         html += `<div class="date-line">Date: ${getTodayDate()}</div>`;
         
-        // Generation 1
         html += `<div class="gen-row">
                     <div class="gen-label">First Generation</div>
                     <div class="members-row">
-                        <div class="member-card">
-                            <div class="member-name">${escapeHtml(gen1Name)}</div>
-                        </div>
+                        <div class="member-card"><div class="member-name">${escapeHtml(gen1Name)}</div></div>
                     </div>
                 </div>`;
         
-        if (gen2.length > 0) {
-            html += `<div class="arrow-container"><div class="arrow-symbol">↓</div></div>`;
-        }
+        if (gen2.length > 0) html += `<div class="arrow-container"><div class="arrow-symbol">↓</div></div>`;
         
-        // Generation 2 - ALL IN ONE ROW
         let gen2Count = gen2.length;
-        let gen2FontSize = calculateFontSize(gen2Count);
-        let gen2Padding = calculatePadding(gen2Count);
+        let gen2Font = calculateFontSize(gen2Count);
+        let gen2Pad = calculatePadding(gen2Count);
         
-        html += `<div class="gen-row">
-                    <div class="gen-label">Second Generation</div>
-                    <div class="members-row" style="gap: ${gen2Count > 7 ? '4px' : '8px'};">`;
-        
+        html += `<div class="gen-row"><div class="gen-label">Second Generation</div><div class="members-row" style="gap: ${gen2Count > 7 ? '3px' : '6px'};">`;
         gen2.forEach((name, idx) => {
             const isSelected = (idx === selectedGen2Parent);
             html += `<div class="member-wrapper">
-                        <div class="member-card ${isSelected ? 'has-children' : ''}" style="padding: ${gen2Padding};">
-                            <div class="member-name" style="font-size: ${gen2FontSize};">${escapeHtml(name)}</div>
+                        <div class="member-card ${isSelected ? 'has-children' : ''}" style="padding: ${gen2Pad};">
+                            <div class="member-name" style="font-size: ${gen2Font};">${escapeHtml(name)}</div>
                         </div>`;
             if (isSelected && gen3.length > 0) {
-                html += `<div class="arrow-container" style="margin-top: 4px;"><div class="arrow-symbol" style="font-size: 1.2rem;">↓</div></div>`;
-            } else {
-                html += `<div style="height: 22px;"></div>`;
-            }
+                html += `<div class="arrow-container" style="margin-top: 2px;"><div class="arrow-symbol" style="font-size: 1rem;">↓</div></div>`;
+            } else { html += `<div style="height: 18px;"></div>`; }
             html += `</div>`;
         });
         html += `</div></div>`;
         
-        // Generation 3
         if (gen3.length > 0 && gen2.length > 0) {
             let gen3Count = gen3.length;
-            let gen3FontSize = calculateFontSize(gen3Count);
-            let gen3Padding = calculatePadding(gen3Count);
-            
-            html += `<div class="gen-row">
-                        <div class="gen-label">Third Generation</div>
-                        <div class="members-row" style="gap: ${gen3Count > 7 ? '4px' : '8px'};">`;
-            
+            let gen3Font = calculateFontSize(gen3Count);
+            let gen3Pad = calculatePadding(gen3Count);
+            html += `<div class="gen-row"><div class="gen-label">Third Generation</div><div class="members-row" style="gap: ${gen3Count > 7 ? '3px' : '6px'};">`;
             gen3.forEach((name, idx) => {
                 const isSelected = (idx === selectedGen3Parent);
                 html += `<div class="member-wrapper">
-                            <div class="member-card ${isSelected ? 'has-children' : ''}" style="padding: ${gen3Padding};">
-                                <div class="member-name" style="font-size: ${gen3FontSize};">${escapeHtml(name)}</div>
+                            <div class="member-card ${isSelected ? 'has-children' : ''}" style="padding: ${gen3Pad};">
+                                <div class="member-name" style="font-size: ${gen3Font};">${escapeHtml(name)}</div>
                             </div>`;
                 if (isSelected && gen4.length > 0) {
-                    html += `<div class="arrow-container" style="margin-top: 4px;"><div class="arrow-symbol" style="font-size: 1.2rem;">↓</div></div>`;
-                } else {
-                    html += `<div style="height: 22px;"></div>`;
-                }
+                    html += `<div class="arrow-container" style="margin-top: 2px;"><div class="arrow-symbol" style="font-size: 1rem;">↓</div></div>`;
+                } else { html += `<div style="height: 18px;"></div>`; }
                 html += `</div>`;
             });
             html += `</div></div>`;
         }
         
-        // Generation 4
         if (gen4.length > 0 && gen3.length > 0) {
             let gen4Count = gen4.length;
-            let gen4FontSize = calculateFontSize(gen4Count);
-            let gen4Padding = calculatePadding(gen4Count);
-            
-            html += `<div class="gen-row">
-                        <div class="gen-label">Fourth Generation</div>
-                        <div class="members-row" style="gap: ${gen4Count > 7 ? '4px' : '8px'};">`;
+            let gen4Font = calculateFontSize(gen4Count);
+            let gen4Pad = calculatePadding(gen4Count);
+            html += `<div class="gen-row"><div class="gen-label">Fourth Generation</div><div class="members-row" style="gap: ${gen4Count > 7 ? '3px' : '6px'};">`;
             gen4.forEach((name) => {
-                html += `<div class="member-card" style="padding: ${gen4Padding};">
-                            <div class="member-name" style="font-size: ${gen4FontSize};">${escapeHtml(name)}</div>
-                        </div>`;
+                html += `<div class="member-card" style="padding: ${gen4Pad};"><div class="member-name" style="font-size: ${gen4Font};">${escapeHtml(name)}</div></div>`;
             });
             html += `</div></div>`;
         }
@@ -770,21 +766,20 @@
     function exportToWord() {
         const certContent = document.getElementById('certificate').cloneNode(true);
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Genealogy_Certificate</title><style>
-            body { font-family: 'Times New Roman', serif; padding: 40px; background: white; }
-            .certificate { border: 2px solid black; padding: 1.5rem; max-width: 100%; margin: 0 auto; }
-            .certificate-header { text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; }
-            .panchayat-name { font-size: 1.5rem; font-weight: bold; }
-            .cert-title { font-size: 1.6rem; text-decoration: underline; }
-            .date-line { text-align: right; font-size: 0.85rem; margin-bottom: 15px; }
-            .gen-row { margin: 15px 0; text-align: center; }
-            .members-row { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 6px; overflow-x: visible; }
+            body { font-family: 'Times New Roman', serif; padding: 30px; background: white; }
+            .certificate { border: 2px solid #2d6a3b; padding: 0.4in; max-width: 100%; margin: 0 auto; }
+            .certificate-header { text-align: center; border-bottom: 2px solid #2d6a3b; margin-bottom: 15px; }
+            .panchayat-name { font-size: 1.3rem; font-weight: bold; }
+            .cert-title { font-size: 1.4rem; text-decoration: underline; }
+            .date-line { text-align: right; font-size: 0.75rem; margin-bottom: 10px; }
+            .gen-row { margin: 10px 0; text-align: center; }
+            .members-row { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 5px; }
             .member-wrapper { display: flex; flex-direction: column; align-items: center; }
-            .member-card { border: 2px solid black; text-align: center; background: white; }
-            .member-name { font-weight: bold; word-break: break-word; }
-            .has-children { background: #f0f0f0; }
-            .arrow-container { text-align: center; margin: 4px 0; }
-            .arrow-symbol { font-size: 1.2rem; font-weight: bold; }
-            .signature-area { text-align: right; margin-top: 35px; border-top: 1px dashed black; padding-top: 15px; }
+            .member-card { border: 1.5px solid #2d6a3b; padding: 5px 8px; text-align: center; min-width: 70px; }
+            .member-name { font-weight: bold; font-size: 0.7rem; }
+            .has-children { background: #f0f5ea; }
+            .arrow-symbol { font-size: 1rem; }
+            .signature-area { text-align: right; margin-top: 20px; border-top: 1px dashed #2d6a3b; padding-top: 10px; }
             @media print { body { padding: 0; } }
         </style></head><body>${certContent.outerHTML}</body></html>`;
         const blob = new Blob([html], { type: 'application/msword' });
@@ -795,10 +790,23 @@
         URL.revokeObjectURL(link.href);
     }
     
+    function generatePDF() {
+        const element = document.getElementById('certificate');
+        const opt = {
+            margin: [0.3, 0.3, 0.3, 0.3],
+            filename: 'Genealogy_Certificate_Bhagabanpur.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, letterRendering: true, useCORS: true, logging: false },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+    
     document.getElementById('generateBtn').addEventListener('click', generateCertificate);
     document.getElementById('resetBtn').addEventListener('click', loadExampleData);
     document.getElementById('printBtn').addEventListener('click', printCertificate);
     document.getElementById('wordBtn').addEventListener('click', exportToWord);
+    document.getElementById('pdfBtn').addEventListener('click', generatePDF);
     
     renderInputs();
     generateCertificate();
