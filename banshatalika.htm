@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Genealogy Certificate | Bhagabanpur Gram Panchayat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #d4d4d4;
+            font-family: 'Segoe UI', 'Roboto', 'Times New Roman', serif;
+            padding: 25px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            width: 100%;
+            background: #f0f0f0;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1e1e1e;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        .header h1 { font-size: 1.5rem; font-weight: 500; }
+
+        /* Input Section */
+        .input-section {
+            background: #eaeaea;
+            padding: 20px;
+            border-bottom: 2px solid #bbb;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1e1e1e;
+            border-left: 4px solid #444;
+            padding-left: 10px;
+        }
+        .generation-input {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #aaa;
+        }
+        .gen-header {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .members-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .member-input-card {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .member-input-card input {
+            padding: 5px 8px;
+            border: 1px solid #999;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            width: 140px;
+        }
+        .btn-remove {
+            background: #8b3c2c;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        .btn-add {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+        .btn-primary {
+            background: #1e1e1e;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-primary:hover { background: #3a3a3a; }
+        
+        .dropdown-select {
+            margin: 15px 0;
+            padding: 10px;
+            background: #fff8e0;
+            border-radius: 8px;
+            border-left: 4px solid #ff9800;
+        }
+        .dropdown-select label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .dropdown-select select {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            border: 1px solid #999;
+        }
+
+        /* Certificate Panel */
+        .certificate-panel {
+            background: #e0e0e0;
+            padding: 24px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .certificate-wrapper {
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 1000px;
+        }
+        .certificate {
+            background: white;
+            color: black;
+            font-family: 'Times New Roman', 'Georgia', serif;
+            padding: 1.5rem 2rem;
+            border: 2px solid #000;
+            box-shadow: 0 0 0 6px white, 0 0 0 8px #222;
+        }
+        
+        .certificate-header {
+            text-align: center;
+            margin-bottom: 1.2rem;
+            border-bottom: 2px solid #000;
+            padding-bottom: 0.8rem;
+        }
+        .office-title { font-size: 1rem; letter-spacing: 1px; }
+        .panchayat-name { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; margin: 4px 0; }
+        .address-line { font-size: 0.8rem; margin-bottom: 6px; }
+        .cert-title { font-size: 1.6rem; font-weight: bold; margin: 10px 0 4px; text-decoration: underline; }
+        .cert-subtitle {
+            font-size: 0.85rem;
+            font-style: italic;
+            margin-top: 4px;
+            color: #333;
+        }
+
+        /* Date line - placed before First Generation */
+        .date-line {
+            text-align: right;
+            font-size: 0.85rem;
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: normal;
+        }
+
+        /* Tree styles - each generation in a single row */
+        .tree-container {
+            margin: 20px 0;
+        }
+        
+        .gen-row {
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .gen-label {
+            font-size: 0.75rem;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .members-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .member-card {
+            border: 2px solid #000;
+            background: white;
+            text-align: center;
+            padding: 10px 18px;
+            min-width: 130px;
+            position: relative;
+        }
+        
+        .member-name {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        
+        /* Arrow container - placed below the member card */
+        .arrow-container {
+            text-align: center;
+            margin: 5px 0;
+        }
+        
+        .arrow-symbol {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        /* Special styling for parent that has children in next generation */
+        .has-children {
+            background: #f0f0f0;
+            border: 2px solid #000;
+        }
+        
+        .signature-area {
+            margin-top: 35px;
+            text-align: right;
+            border-top: 1px dashed #333;
+            padding-top: 18px;
+        }
+        .footer-note {
+            font-size: 0.65rem;
+            text-align: center;
+            margin-top: 18px;
+            color: #444;
+        }
+        .print-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+        .btn-print, .btn-word {
+            background: #2c2c2c;
+            color: white;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        /* PRINT STYLES - Only certificate content prints */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .app-container {
+                background: white;
+                box-shadow: none;
+                margin: 0;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            
+            .input-section,
+            .print-actions,
+            .btn-primary,
+            .dropdown-select,
+            .header,
+            .collapse-header,
+            .action-buttons,
+            .btn-print,
+            .btn-word {
+                display: none !important;
+            }
+            
+            .certificate-panel {
+                background: white;
+                padding: 0;
+                margin: 0;
+                display: block;
+            }
+            
+            .certificate-wrapper {
+                box-shadow: none;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .certificate {
+                border: 2px solid black;
+                box-shadow: none;
+                padding: 0.4in;
+                margin: 0;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            @page {
+                size: landscape;
+                margin: 0.4in;
+            }
+            
+            .member-card {
+                border: 1px solid black;
+                background: white;
+            }
+            
+            .has-children {
+                background: #f0f0f0;
+            }
+            
+            .gen-row {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            .tree-container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <h1>📜 Genealogy Certificate | Bhagabanpur Gram Panchayat</h1>
+    </div>
+
+    <!-- Input Section -->
+    <div class="input-section">
+        <div class="section-title">📝 Edit Family Tree Data</div>
+        
+        <div class="generation-input">
+            <div class="gen-header">🌟 Generation 1 (Root Ancestor - Single Name)</div>
+            <div class="members-container">
+                <div class="member-input-card">
+                    <input type="text" id="gen1-name" placeholder="Enter name" value="Ram Chandra Mondal">
+                </div>
+            </div>
+        </div>
+
+        <div class="generation-input">
+            <div class="gen-header">🌿 Generation 2 (Children of Gen 1)</div>
+            <div class="members-container" id="gen2-input-container"></div>
+            <button class="btn-add" onclick="addGen2Member()">+ Add Child</button>
+        </div>
+
+        <div class="generation-input">
+            <div class="gen-header">🌺 Generation 3</div>
+            <div class="members-container" id="gen3-input-container"></div>
+            <button class="btn-add" onclick="addGen3Member()">+ Add Member</button>
+        </div>
+
+        <div class="generation-input">
+            <div class="gen-header">🍃 Generation 4</div>
+            <div class="members-container" id="gen4-input-container"></div>
+            <button class="btn-add" onclick="addGen4Member()">+ Add Member</button>
+        </div>
+
+        <div class="dropdown-select">
+            <label>🔽 Select parent from Generation 2 (whose children will be shown in Generation 3):</label>
+            <select id="select-gen2-parent"></select>
+        </div>
+
+        <div class="dropdown-select">
+            <label>🔽 Select parent from Generation 3 (whose children will be shown in Generation 4):</label>
+            <select id="select-gen3-parent"></select>
+        </div>
+
+        <div class="action-buttons" style="margin-top: 15px;">
+            <button class="btn-primary" id="generateBtn">🎋 Generate Certificate</button>
+            <button class="btn-primary" id="resetBtn">⟳ Reset Example</button>
+        </div>
+    </div>
+
+    <!-- Certificate Panel -->
+    <div class="certificate-panel">
+        <div style="width:100%; max-width:1000px;">
+            <div class="print-actions">
+                <button class="btn-print" id="printBtn">🖨️ Print Certificate</button>
+                <button class="btn-word" id="wordBtn">📄 Export to Word</button>
+            </div>
+            <div class="certificate-wrapper">
+                <div class="certificate" id="certificate">
+                    <div class="certificate-header">
+                        <div class="office-title">OFFICE OF THE</div>
+                        <div class="panchayat-name">BHAGABANPUR GRAM PANCHAYAT</div>
+                        <div class="address-line">Vill+P.O - Arbara, Chanchal, Malda (West Bengal) - 732123</div>
+                        <div class="cert-title">FAMILY GENEALOGY CERTIFICATE</div>
+                        <div class="cert-subtitle">(Family Tree / Four Generations Lineage)</div>
+                    </div>
+                    
+                    <!-- Date placed just before First Generation -->
+                    <div id="treeDisplay">
+                        <div style="text-align:center; padding:40px;">👉 Click "Generate Certificate" to view family tree</div>
+                    </div>
+                    
+                    <div class="signature-area">
+                        <div style="font-weight:bold;">(Signature)</div>
+                        <div>Prodhan</div>
+                        <div>Bhagabanpur Gram Panchayat</div>
+                        <div style="font-size:0.7rem;">[Seal]</div>
+                    </div>
+                    <div class="footer-note">This certificate verifies the ancestral lineage of four generations as per records.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get today's date in DD/MM/YYYY format
+    function getTodayDate() {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+    
+    // Data storage
+    let gen1Name = "Ram Chandra Mondal";
+    let gen2 = ["Bishwanath Mondal", "Lakshmi Mondal", "Gobinda Mondal"];
+    let gen3 = ["Gouranga Mondal", "Mamata Mondal", "Sushanta Mondal", "Anita Mondal"];
+    let gen4 = ["Sourav Mondal", "Priyanka Mondal", "Rohan Mondal", "Megha Mondal"];
+    
+    let selectedGen2Parent = 0;
+    let selectedGen3Parent = 0;
+
+    function escapeHtml(str) { 
+        if(!str) return ''; 
+        return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); 
+    }
+
+    function renderInputs() {
+        document.getElementById('gen1-name').value = gen1Name;
+        
+        const gen2Container = document.getElementById('gen2-input-container');
+        gen2Container.innerHTML = '';
+        gen2.forEach((name, idx) => {
+            gen2Container.innerHTML += `
+                <div class="member-input-card">
+                    <input type="text" value="${escapeHtml(name)}" data-gen2-idx="${idx}" class="gen2-input">
+                    <button class="btn-remove" onclick="removeGen2(${idx})">✕</button>
+                </div>
+            `;
+        });
+        
+        const gen3Container = document.getElementById('gen3-input-container');
+        gen3Container.innerHTML = '';
+        gen3.forEach((name, idx) => {
+            gen3Container.innerHTML += `
+                <div class="member-input-card">
+                    <input type="text" value="${escapeHtml(name)}" data-gen3-idx="${idx}" class="gen3-input">
+                    <button class="btn-remove" onclick="removeGen3(${idx})">✕</button>
+                </div>
+            `;
+        });
+        
+        const gen4Container = document.getElementById('gen4-input-container');
+        gen4Container.innerHTML = '';
+        gen4.forEach((name, idx) => {
+            gen4Container.innerHTML += `
+                <div class="member-input-card">
+                    <input type="text" value="${escapeHtml(name)}" data-gen4-idx="${idx}" class="gen4-input">
+                    <button class="btn-remove" onclick="removeGen4(${idx})">✕</button>
+                </div>
+            `;
+        });
+        
+        const gen2Select = document.getElementById('select-gen2-parent');
+        gen2Select.innerHTML = '';
+        gen2.forEach((name, idx) => {
+            gen2Select.innerHTML += `<option value="${idx}" ${selectedGen2Parent === idx ? 'selected' : ''}>${escapeHtml(name)}</option>`;
+        });
+        if (gen2.length === 0) gen2Select.innerHTML = '<option disabled>No members</option>';
+        
+        const gen3Select = document.getElementById('select-gen3-parent');
+        gen3Select.innerHTML = '';
+        gen3.forEach((name, idx) => {
+            gen3Select.innerHTML += `<option value="${idx}" ${selectedGen3Parent === idx ? 'selected' : ''}>${escapeHtml(name)}</option>`;
+        });
+        if (gen3.length === 0) gen3Select.innerHTML = '<option disabled>No members</option>';
+        
+        document.querySelectorAll('.gen2-input').forEach(inp => {
+            inp.addEventListener('change', (e) => {
+                const idx = parseInt(inp.dataset.gen2Idx);
+                if (!isNaN(idx)) gen2[idx] = inp.value;
+                renderInputs();
+            });
+        });
+        document.querySelectorAll('.gen3-input').forEach(inp => {
+            inp.addEventListener('change', (e) => {
+                const idx = parseInt(inp.dataset.gen3Idx);
+                if (!isNaN(idx)) gen3[idx] = inp.value;
+                renderInputs();
+            });
+        });
+        document.querySelectorAll('.gen4-input').forEach(inp => {
+            inp.addEventListener('change', (e) => {
+                const idx = parseInt(inp.dataset.gen4Idx);
+                if (!isNaN(idx)) gen4[idx] = inp.value;
+            });
+        });
+        
+        document.getElementById('gen1-name').addEventListener('change', (e) => {
+            gen1Name = e.target.value;
+        });
+        
+        gen2Select.onchange = (e) => { selectedGen2Parent = parseInt(e.target.value); };
+        gen3Select.onchange = (e) => { selectedGen3Parent = parseInt(e.target.value); };
+    }
+    
+    function addGen2Member() { gen2.push("New Member"); renderInputs(); }
+    function addGen3Member() { gen3.push("New Member"); renderInputs(); }
+    function addGen4Member() { gen4.push("New Member"); renderInputs(); }
+    function removeGen2(idx) { gen2.splice(idx, 1); if(selectedGen2Parent >= gen2.length) selectedGen2Parent = 0; renderInputs(); }
+    function removeGen3(idx) { gen3.splice(idx, 1); if(selectedGen3Parent >= gen3.length) selectedGen3Parent = 0; renderInputs(); }
+    function removeGen4(idx) { gen4.splice(idx, 1); renderInputs(); }
+    
+    function generateCertificate() {
+        let html = `<div class="tree-container">`;
+        
+        // Date line - placed just before First Generation
+        html += `<div class="date-line">Date: ${getTodayDate()}</div>`;
+        
+        // ========== GENERATION 1 ==========
+        html += `<div class="gen-row">
+                    <div class="gen-label">First Generation</div>
+                    <div class="members-row">
+                        <div class="member-card">
+                            <div class="member-name">${escapeHtml(gen1Name)}</div>
+                        </div>
+                    </div>
+                </div>`;
+        
+        // Arrow row - connects Gen1 to Gen2 (always show if Gen2 has members)
+        if (gen2.length > 0) {
+            html += `<div class="arrow-container">
+                        <div class="arrow-symbol">↓</div>
+                    </div>`;
+        }
+        
+        // ========== GENERATION 2 ==========
+        html += `<div class="gen-row">
+                    <div class="gen-label">Second Generation</div>
+                    <div class="members-row">`;
+        
+        gen2.forEach((name, idx) => {
+            const isSelected = (idx === selectedGen2Parent);
+            html += `<div style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="member-card ${isSelected ? 'has-children' : ''}">
+                            <div class="member-name">${escapeHtml(name)}</div>
+                        </div>`;
+            
+            // Arrow under the SELECTED parent only (showing connection to Gen3)
+            if (isSelected && gen3.length > 0) {
+                html += `<div class="arrow-container" style="margin-top: 8px;">
+                            <div class="arrow-symbol">↓</div>
+                        </div>`;
+            } else {
+                // Add empty space for alignment
+                html += `<div style="height: 28px;"></div>`;
+            }
+            html += `</div>`;
+        });
+        
+        html += `</div></div>`;
+        
+        // ========== GENERATION 3 ==========
+        if (gen3.length > 0 && gen2.length > 0) {
+            html += `<div class="gen-row">
+                        <div class="gen-label">Third Generation</div>
+                        <div class="members-row">`;
+            
+            gen3.forEach((name, idx) => {
+                const isSelected = (idx === selectedGen3Parent);
+                html += `<div style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="member-card ${isSelected ? 'has-children' : ''}">
+                                <div class="member-name">${escapeHtml(name)}</div>
+                            </div>`;
+                
+                // Arrow under the SELECTED parent only (showing connection to Gen4)
+                if (isSelected && gen4.length > 0) {
+                    html += `<div class="arrow-container" style="margin-top: 8px;">
+                                <div class="arrow-symbol">↓</div>
+                            </div>`;
+                } else {
+                    html += `<div style="height: 28px;"></div>`;
+                }
+                html += `</div>`;
+            });
+            
+            html += `</div></div>`;
+        }
+        
+        // ========== GENERATION 4 ==========
+        if (gen4.length > 0 && gen3.length > 0) {
+            html += `<div class="gen-row">
+                        <div class="gen-label">Fourth Generation</div>
+                        <div class="members-row">`;
+            
+            gen4.forEach((name) => {
+                html += `<div class="member-card">
+                            <div class="member-name">${escapeHtml(name)}</div>
+                        </div>`;
+            });
+            
+            html += `</div></div>`;
+        }
+        
+        html += `</div>`;
+        document.getElementById('treeDisplay').innerHTML = html;
+    }
+    
+    function loadExampleData() {
+        gen1Name = "Ram Chandra Mondal";
+        gen2 = ["Bishwanath Mondal", "Lakshmi Mondal", "Gobinda Mondal"];
+        gen3 = ["Gouranga Mondal", "Mamata Mondal", "Sushanta Mondal", "Anita Mondal"];
+        gen4 = ["Sourav Mondal", "Priyanka Mondal", "Rohan Mondal", "Megha Mondal"];
+        selectedGen2Parent = 0;
+        selectedGen3Parent = 0;
+        renderInputs();
+        generateCertificate();
+    }
+    
+    // Print function
+    function printCertificate() {
+        window.print();
+    }
+    
+    // Export to Word function
+    function exportToWord() {
+        const certContent = document.getElementById('certificate').cloneNode(true);
+        
+        const html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Genealogy_Certificate_Bhagabanpur</title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                body {
+                    font-family: 'Times New Roman', Georgia, serif;
+                    padding: 40px;
+                    background: white;
+                }
+                .certificate {
+                    border: 2px solid black;
+                    padding: 1.5rem 2rem;
+                    max-width: 1000px;
+                    margin: 0 auto;
+                    background: white;
+                }
+                .certificate-header {
+                    text-align: center;
+                    margin-bottom: 1.2rem;
+                    border-bottom: 2px solid #000;
+                    padding-bottom: 0.8rem;
+                }
+                .office-title { font-size: 1rem; letter-spacing: 1px; }
+                .panchayat-name { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; margin: 4px 0; }
+                .address-line { font-size: 0.8rem; margin-bottom: 6px; }
+                .cert-title { font-size: 1.6rem; font-weight: bold; margin: 10px 0 4px; text-decoration: underline; }
+                .cert-subtitle { font-size: 0.85rem; font-style: italic; margin-top: 4px; color: #333; }
+                .date-line { text-align: right; font-size: 0.85rem; margin-bottom: 15px; color: #333; }
+                .tree-container { margin: 20px 0; }
+                .gen-row { margin: 15px 0; text-align: center; }
+                .gen-label { font-size: 0.75rem; color: #555; margin-bottom: 8px; font-weight: bold; }
+                .members-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+                .member-card { border: 2px solid black; padding: 10px 18px; min-width: 130px; text-align: center; background: white; }
+                .member-name { font-weight: bold; font-size: 0.95rem; }
+                .has-children { background: #f0f0f0; }
+                .arrow-container { text-align: center; margin: 5px 0; }
+                .arrow-symbol { font-size: 1.5rem; font-weight: bold; color: #000; }
+                .signature-area { text-align: right; margin-top: 35px; border-top: 1px dashed black; padding-top: 15px; }
+                .footer-note { font-size: 0.65rem; text-align: center; margin-top: 18px; color: #444; }
+            </style>
+        </head>
+        <body>
+            ${certContent.outerHTML}
+        </body>
+        </html>`;
+        
+        const blob = new Blob([html], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Genealogy_Certificate_Bhagabanpur.doc';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+    
+    document.getElementById('generateBtn').addEventListener('click', generateCertificate);
+    document.getElementById('resetBtn').addEventListener('click', loadExampleData);
+    document.getElementById('printBtn').addEventListener('click', printCertificate);
+    document.getElementById('wordBtn').addEventListener('click', exportToWord);
+    
+    // Initialize
+    renderInputs();
+    generateCertificate();
+</script>
+</body>
+</html>
