@@ -69,6 +69,8 @@
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 10px;
+            max-height: 320px;
+            overflow-y: auto;
         }
         .member-input-card {
             background: #f9f9f9;
@@ -156,6 +158,30 @@
             padding: 1.5rem 2rem;
             border: 2px solid #000;
             box-shadow: 0 0 0 6px white, 0 0 0 8px #222;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: visible;
+        }
+        
+        /* Family Picture as Background (subtle watermark) */
+        .certificate::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" opacity="0.08"><rect width="800" height="600" fill="%23f5f0e0"/><circle cx="200" cy="150" r="60" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="200" cy="145" r="15" fill="%23806040"/><circle cx="180" cy="140" r="4" fill="%23806040"/><circle cx="220" cy="140" r="4" fill="%23806040"/><path d="M180 160 Q200 175 220 160" stroke="%23806040" fill="none" stroke-width="2"/><rect x="170" y="170" width="60" height="50" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="400" cy="200" r="70" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="400" cy="195" r="18" fill="%23806040"/><circle cx="375" cy="188" r="5" fill="%23806040"/><circle cx="425" cy="188" r="5" fill="%23806040"/><path d="M375 215 Q400 235 425 215" stroke="%23806040" fill="none" stroke-width="2"/><rect x="365" y="230" width="70" height="55" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="600" cy="150" r="55" fill="none" stroke="%23806040" stroke-width="2"/><circle cx="600" cy="145" r="14" fill="%23806040"/><circle cx="580" cy="140" r="4" fill="%23806040"/><circle cx="620" cy="140" r="4" fill="%23806040"/><path d="M580 158 Q600 170 620 158" stroke="%23806040" fill="none" stroke-width="2"/><rect x="570" y="168" width="60" height="48" fill="none" stroke="%23806040" stroke-width="2"/><text x="400" y="520" font-size="40" fill="%23806040" font-family="serif" text-anchor="middle" opacity="0.4">☦</text><text x="400" y="560" font-size="20" fill="%23806040" font-family="serif" text-anchor="middle" opacity="0.3">Family Heritage</text></svg>');
+            background-repeat: repeat;
+            background-size: 200px 180px;
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .certificate > * {
+            position: relative;
+            z-index: 1;
         }
         
         .certificate-header {
@@ -163,6 +189,7 @@
             margin-bottom: 1.2rem;
             border-bottom: 2px solid #000;
             padding-bottom: 0.8rem;
+            background: rgba(255,255,255,0.85);
         }
         .office-title { font-size: 1rem; letter-spacing: 1px; }
         .panchayat-name { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; margin: 4px 0; }
@@ -183,11 +210,18 @@
             margin-bottom: 15px;
             color: #333;
             font-weight: normal;
+            background: rgba(255,255,255,0.7);
+            padding: 4px 8px;
+            display: inline-block;
+            width: 100%;
         }
 
-        /* Tree styles - each generation in a single row */
+        /* Tree styles - ALL MEMBERS IN SINGLE ROW (no wrap) */
         .tree-container {
             margin: 20px 0;
+            background: rgba(255,255,255,0.75);
+            padding: 10px;
+            border-radius: 8px;
         }
         
         .gen-row {
@@ -202,29 +236,55 @@
             font-weight: bold;
         }
         
+        /* CRITICAL: Members row - NO WRAP, horizontal scroll if needed */
         .members-row {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: row;
+            flex-wrap: nowrap;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 8px;
+            margin: 10px 0;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding-bottom: 8px;
         }
         
+        /* For WebKit scrollbar styling */
+        .members-row::-webkit-scrollbar {
+            height: 6px;
+        }
+        .members-row::-webkit-scrollbar-track {
+            background: #ddd;
+            border-radius: 3px;
+        }
+        .members-row::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        /* Dynamic member card - auto adjusts based on count */
         .member-card {
             border: 2px solid #000;
-            background: white;
+            background: rgba(255,255,255,0.95);
             text-align: center;
-            padding: 10px 18px;
-            min-width: 130px;
-            position: relative;
+            padding: 8px 10px;
+            flex: 0 0 auto;
+            min-width: 80px;
+            max-width: 130px;
+            transition: all 0.1s ease;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
         }
         
+        /* Font size automatically reduces when many members */
         .member-name {
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: clamp(0.6rem, 1.8vw, 0.9rem);
+            word-break: break-word;
+            line-height: 1.3;
         }
         
-        /* Arrow container - placed below the member card */
+        /* Arrow container */
         .arrow-container {
             text-align: center;
             margin: 5px 0;
@@ -236,10 +296,19 @@
             color: #000;
         }
         
-        /* Special styling for parent that has children in next generation */
+        /* Parent highlight */
         .has-children {
-            background: #f0f0f0;
+            background: #e8e0c8;
             border: 2px solid #000;
+            position: relative;
+        }
+        
+        /* Individual member wrapper for arrow placement */
+        .member-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 0 0 auto;
         }
         
         .signature-area {
@@ -247,12 +316,15 @@
             text-align: right;
             border-top: 1px dashed #333;
             padding-top: 18px;
+            background: rgba(255,255,255,0.8);
         }
         .footer-note {
             font-size: 0.65rem;
             text-align: center;
             margin-top: 18px;
             color: #444;
+            background: rgba(255,255,255,0.7);
+            padding: 4px;
         }
         .print-actions {
             display: flex;
@@ -271,7 +343,15 @@
             font-size: 0.8rem;
         }
 
-        /* PRINT STYLES - Only certificate content prints */
+        /* Limit max members warning */
+        .max-warning {
+            color: #c0392b;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* PRINT STYLES */
         @media print {
             body {
                 background: white;
@@ -292,7 +372,6 @@
             .btn-primary,
             .dropdown-select,
             .header,
-            .collapse-header,
             .action-buttons,
             .btn-print,
             .btn-word {
@@ -320,6 +399,11 @@
                 margin: 0;
                 page-break-inside: avoid;
                 break-inside: avoid;
+                overflow-x: visible;
+            }
+            
+            .certificate::before {
+                opacity: 0.05;
             }
             
             @page {
@@ -341,9 +425,9 @@
                 break-inside: avoid;
             }
             
-            .tree-container {
-                page-break-inside: avoid;
-                break-inside: avoid;
+            .members-row {
+                overflow-x: visible;
+                flex-wrap: nowrap;
             }
         }
     </style>
@@ -356,7 +440,7 @@
 
     <!-- Input Section -->
     <div class="input-section">
-        <div class="section-title">📝 Edit Family Tree Data</div>
+        <div class="section-title">📝 Edit Family Tree Data (Max 10 members per generation - all in one row)</div>
         
         <div class="generation-input">
             <div class="gen-header">🌟 Generation 1 (Root Ancestor - Single Name)</div>
@@ -368,21 +452,24 @@
         </div>
 
         <div class="generation-input">
-            <div class="gen-header">🌿 Generation 2 (Children of Gen 1)</div>
+            <div class="gen-header">🌿 Generation 2 (Children of Gen 1) <span id="gen2-count" style="font-size:0.7rem; color:#666;"></span></div>
             <div class="members-container" id="gen2-input-container"></div>
-            <button class="btn-add" onclick="addGen2Member()">+ Add Child</button>
+            <button class="btn-add" id="addGen2Btn" onclick="addGen2Member()">+ Add Child</button>
+            <div id="gen2-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
         </div>
 
         <div class="generation-input">
-            <div class="gen-header">🌺 Generation 3</div>
+            <div class="gen-header">🌺 Generation 3 <span id="gen3-count" style="font-size:0.7rem; color:#666;"></span></div>
             <div class="members-container" id="gen3-input-container"></div>
-            <button class="btn-add" onclick="addGen3Member()">+ Add Member</button>
+            <button class="btn-add" id="addGen3Btn" onclick="addGen3Member()">+ Add Member</button>
+            <div id="gen3-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
         </div>
 
         <div class="generation-input">
-            <div class="gen-header">🍃 Generation 4</div>
+            <div class="gen-header">🍃 Generation 4 <span id="gen4-count" style="font-size:0.7rem; color:#666;"></span></div>
             <div class="members-container" id="gen4-input-container"></div>
-            <button class="btn-add" onclick="addGen4Member()">+ Add Member</button>
+            <button class="btn-add" id="addGen4Btn" onclick="addGen4Member()">+ Add Member</button>
+            <div id="gen4-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
         </div>
 
         <div class="dropdown-select">
@@ -397,7 +484,7 @@
 
         <div class="action-buttons" style="margin-top: 15px;">
             <button class="btn-primary" id="generateBtn">🎋 Generate Certificate</button>
-            <button class="btn-primary" id="resetBtn">⟳ Reset Example</button>
+            <button class="btn-primary" id="resetBtn">⟳ Reset Example (10 members)</button>
         </div>
     </div>
 
@@ -418,7 +505,6 @@
                         <div class="cert-subtitle">(Family Tree / Four Generations Lineage)</div>
                     </div>
                     
-                    <!-- Date placed just before First Generation -->
                     <div id="treeDisplay">
                         <div style="text-align:center; padding:40px;">👉 Click "Generate Certificate" to view family tree</div>
                     </div>
@@ -437,7 +523,8 @@
 </div>
 
 <script>
-    // Get today's date in DD/MM/YYYY format
+    const MAX_MEMBERS = 10;
+    
     function getTodayDate() {
         const today = new Date();
         const day = String(today.getDate()).padStart(2, '0');
@@ -446,11 +533,10 @@
         return `${day}/${month}/${year}`;
     }
     
-    // Data storage
     let gen1Name = "Ram Chandra Mondal";
-    let gen2 = ["Bishwanath Mondal", "Lakshmi Mondal", "Gobinda Mondal"];
-    let gen3 = ["Gouranga Mondal", "Mamata Mondal", "Sushanta Mondal", "Anita Mondal"];
-    let gen4 = ["Sourav Mondal", "Priyanka Mondal", "Rohan Mondal", "Megha Mondal"];
+    let gen2 = ["Bishwanath Mondal", "Lakshmi Mondal", "Gobinda Mondal", "Sarala Mondal", "Niranjan Mondal", "Kalpana Mondal"];
+    let gen3 = ["Gouranga Mondal", "Mamata Mondal", "Sushanta Mondal", "Anita Mondal", "Ratan Mondal", "Kalyani Mondal", "Tapan Mondal", "Mithun Mondal"];
+    let gen4 = ["Sourav Mondal", "Priyanka Mondal", "Rohan Mondal", "Megha Mondal", "Arjun Mondal", "Tanushree Mondal", "Debashis Mondal", "Rimpa Mondal", "Sukanta Mondal"];
     
     let selectedGen2Parent = 0;
     let selectedGen3Parent = 0;
@@ -458,6 +544,23 @@
     function escapeHtml(str) { 
         if(!str) return ''; 
         return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); 
+    }
+
+    function updateMaxWarnings() {
+        document.getElementById('gen2-count').innerHTML = `(${gen2.length}/${MAX_MEMBERS})`;
+        document.getElementById('gen3-count').innerHTML = `(${gen3.length}/${MAX_MEMBERS})`;
+        document.getElementById('gen4-count').innerHTML = `(${gen4.length}/${MAX_MEMBERS})`;
+        
+        document.getElementById('gen2-warning').style.display = gen2.length >= MAX_MEMBERS ? 'block' : 'none';
+        document.getElementById('gen3-warning').style.display = gen3.length >= MAX_MEMBERS ? 'block' : 'none';
+        document.getElementById('gen4-warning').style.display = gen4.length >= MAX_MEMBERS ? 'block' : 'none';
+        
+        const addBtn2 = document.getElementById('addGen2Btn');
+        const addBtn3 = document.getElementById('addGen3Btn');
+        const addBtn4 = document.getElementById('addGen4Btn');
+        if(addBtn2) addBtn2.disabled = gen2.length >= MAX_MEMBERS;
+        if(addBtn3) addBtn3.disabled = gen3.length >= MAX_MEMBERS;
+        if(addBtn4) addBtn4.disabled = gen4.length >= MAX_MEMBERS;
     }
 
     function renderInputs() {
@@ -537,22 +640,36 @@
         
         gen2Select.onchange = (e) => { selectedGen2Parent = parseInt(e.target.value); };
         gen3Select.onchange = (e) => { selectedGen3Parent = parseInt(e.target.value); };
+        
+        updateMaxWarnings();
     }
     
-    function addGen2Member() { gen2.push("New Member"); renderInputs(); }
-    function addGen3Member() { gen3.push("New Member"); renderInputs(); }
-    function addGen4Member() { gen4.push("New Member"); renderInputs(); }
+    function addGen2Member() { if(gen2.length < MAX_MEMBERS) { gen2.push("New Member"); renderInputs(); } }
+    function addGen3Member() { if(gen3.length < MAX_MEMBERS) { gen3.push("New Member"); renderInputs(); } }
+    function addGen4Member() { if(gen4.length < MAX_MEMBERS) { gen4.push("New Member"); renderInputs(); } }
     function removeGen2(idx) { gen2.splice(idx, 1); if(selectedGen2Parent >= gen2.length) selectedGen2Parent = 0; renderInputs(); }
     function removeGen3(idx) { gen3.splice(idx, 1); if(selectedGen3Parent >= gen3.length) selectedGen3Parent = 0; renderInputs(); }
     function removeGen4(idx) { gen4.splice(idx, 1); renderInputs(); }
     
+    function calculateFontSize(count) {
+        if (count <= 4) return '0.95rem';
+        if (count <= 6) return '0.85rem';
+        if (count <= 8) return '0.75rem';
+        return '0.65rem';
+    }
+    
+    function calculatePadding(count) {
+        if (count <= 4) return '8px 14px';
+        if (count <= 6) return '6px 10px';
+        if (count <= 8) return '5px 8px';
+        return '4px 6px';
+    }
+    
     function generateCertificate() {
         let html = `<div class="tree-container">`;
-        
-        // Date line - placed just before First Generation
         html += `<div class="date-line">Date: ${getTodayDate()}</div>`;
         
-        // ========== GENERATION 1 ==========
+        // Generation 1
         html += `<div class="gen-row">
                     <div class="gen-label">First Generation</div>
                     <div class="members-row">
@@ -562,78 +679,74 @@
                     </div>
                 </div>`;
         
-        // Arrow row - connects Gen1 to Gen2 (always show if Gen2 has members)
         if (gen2.length > 0) {
-            html += `<div class="arrow-container">
-                        <div class="arrow-symbol">↓</div>
-                    </div>`;
+            html += `<div class="arrow-container"><div class="arrow-symbol">↓</div></div>`;
         }
         
-        // ========== GENERATION 2 ==========
+        // Generation 2 - ALL IN ONE ROW
+        let gen2Count = gen2.length;
+        let gen2FontSize = calculateFontSize(gen2Count);
+        let gen2Padding = calculatePadding(gen2Count);
+        
         html += `<div class="gen-row">
                     <div class="gen-label">Second Generation</div>
-                    <div class="members-row">`;
+                    <div class="members-row" style="gap: ${gen2Count > 7 ? '4px' : '8px'};">`;
         
         gen2.forEach((name, idx) => {
             const isSelected = (idx === selectedGen2Parent);
-            html += `<div style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="member-card ${isSelected ? 'has-children' : ''}">
-                            <div class="member-name">${escapeHtml(name)}</div>
+            html += `<div class="member-wrapper">
+                        <div class="member-card ${isSelected ? 'has-children' : ''}" style="padding: ${gen2Padding};">
+                            <div class="member-name" style="font-size: ${gen2FontSize};">${escapeHtml(name)}</div>
                         </div>`;
-            
-            // Arrow under the SELECTED parent only (showing connection to Gen3)
             if (isSelected && gen3.length > 0) {
-                html += `<div class="arrow-container" style="margin-top: 8px;">
-                            <div class="arrow-symbol">↓</div>
-                        </div>`;
+                html += `<div class="arrow-container" style="margin-top: 4px;"><div class="arrow-symbol" style="font-size: 1.2rem;">↓</div></div>`;
             } else {
-                // Add empty space for alignment
-                html += `<div style="height: 28px;"></div>`;
+                html += `<div style="height: 22px;"></div>`;
             }
             html += `</div>`;
         });
-        
         html += `</div></div>`;
         
-        // ========== GENERATION 3 ==========
+        // Generation 3
         if (gen3.length > 0 && gen2.length > 0) {
+            let gen3Count = gen3.length;
+            let gen3FontSize = calculateFontSize(gen3Count);
+            let gen3Padding = calculatePadding(gen3Count);
+            
             html += `<div class="gen-row">
                         <div class="gen-label">Third Generation</div>
-                        <div class="members-row">`;
+                        <div class="members-row" style="gap: ${gen3Count > 7 ? '4px' : '8px'};">`;
             
             gen3.forEach((name, idx) => {
                 const isSelected = (idx === selectedGen3Parent);
-                html += `<div style="display: flex; flex-direction: column; align-items: center;">
-                            <div class="member-card ${isSelected ? 'has-children' : ''}">
-                                <div class="member-name">${escapeHtml(name)}</div>
+                html += `<div class="member-wrapper">
+                            <div class="member-card ${isSelected ? 'has-children' : ''}" style="padding: ${gen3Padding};">
+                                <div class="member-name" style="font-size: ${gen3FontSize};">${escapeHtml(name)}</div>
                             </div>`;
-                
-                // Arrow under the SELECTED parent only (showing connection to Gen4)
                 if (isSelected && gen4.length > 0) {
-                    html += `<div class="arrow-container" style="margin-top: 8px;">
-                                <div class="arrow-symbol">↓</div>
-                            </div>`;
+                    html += `<div class="arrow-container" style="margin-top: 4px;"><div class="arrow-symbol" style="font-size: 1.2rem;">↓</div></div>`;
                 } else {
-                    html += `<div style="height: 28px;"></div>`;
+                    html += `<div style="height: 22px;"></div>`;
                 }
                 html += `</div>`;
             });
-            
             html += `</div></div>`;
         }
         
-        // ========== GENERATION 4 ==========
+        // Generation 4
         if (gen4.length > 0 && gen3.length > 0) {
+            let gen4Count = gen4.length;
+            let gen4FontSize = calculateFontSize(gen4Count);
+            let gen4Padding = calculatePadding(gen4Count);
+            
             html += `<div class="gen-row">
                         <div class="gen-label">Fourth Generation</div>
-                        <div class="members-row">`;
-            
+                        <div class="members-row" style="gap: ${gen4Count > 7 ? '4px' : '8px'};">`;
             gen4.forEach((name) => {
-                html += `<div class="member-card">
-                            <div class="member-name">${escapeHtml(name)}</div>
+                html += `<div class="member-card" style="padding: ${gen4Padding};">
+                            <div class="member-name" style="font-size: ${gen4FontSize};">${escapeHtml(name)}</div>
                         </div>`;
             });
-            
             html += `</div></div>`;
         }
         
@@ -643,81 +756,41 @@
     
     function loadExampleData() {
         gen1Name = "Ram Chandra Mondal";
-        gen2 = ["Bishwanath Mondal", "Lakshmi Mondal", "Gobinda Mondal"];
-        gen3 = ["Gouranga Mondal", "Mamata Mondal", "Sushanta Mondal", "Anita Mondal"];
-        gen4 = ["Sourav Mondal", "Priyanka Mondal", "Rohan Mondal", "Megha Mondal"];
+        gen2 = ["Bishwanath", "Lakshmi", "Gobinda", "Sarala", "Niranjan", "Kalpana", "Haripada", "Malati", "Sukumar", "Arati"];
+        gen3 = ["Gouranga", "Mamata", "Sushanta", "Anita", "Ratan", "Kalyani", "Tapan", "Mithun", "Rekha", "Subrata"];
+        gen4 = ["Sourav", "Priyanka", "Rohan", "Megha", "Arjun", "Tanushree", "Debashis", "Rimpa", "Sukanta", "Moumita"];
         selectedGen2Parent = 0;
         selectedGen3Parent = 0;
         renderInputs();
         generateCertificate();
     }
     
-    // Print function
-    function printCertificate() {
-        window.print();
-    }
+    function printCertificate() { window.print(); }
     
-    // Export to Word function
     function exportToWord() {
         const certContent = document.getElementById('certificate').cloneNode(true);
-        
-        const html = `<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Genealogy_Certificate_Bhagabanpur</title>
-            <style>
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                body {
-                    font-family: 'Times New Roman', Georgia, serif;
-                    padding: 40px;
-                    background: white;
-                }
-                .certificate {
-                    border: 2px solid black;
-                    padding: 1.5rem 2rem;
-                    max-width: 1000px;
-                    margin: 0 auto;
-                    background: white;
-                }
-                .certificate-header {
-                    text-align: center;
-                    margin-bottom: 1.2rem;
-                    border-bottom: 2px solid #000;
-                    padding-bottom: 0.8rem;
-                }
-                .office-title { font-size: 1rem; letter-spacing: 1px; }
-                .panchayat-name { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; margin: 4px 0; }
-                .address-line { font-size: 0.8rem; margin-bottom: 6px; }
-                .cert-title { font-size: 1.6rem; font-weight: bold; margin: 10px 0 4px; text-decoration: underline; }
-                .cert-subtitle { font-size: 0.85rem; font-style: italic; margin-top: 4px; color: #333; }
-                .date-line { text-align: right; font-size: 0.85rem; margin-bottom: 15px; color: #333; }
-                .tree-container { margin: 20px 0; }
-                .gen-row { margin: 15px 0; text-align: center; }
-                .gen-label { font-size: 0.75rem; color: #555; margin-bottom: 8px; font-weight: bold; }
-                .members-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
-                .member-card { border: 2px solid black; padding: 10px 18px; min-width: 130px; text-align: center; background: white; }
-                .member-name { font-weight: bold; font-size: 0.95rem; }
-                .has-children { background: #f0f0f0; }
-                .arrow-container { text-align: center; margin: 5px 0; }
-                .arrow-symbol { font-size: 1.5rem; font-weight: bold; color: #000; }
-                .signature-area { text-align: right; margin-top: 35px; border-top: 1px dashed black; padding-top: 15px; }
-                .footer-note { font-size: 0.65rem; text-align: center; margin-top: 18px; color: #444; }
-            </style>
-        </head>
-        <body>
-            ${certContent.outerHTML}
-        </body>
-        </html>`;
-        
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Genealogy_Certificate</title><style>
+            body { font-family: 'Times New Roman', serif; padding: 40px; background: white; }
+            .certificate { border: 2px solid black; padding: 1.5rem; max-width: 100%; margin: 0 auto; }
+            .certificate-header { text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; }
+            .panchayat-name { font-size: 1.5rem; font-weight: bold; }
+            .cert-title { font-size: 1.6rem; text-decoration: underline; }
+            .date-line { text-align: right; font-size: 0.85rem; margin-bottom: 15px; }
+            .gen-row { margin: 15px 0; text-align: center; }
+            .members-row { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 6px; overflow-x: visible; }
+            .member-wrapper { display: flex; flex-direction: column; align-items: center; }
+            .member-card { border: 2px solid black; text-align: center; background: white; }
+            .member-name { font-weight: bold; word-break: break-word; }
+            .has-children { background: #f0f0f0; }
+            .arrow-container { text-align: center; margin: 4px 0; }
+            .arrow-symbol { font-size: 1.2rem; font-weight: bold; }
+            .signature-area { text-align: right; margin-top: 35px; border-top: 1px dashed black; padding-top: 15px; }
+            @media print { body { padding: 0; } }
+        </style></head><body>${certContent.outerHTML}</body></html>`;
         const blob = new Blob([html], { type: 'application/msword' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'Genealogy_Certificate_Bhagabanpur.doc';
+        link.download = 'Genealogy_Certificate.doc';
         link.click();
         URL.revokeObjectURL(link.href);
     }
@@ -727,7 +800,6 @@
     document.getElementById('printBtn').addEventListener('click', printCertificate);
     document.getElementById('wordBtn').addEventListener('click', exportToWord);
     
-    // Initialize
     renderInputs();
     generateCertificate();
 </script>
