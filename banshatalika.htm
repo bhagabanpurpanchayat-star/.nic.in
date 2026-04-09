@@ -5,61 +5,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Genealogy Certificate | Bhagabanpur Gram Panchayat</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, #1a5c2a 0%, #0d3b1a 100%);
-            font-family: 'Segoe UI', 'Roboto', 'Times New Roman', serif;
-            padding: 25px 20px;
-            display: flex;
-            justify-content: center;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
+            background: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2070&auto=format') center/cover no-repeat fixed;
+            position: relative;
+            color: #1e2f3e;
+            line-height: 1.5;
         }
-        .app-container {
-            max-width: 1200px;
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            background: #f5f5dc;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
         }
-        .header {
-            background: linear-gradient(135deg, #2d6a3b 0%, #1a4a28 100%);
-            color: #f9f3d9;
-            text-align: center;
-            padding: 1rem;
-            border-bottom: 3px solid #d4a843;
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.8rem 1.5rem;
         }
-        .header h1 { font-size: 1.5rem; font-weight: 500; letter-spacing: 1px; }
-        .input-section {
-            background: #e8e0c8;
-            padding: 20px;
-            border-bottom: 2px solid #c4b896;
+
+        /* Welcome Hero Section */
+        .welcome-hero {
+            background: rgba(11, 43, 64, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .welcome-hero h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .welcome-hero h1 i { color: #E6B17E; font-size: 2rem; }
+        
+        @media (max-width: 768px) {
+            .welcome-hero { padding: 1.2rem; }
+            .welcome-hero h1 { font-size: 1.3rem; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.25);
         }
         .section-title {
             font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #1a4a28;
-            border-left: 4px solid #2d6a3b;
-            padding-left: 10px;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid #E6B17E;
+            padding-left: 15px;
         }
+        .section-title i { color: #E6B17E; }
+        
         .step-container { transition: all 0.3s ease; }
         .step-hidden { display: none; }
+        
         .generation-input {
-            background: #fffef7;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #c4b896;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         .gen-header {
             font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: #2d6a3b;
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            color: #FFE6C7;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -67,264 +111,245 @@
         .members-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 10px;
-            max-height: 360px;
+            gap: 10px;
+            margin-bottom: 8px;
+            max-height: 320px;
             overflow-y: auto;
         }
         .member-input-card {
-            background: #f9f5e8;
-            border: 1px solid #c4b896;
-            border-radius: 8px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 14px;
             padding: 8px 12px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             min-width: 260px;
         }
         .member-input-card input {
-            padding: 5px 8px;
-            border: 1px solid #b8a87c;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.75rem;
             width: 110px;
-            background: #fff;
         }
-        .member-input-card .age-input { width: 65px; }
+        .member-input-card .age-input { width: 60px; }
         .member-input-card .guardian-display {
             background: #e8e0c8;
             padding: 5px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            color: #1a4a28;
+            border-radius: 10px;
+            font-size: 0.65rem;
             font-weight: bold;
             min-width: 100px;
             text-align: center;
         }
         .btn-remove {
-            background: #8b5a3c;
+            background: #c0392b;
             color: white;
             border: none;
             padding: 3px 8px;
-            border-radius: 50%;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
         .btn-add {
-            background: #2d6a3b;
+            background: rgba(46, 125, 50, 0.9);
             color: white;
             border: none;
-            padding: 5px 12px;
-            border-radius: 20px;
+            padding: 6px 16px;
+            border-radius: 35px;
             cursor: pointer;
-            font-size: 0.75rem;
-            margin-top: 5px;
+            font-size: 0.7rem;
+            margin-top: 6px;
+            font-weight: 600;
         }
-        .btn-add:hover { background: #1a4a28; }
         .btn-primary {
-            background: #2d6a3b;
-            color: white;
+            background: #E6B17E;
+            color: #1e2f3e;
             border: none;
             padding: 8px 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
-            border-radius: 40px;
+            border-radius: 35px;
             cursor: pointer;
             margin-right: 10px;
-            transition: 0.2s;
         }
-        .btn-primary:hover { background: #1a4a28; transform: scale(1.02); }
         .btn-secondary {
-            background: #8b5a3c;
+            background: rgba(100, 100, 100, 0.8);
             color: white;
             border: none;
             padding: 8px 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
-            border-radius: 40px;
+            border-radius: 35px;
             cursor: pointer;
             margin-right: 10px;
         }
-        .btn-secondary:hover { background: #6b3a1c; }
         .dropdown-select {
-            margin: 15px 0;
+            margin: 12px 0;
             padding: 10px;
-            background: #f5efdf;
-            border-radius: 8px;
-            border-left: 4px solid #d4a843;
+            background: rgba(255,255,255,0.15);
+            border-radius: 14px;
+            border-left: 3px solid #E6B17E;
         }
         .dropdown-select label {
             font-weight: bold;
             margin-right: 10px;
-            color: #2d6a3b;
+            color: #FFE6C7;
+            font-size: 0.8rem;
         }
         .dropdown-select select {
-            padding: 5px 10px;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            border: 1px solid #c4b896;
-            background: white;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 25px;
+            border: none;
         }
         .optional-note {
-            font-size: 0.7rem;
-            color: #6b4c2c;
+            font-size: 0.65rem;
+            color: #FFE6C7;
             font-style: italic;
-            margin-top: 8px;
+            margin-top: 6px;
         }
-        .certificate-panel {
-            background: #ddd0b0;
-            padding: 24px 20px;
-            display: flex;
-            justify-content: center;
-        }
+        
+        /* CERTIFICATE - COMPACT, FITS ONE A4 LANDSCAPE */
+        .certificate-panel { margin-top: 1.5rem; }
         .certificate-wrapper {
             background: white;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
             width: 100%;
             max-width: 1000px;
+            margin: 0 auto;
         }
         .certificate {
             background: #ffffff;
             color: #000000;
             font-family: 'Times New Roman', 'Georgia', serif;
             padding: 0.6rem 1rem;
-            position: relative;
-            overflow-x: auto;
         }
-        .certificate-header {
-            text-align: center;
-            margin-bottom: 0.6rem;
-            padding-bottom: 0;
-        }
-        .office-title { font-size: 0.8rem; letter-spacing: 2px; color: #000000; font-weight: 600; }
-        .panchayat-name { font-size: 1.3rem; font-weight: bold; text-transform: uppercase; margin: 3px 0; color: #000000; }
-        .address-line { font-size: 0.65rem; margin-bottom: 5px; color: #000000; }
-        .address-hr {
-            width: 80%;
-            margin: 6px auto 0 auto;
-            border: none;
-            border-top: 1px solid #000000;
-        }
-        /* UNDERLINE REMOVED from cert-title */
-        .cert-title { font-size: 0.8rem; font-weight: bold; margin: 6px 0 2px; color: #000000; }
-        .cert-subtitle { font-size: 0.7rem; font-style: italic; margin-top: 3px; color: #000000; }
+        
+        .certificate-header { text-align: center; margin-bottom: 0.5rem; }
+        .office-title { font-size: 0.7rem; letter-spacing: 1px; color: #000000; font-weight: 600; }
+        .panchayat-name { font-size: 1.8rem; font-weight: bold; text-transform: uppercase; margin: 2px 0; color: #000000; }
+        .address-line { font-size: 0.70rem; margin-bottom: 3px; color: #000000; }
+        .cert-title { font-size: 1.1rem; font-weight: bold; margin: 5px 0 2px; color: #000000; }
+        .cert-subtitle { font-size: 0.6rem; font-style: italic; margin-top: 2px; color: #000000; }
+        
         .date-line {
             text-align: right;
-            font-size: 0.7rem;
-            margin-bottom: 8px;
+            font-size: 0.6rem;
+            margin-bottom: 6px;
             color: #000000;
-            padding: 2px 5px;
+            padding: 2px 0;
         }
-        .tree-container { margin: 8px 0; background: #ffffff; padding: 5px; }
-        .gen-row { margin: 8px 0; text-align: center; }
+        .tree-container { margin: 6px 0; padding: 0; }
+        .gen-row { margin: 5px 0; text-align: center; }
         .gen-label {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             color: #000000;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-weight: bold;
-            background: #f5f5f5;
+            background: #f0f0f0;
             display: inline-block;
             padding: 1px 8px;
             border-radius: 12px;
         }
         .members-row {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             justify-content: center;
             align-items: flex-start;
-            gap: 6px;
-            margin: 5px 0;
-            overflow-x: auto;
-            padding-bottom: 4px;
+            gap: 4px;
+            margin: 3px 0;
         }
         .member-card {
             border: 1px solid #000000;
             background: #ffffff;
             text-align: center;
-            padding: 4px 6px;
+            padding: 3px 5px;
             flex: 0 0 auto;
-            min-width: 85px;
-            max-width: 120px;
-            border-radius: 3px;
+            min-width: 75px;
+            max-width: 95px;
+            border-radius: 6px;
         }
-        .member-name { font-weight: bold; font-size: 0.75rem; color: #000000; margin-bottom: 2px; }
-        .member-detail { font-size: 0.6rem; color: #000000; margin-top: 3px; padding-top: 2px; }
-        .arrow-container { text-align: center; margin: 2px 0; }
-        .arrow-symbol { font-size: 1rem; font-weight: bold; color: #000000; }
-        .has-children { background: #f5f5f5; border: 1px solid #000000; }
+        .member-name { font-weight: bold; font-size: 0.65rem; color: #000000; margin-bottom: 2px; }
+        .member-detail { font-size: 0.5rem; color: #000000; margin-top: 2px; padding-top: 2px; border-top: 0.5px solid #ccc; }
+        .arrow-container { text-align: center; margin: 1px 0; }
+        .arrow-symbol { font-size: 0.8rem; font-weight: bold; color: #000000; }
+        .has-children { background: #f5f5f5; border: 1.5px solid #000000; }
         .member-wrapper { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; }
-        .signature-area { margin-top: 15px; text-align: right; padding-top: 8px; font-size: 0.75rem; }
-        .footer-note { font-size: 0.55rem; text-align: center; margin-top: 8px; padding: 3px; }
-        .print-actions { display: flex; gap: 12px; justify-content: flex-end; margin-bottom: 12px; }
-        .btn-print, .btn-word, .btn-pdf { background: #2d6a3b; color: #f9f3d9; border: none; padding: 6px 16px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
-        .btn-pdf { background: #8b5a3c; }
-        .max-warning { color: #c0392b; font-size: 0.7rem; margin-top: 5px; display: none; }
-        .step-buttons { display: flex; gap: 12px; margin-top: 15px; margin-bottom: 10px; }
+        
+        .signature-area { margin-top: 12px; text-align: right; padding-top: 5px; font-size: 0.7rem; color: #000000; }
+        .footer-note { font-size: 0.5rem; text-align: center; margin-top: 6px; padding: 2px; color: #000000; }
+        
+        .print-actions { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 12px; }
+        .btn-print, .btn-word, .btn-pdf { background: #E6B17E; color: #1e2f3e; border: none; padding: 6px 18px; border-radius: 35px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
+        .btn-pdf { background: #1e5a6b; color: white; }
+        .max-warning { color: #ffcc00; font-size: 0.65rem; margin-top: 4px; display: none; }
+        .step-buttons { display: flex; gap: 10px; margin-top: 12px; margin-bottom: 6px; }
+        
         .certificate-wrapper.hidden-cert { display: none; }
         .certificate-wrapper.visible-cert { display: block; }
         
+        .footer {
+            text-align: center;
+            padding: 0.8rem;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.8);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            margin-top: 1.5rem;
+            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.3);
+            border-radius: 35px;
+        }
+        
+        /* PRINT - A4 LANDSCAPE, SINGLE PAGE, DEEP BLACK TEXT, WHITE BACKGROUND */
         @media print {
             body { background: white; padding: 0; margin: 0; }
-            .app-container { background: white; box-shadow: none; margin: 0; border-radius: 0; max-width: 100%; }
-            .input-section, .print-actions, .btn-primary, .dropdown-select, .header, .step-buttons, .btn-print, .btn-word, .btn-pdf { display: none !important; }
-            .certificate-panel { background: white; padding: 0; margin: 0; display: block; }
-            .certificate-wrapper { box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
+            body::before { display: none; }
+            .container { padding: 0; margin: 0; max-width: 100%; }
+            .welcome-hero, .glass-card, .print-actions, .footer, .step-buttons, 
+            .btn-primary, .btn-secondary, .btn-add, .dropdown-select, .optional-note { display: none !important; }
+            .certificate-panel { background: white; padding: 0; margin: 0; }
+            .certificate-wrapper { box-shadow: none; background: white; border-radius: 0; }
             .certificate {
-                background: white;
-                color: black;
+                background: white !important;
+                color: black !important;
                 border: none !important;
-                box-shadow: none;
-                padding: 0.2in;
-                margin: 0;
-                page-break-inside: avoid;
-                break-inside: avoid;
+                padding: 0.1in !important;
+                margin: 0 !important;
                 width: 100%;
+                height: auto;
             }
             @page {
                 size: A4 landscape;
-                margin: 0.2in;
+                margin: 0.15in;
             }
-            .member-card {
-                border: 1px solid black;
-                background: white;
-                page-break-inside: avoid;
-            }
-            .member-name, .member-detail, .gen-label, .date-line, .signature-area, .footer-note, .certificate-header * {
-                color: black !important;
-            }
-            .tree-container {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-            .gen-row {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-            .members-row {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .address-hr {
-                border-top: 1px solid black;
-            }
+            .member-card { border: 1px solid black !important; background: white !important; }
+            .member-name, .member-detail, .gen-label, .date-line, .signature-area, .footer-note, 
+            .certificate-header * { color: black !important; }
+            .signature-area { border-top: none !important; }
+            .gen-row, .members-row, .tree-container { break-inside: avoid; page-break-inside: avoid; }
         }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <div class="header"><h1>🌿 Genealogy Certificate | Bhagabanpur Gram Panchayat 🌿</h1></div>
+<div class="container">
+  
+    <div class="welcome-hero">
+        <h1><i class="fas fa-tree"></i> Genealogy Certificate | Bangsha Talika</h1>
+    </div>
 
-    <div class="input-section">
-        <div class="section-title">📝 Family Tree Builder (Auto Guardian Logic)</div>
+    <div class="glass-card">
+        <div class="section-title"><i class="fas fa-pen-alt"></i> Enter Family Details</div>
         
         <div id="step1-container" class="step-container">
             <div class="generation-input">
-                <div class="gen-header">🌟 Step 1: Root Ancestor (Generation 1)</div>
+                <div class="gen-header"><i class="fas fa-star"></i> Step 1: Root Ancestor (Generation 1)</div>
                 <div class="members-container">
                     <div class="member-input-card" style="min-width:320px;">
-                        <input type="text" id="gen1-name" placeholder="Full Name" value="Ram Chandra Mondal" style="width:150px;">
-                        <input type="text" id="gen1-guardian" placeholder="Guardian's Name" value="Late Shri Gopal Mondal" style="width:150px;">
+                        <input type="text" id="gen1-name" placeholder="Full Name" value="Ram Chandra Mondal" style="width:140px;">
+                        <input type="text" id="gen1-guardian" placeholder="Guardian's Name" value="Late Shri Gopal Mondal" style="width:140px;">
                         <input type="text" id="gen1-age" placeholder="Age" value="82" class="age-input">
                     </div>
                 </div>
@@ -334,8 +359,8 @@
 
         <div id="step2-container" class="step-container step-hidden">
             <div class="generation-input">
-                <div class="gen-header">🌿 Step 2: Generation 2 <span id="gen2-count"></span>
-                    <button id="backToGen1" class="btn-secondary" style="padding:3px 12px;">← Back</button>
+                <div class="gen-header"><i class="fas fa-users"></i> Step 2: Generation 2 <span id="gen2-count"></span>
+                    <button id="backToGen1" class="btn-secondary" style="padding:4px 12px;">← Back</button>
                 </div>
                 <div class="optional-note">💡 Guardian for all Gen 2 members = <strong id="gen2-guardian-preview">Root Ancestor Name</strong></div>
                 <div class="members-container" id="gen2-input-container"></div>
@@ -350,14 +375,13 @@
 
         <div id="step3-container" class="step-container step-hidden">
             <div class="generation-input">
-                <div class="gen-header">🌺 Step 3: Generation 3 <span id="gen3-count"></span>
-                    <button id="backToGen2" class="btn-secondary" style="padding:3px 12px;">← Back</button>
+                <div class="gen-header"><i class="fas fa-child"></i> Step 3: Generation 3 <span id="gen3-count"></span>
+                    <button id="backToGen2" class="btn-secondary" style="padding:4px 12px;">← Back</button>
                 </div>
                 <div class="dropdown-select">
-                    <label>👨‍👩‍👧 Select Parent from Generation 2 (Guardian for ALL Gen 3 members):</label>
+                    <label>Select Parent from Generation 2 (Guardian for ALL Gen 3):</label>
                     <select id="select-gen2-parent"></select>
                 </div>
-                <div class="optional-note">💡 Guardian for all Gen 3 members will be the selected parent's name</div>
                 <div class="members-container" id="gen3-input-container"></div>
                 <button class="btn-add" id="addGen3Btn">+ Add Member</button>
                 <div id="gen3-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
@@ -370,14 +394,13 @@
 
         <div id="step4-container" class="step-container step-hidden">
             <div class="generation-input">
-                <div class="gen-header">🍃 Step 4: Generation 4 <span id="gen4-count"></span>
-                    <button id="backToGen3" class="btn-secondary" style="padding:3px 12px;">← Back</button>
+                <div class="gen-header"><i class="fas fa-seedling"></i> Step 4: Generation 4 <span id="gen4-count"></span>
+                    <button id="backToGen3" class="btn-secondary" style="padding:4px 12px;">← Back</button>
                 </div>
                 <div class="dropdown-select">
-                    <label>👨‍👩‍👧 Select Parent from Generation 3 (Guardian for ALL Gen 4 members):</label>
+                    <label>Select Parent from Generation 3 (Guardian for ALL Gen 4):</label>
                     <select id="select-gen3-parent"></select>
                 </div>
-                <div class="optional-note">💡 Guardian for all Gen 4 members will be the selected parent's name</div>
                 <div class="members-container" id="gen4-input-container"></div>
                 <button class="btn-add" id="addGen4Btn">+ Add Member</button>
                 <div id="gen4-warning" class="max-warning">⚠️ Maximum 10 members reached</div>
@@ -390,11 +413,11 @@
     </div>
 
     <div class="certificate-panel">
-        <div style="width:100%; max-width:1000px;">
+        <div style="width:100%; max-width:1000px; margin:0 auto;">
             <div class="print-actions">
-                <button class="btn-print" id="printBtn">🖨️ Print (A4 Landscape)</button>
-                <button class="btn-word" id="wordBtn">📄 Export to Word</button>
-                <button class="btn-pdf" id="pdfBtn">📑 Save as PDF</button>
+                <button class="btn-print" id="printBtn"><i class="fas fa-print"></i> Print (A4 Landscape)</button>
+                <button class="btn-word" id="wordBtn"><i class="fas fa-file-word"></i> Export to Word</button>
+                <button class="btn-pdf" id="pdfBtn"><i class="fas fa-file-pdf"></i> Save as PDF</button>
             </div>
             <div class="certificate-wrapper hidden-cert" id="certificateWrapper">
                 <div class="certificate" id="certificate">
@@ -402,7 +425,6 @@
                         <div class="office-title">OFFICE OF THE</div>
                         <div class="panchayat-name">BHAGABANPUR GRAM PANCHAYAT</div>
                         <div class="address-line">Vill+P.O - Arbara, Chanchal, Malda (West Bengal) - 732123</div>
-                        <hr class="address-hr">
                         <div class="cert-title">FAMILY GENEALOGY CERTIFICATE</div>
                         <div class="cert-subtitle">(Four Generations Lineage with Guardian & Age Details)</div>
                     </div>
@@ -411,12 +433,16 @@
                         <div style="font-weight:bold;">(Signature)</div>
                         <div>Prodhan</div>
                         <div>Bhagabanpur Gram Panchayat</div>
-                        <div style="font-size:0.65rem; margin-top:3px;">[Official Seal]</div>
+                        <div style="font-size:0.55rem; margin-top:2px;">[Official Seal]</div>
                     </div>
                     <div class="footer-note">This is a computer generated certificate verifying the ancestral lineage as per provided information.</div>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2025 Bhagabanpur Gram Panchayat, Chanchal-1, Malda | Genealogy Certificate System</p>
     </div>
 </div>
 
@@ -520,10 +546,10 @@
         gen2.forEach((member, idx) => {
             gen2Container.innerHTML += `
                 <div class="member-input-card">
-                    <input type="text" value="${escapeHtml(member.name)}" data-gen2-idx="${idx}" class="gen2-name" placeholder="Name" style="width:130px;">
-                    <div class="guardian-display">👤 Guardian: ${escapeHtml(gen2Guardian)}</div>
+                    <input type="text" value="${escapeHtml(member.name)}" data-gen2-idx="${idx}" class="gen2-name" placeholder="Name" style="width:120px;">
+                    <div class="guardian-display">Guardian: ${escapeHtml(gen2Guardian)}</div>
                     <input type="text" value="${escapeHtml(member.age)}" data-gen2-age-idx="${idx}" class="gen2-age age-input" placeholder="Age">
-                    <button class="btn-remove" onclick="removeGen2(${idx})">✕</button>
+                    <button class="btn-remove" onclick="removeGen2(${idx})"><i class="fas fa-trash"></i></button>
                 </div>
             `;
         });
@@ -534,10 +560,10 @@
         gen3.forEach((member, idx) => {
             gen3Container.innerHTML += `
                 <div class="member-input-card">
-                    <input type="text" value="${escapeHtml(member.name)}" data-gen3-idx="${idx}" class="gen3-name" placeholder="Name" style="width:130px;">
-                    <div class="guardian-display gen3-guardian-display">👤 Guardian: ${escapeHtml(gen3Guardian) || "Select Parent"}</div>
+                    <input type="text" value="${escapeHtml(member.name)}" data-gen3-idx="${idx}" class="gen3-name" placeholder="Name" style="width:120px;">
+                    <div class="guardian-display gen3-guardian-display">Guardian: ${escapeHtml(gen3Guardian) || "Select Parent"}</div>
                     <input type="text" value="${escapeHtml(member.age)}" data-gen3-age-idx="${idx}" class="gen3-age age-input" placeholder="Age">
-                    <button class="btn-remove" onclick="removeGen3(${idx})">✕</button>
+                    <button class="btn-remove" onclick="removeGen3(${idx})"><i class="fas fa-trash"></i></button>
                 </div>
             `;
         });
@@ -548,10 +574,10 @@
         gen4.forEach((member, idx) => {
             gen4Container.innerHTML += `
                 <div class="member-input-card">
-                    <input type="text" value="${escapeHtml(member.name)}" data-gen4-idx="${idx}" class="gen4-name" placeholder="Name" style="width:130px;">
-                    <div class="guardian-display gen4-guardian-display">👤 Guardian: ${escapeHtml(gen4Guardian) || "Select Parent"}</div>
+                    <input type="text" value="${escapeHtml(member.name)}" data-gen4-idx="${idx}" class="gen4-name" placeholder="Name" style="width:120px;">
+                    <div class="guardian-display gen4-guardian-display">Guardian: ${escapeHtml(gen4Guardian) || "Select Parent"}</div>
                     <input type="text" value="${escapeHtml(member.age)}" data-gen4-age-idx="${idx}" class="gen4-age age-input" placeholder="Age">
-                    <button class="btn-remove" onclick="removeGen4(${idx})">✕</button>
+                    <button class="btn-remove" onclick="removeGen4(${idx})"><i class="fas fa-trash"></i></button>
                 </div>
             `;
         });
@@ -565,7 +591,6 @@
         
         const gen2Select = document.getElementById('select-gen2-parent');
         if(gen2Select) gen2Select.onchange = (e) => { selectedGen2Parent = parseInt(e.target.value); renderAllInputs(); updateGen3DropdownAndGuardian(); };
-        
         const gen3Select = document.getElementById('select-gen3-parent');
         if(gen3Select) gen3Select.onchange = (e) => { selectedGen3Parent = parseInt(e.target.value); renderAllInputs(); updateGen4DropdownAndGuardian(); };
         
@@ -574,9 +599,6 @@
         document.getElementById('gen1-age').onchange = (e) => { gen1.age = e.target.value; };
         
         updateCounters();
-        if(document.getElementById('step2-container') && !document.getElementById('step2-container').classList.contains('step-hidden')) updateGen2GuardianPreview();
-        if(document.getElementById('step3-container') && !document.getElementById('step3-container').classList.contains('step-hidden')) updateGen3DropdownAndGuardian();
-        if(document.getElementById('step4-container') && !document.getElementById('step4-container').classList.contains('step-hidden')) updateGen4DropdownAndGuardian();
     }
     
     function updateCounters() {
@@ -606,9 +628,8 @@
     
     function generateCertificateContent() {
         let html = `<div class="tree-container"><div class="date-line">Date of Issue: ${getTodayDate()}</div>`;
-        
-        html += `<div class="gen-row"><div class="gen-label">First Generation (Root Ancestor)</div><div class="members-row">`;
-        html += `<div class="member-card"><div class="member-name">${escapeHtml(gen1.name)}</div><div class="member-detail">Guardian: ${escapeHtml(gen1.guardian)}<br>Age: ${escapeHtml(gen1.age)} yrs</div></div>`;
+        html += `<div class="gen-row"><div class="gen-label">First Generation (Root)</div><div class="members-row">`;
+        html += `<div class="member-card"><div class="member-name">${escapeHtml(gen1.name)}</div><div class="member-detail">Guardian: ${escapeHtml(gen1.guardian)}<br>Age: ${escapeHtml(gen1.age)}y</div></div>`;
         html += `</div></div>`;
         
         if(gen2.length > 0) {
@@ -619,10 +640,10 @@
                 const isSelected = (idx === selectedGen2Parent);
                 html += `<div class="member-wrapper"><div class="member-card ${isSelected ? 'has-children' : ''}">
                             <div class="member-name">${escapeHtml(member.name)}</div>
-                            <div class="member-detail">Guardian: ${escapeHtml(gen2Guardian)}<br>Age: ${escapeHtml(member.age)} yrs</div>
+                            <div class="member-detail">Guardian: ${escapeHtml(gen2Guardian)}<br>Age: ${escapeHtml(member.age)}y</div>
                         </div>`;
                 if(isSelected && gen3.length > 0) html += `<div class="arrow-container"><div class="arrow-symbol">▼</div></div>`;
-                else html += `<div style="height:18px;"></div>`;
+                else html += `<div style="height:14px;"></div>`;
                 html += `</div>`;
             });
             html += `</div></div>`;
@@ -635,10 +656,10 @@
                 const isSelected = (idx === selectedGen3Parent);
                 html += `<div class="member-wrapper"><div class="member-card ${isSelected ? 'has-children' : ''}">
                             <div class="member-name">${escapeHtml(member.name)}</div>
-                            <div class="member-detail">Guardian: ${escapeHtml(gen3Guardian)}<br>Age: ${escapeHtml(member.age)} yrs</div>
+                            <div class="member-detail">Guardian: ${escapeHtml(gen3Guardian)}<br>Age: ${escapeHtml(member.age)}y</div>
                         </div>`;
                 if(isSelected && gen4.length > 0) html += `<div class="arrow-container"><div class="arrow-symbol">▼</div></div>`;
-                else html += `<div style="height:18px;"></div>`;
+                else html += `<div style="height:14px;"></div>`;
                 html += `</div>`;
             });
             html += `</div></div>`;
@@ -649,11 +670,10 @@
             const gen4Guardian = getGen4Guardian();
             gen4.forEach(member => {
                 html += `<div class="member-card"><div class="member-name">${escapeHtml(member.name)}</div>
-                         <div class="member-detail">Guardian: ${escapeHtml(gen4Guardian)}<br>Age: ${escapeHtml(member.age)} yrs</div></div>`;
+                         <div class="member-detail">Guardian: ${escapeHtml(gen4Guardian)}<br>Age: ${escapeHtml(member.age)}y</div></div>`;
             });
             html += `</div></div>`;
         }
-        
         html += `</div>`;
         document.getElementById('treeDisplay').innerHTML = html;
     }
@@ -666,7 +686,7 @@
     function printCertificate() { window.print(); }
     function exportToWord() {
         const certClone = document.getElementById('certificate').cloneNode(true);
-        const style = `<style>body { font-family: 'Times New Roman', serif; margin:0; padding:20px; } .member-card { border:1px solid black; padding:6px; } .member-detail { font-size:0.65rem; } .certificate { max-width:100%; } .gen-label { font-weight:bold; } .arrow-symbol { font-size:1rem; } .address-hr { border-top:1px solid black; width:80%; margin:6px auto; }</style>`;
+        const style = `<style>body { margin:0; padding:0.1in; } .member-card { border:1px solid black; padding:3px; margin:2px; display:inline-block; min-width:70px; } .member-detail { font-size:0.55rem; } .members-row { display:flex; flex-wrap:wrap; justify-content:center; gap:3px; } @page { size: A4 landscape; margin:0.15in; }</style>`;
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Genealogy_Certificate</title>${style}</head><body>${certClone.outerHTML}</body></html>`;
         const blob = new Blob([html], { type: 'application/msword' });
         const link = document.createElement('a');
@@ -679,10 +699,10 @@
     function generatePDF() {
         const element = document.getElementById('certificate');
         const opt = {
-            margin: [0.25, 0.25, 0.25, 0.25],
-            filename: 'Genealogy_Certificate_Bhagabanpur.pdf',
+            margin: [0.2, 0.2, 0.2, 0.2],
+            filename: 'Genealogy_Certificate.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, backgroundColor: '#ffffff', letterRendering: true, logging: false },
+            html2canvas: { scale: 2, backgroundColor: '#ffffff', logging: false },
             jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
         };
         html2pdf().set(opt).from(element).save();
@@ -690,10 +710,10 @@
     
     document.getElementById('nextToGen2').onclick = () => { showStep(2); renderAllInputs(); };
     document.getElementById('backToGen1').onclick = () => { showStep(1); };
-    document.getElementById('nextToGen3').onclick = () => { if(gen2.length===0) alert("Please add at least one member in Generation 2."); else showStep(3); renderAllInputs(); };
+    document.getElementById('nextToGen3').onclick = () => { if(gen2.length===0) alert("Add at least one member in Generation 2."); else showStep(3); renderAllInputs(); };
     document.getElementById('skipToGen3').onclick = () => { showStep(3); renderAllInputs(); };
     document.getElementById('backToGen2').onclick = () => { showStep(2); renderAllInputs(); };
-    document.getElementById('nextToGen4').onclick = () => { if(gen3.length===0) alert("Please add at least one member in Generation 3."); else showStep(4); renderAllInputs(); };
+    document.getElementById('nextToGen4').onclick = () => { if(gen3.length===0) alert("Add at least one member in Generation 3."); else showStep(4); renderAllInputs(); };
     document.getElementById('skipToGen4').onclick = () => { showStep(4); renderAllInputs(); };
     document.getElementById('backToGen3').onclick = () => { showStep(3); renderAllInputs(); };
     document.getElementById('finishAndGenerate').onclick = () => { generateAndShowCertificate(); };
