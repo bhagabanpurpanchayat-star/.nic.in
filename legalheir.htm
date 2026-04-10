@@ -203,7 +203,7 @@
             font-size: 0.7rem;
         }
         
-        /* CERTIFICATE STYLES - A4 Portrait */
+        /* CERTIFICATE STYLES - A4 Portrait with LARGER FONT & BOOK ANTIQUA */
         .certificate-panel { margin-top: 1.5rem; }
         .certificate-wrapper {
             background: white;
@@ -216,77 +216,78 @@
         .certificate {
             background: #ffffff;
             color: #000000;
-            font-family: 'Times New Roman', 'Georgia', serif;
-            padding: 1rem 1.2rem;
+            font-family: 'Book Antiqua', 'Georgia', 'Times New Roman', serif;
+            padding: 1.2rem 1.5rem;
         }
         
-        /* Official Certificate Header */
+        /* Official Certificate Header - slightly larger */
         .cert-header {
             text-align: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
         }
         .cert-header .office-title {
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
             font-weight: 600;
         }
         .cert-header .panchayat-name {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 3px 0;
+            margin: 5px 0;
         }
         .cert-header .samiti-name {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             font-weight: 500;
         }
         .cert-header .address-line {
-            font-size: 0.65rem;
-            margin-top: 3px;
+            font-size: 0.75rem;
+            margin-top: 4px;
             margin-bottom: 6px;
         }
         /* Double line across the page */
         .double-line {
             border-top: 3px double #000000;
             width: 100%;
-            margin: 5px 0 10px 0;
+            margin: 8px 0 12px 0;
         }
         
         .ref-date-row {
             display: flex;
             justify-content: space-between;
-            margin: 10px 0 12px 0;
-            font-size: 0.7rem;
+            margin: 12px 0 14px 0;
+            font-size: 0.8rem;
         }
         
         .to-whom {
             text-align: center;
             font-weight: bold;
-            font-size: 0.8rem;
-            margin: 10px 0 8px 0;
+            font-size: 0.9rem;
+            margin: 12px 0 10px 0;
             text-decoration: underline;
         }
         
         .cert-body {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             line-height: 1.5;
             text-align: justify;
-            margin: 8px 0;
+            margin: 10px 0;
         }
         
         /* Deceased Info - Left Aligned, No Table */
         .deceased-info {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             line-height: 1.6;
-            margin: 10px 0;
+            margin: 12px 0;
             text-align: left;
         }
         .deceased-info .deceased-name {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
         }
         .deceased-info .deceased-detail-line {
-            margin: 3px 0;
+            margin: 4px 0;
         }
         .deceased-info .label {
             font-weight: 600;
@@ -294,34 +295,35 @@
             min-width: 85px;
         }
         
-        /* Heirs Table in Certificate */
+        /* Heirs Table in Certificate - larger font */
         .cert-heirs-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 0.7rem;
+            margin: 14px 0;
+            font-size: 0.8rem;
         }
         .cert-heirs-table th, .cert-heirs-table td {
             border: 1px solid #000;
-            padding: 6px 8px;
+            padding: 8px 10px;
             text-align: center;
         }
         .cert-heirs-table th {
             background: #f0f0f0;
             font-weight: bold;
+            font-size: 0.8rem;
         }
         .cert-heirs-table th:nth-child(3) {
-            width: 90px;
+            width: 100px;
         }
         .cert-heirs-table td:nth-child(3) {
-            width: 90px;
+            width: 100px;
         }
         
         /* Verification Statement */
         .verification-statement {
-            font-size: 0.72rem;
+            font-size: 0.82rem;
             line-height: 1.5;
-            margin: 15px 0 10px 0;
+            margin: 16px 0 12px 0;
             text-align: justify;
         }
         .verification-statement .underlined-name {
@@ -332,12 +334,12 @@
         .signature-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 24px;
             padding-top: 15px;
         }
         .signature {
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
         }
         
         .print-actions { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 12px; }
@@ -358,7 +360,7 @@
             border-radius: 35px;
         }
         
-        /* A4 Portrait Print Styles */
+        /* A4 Portrait Print Styles - maintains larger font and Book Antiqua */
         @media print {
             body { 
                 background: white; 
@@ -395,6 +397,7 @@
                 padding: 0.2in !important;
                 margin: 0 !important;
                 width: 100%;
+                font-family: 'Book Antiqua', 'Georgia', 'Times New Roman', serif !important;
             }
             @page {
                 size: A4 portrait;
@@ -413,6 +416,12 @@
             .verification-statement {
                 break-inside: avoid;
             }
+            /* Ensure font sizes are preserved in print */
+            .cert-header .panchayat-name { font-size: 1.6rem; }
+            .cert-body { font-size: 0.85rem; }
+            .deceased-info { font-size: 0.85rem; }
+            .cert-heirs-table { font-size: 0.8rem; }
+            .verification-statement { font-size: 0.82rem; }
         }
     </style>
 </head>
@@ -541,10 +550,10 @@
                         <p>This is to Certify that,</p>
                     </div>
                     
-                    <!-- Deceased Information - Left Aligned, No Table -->
+                    <!-- Deceased Information - Left Aligned, No Table (UPDATED: relation label now dynamic) -->
                     <div class="deceased-info" id="deceasedInfo">
                         <div class="deceased-name"><strong id="deceasedNameDisplay">Late Shri Ram Chandra Mondal</strong></div>
-                        <div class="deceased-detail-line"><span class="label">S/O-</span> <span id="fatherNameDisplay">Late Shri Gopal Mondal</span></div>
+                        <div class="deceased-detail-line"><span class="label" id="relationLabel">S/O-</span> <span id="fatherNameDisplay">Late Shri Gopal Mondal</span></div>
                         <div class="deceased-detail-line"><span class="label">Village-</span> <span id="villageDisplay">Arbara</span></div>
                         <div class="deceased-detail-line"><span class="label">P.O-</span> <span id="postDisplay">Arbara</span></div>
                         <div class="deceased-detail-line"><span class="label">P.S.-</span> <span id="psDisplay">Chanchal</span></div>
@@ -705,6 +714,7 @@
     
     function generateCertificate() {
         const deceasedName = document.getElementById('deceasedName').value || "_________";
+        const relation = document.getElementById('deceasedRelation').value || "S/O";
         const fatherName = document.getElementById('deceasedFatherName').value || "_________";
         const village = document.getElementById('village').value || "_________";
         const postOffice = document.getElementById('postOffice').value || "_________";
@@ -713,6 +723,8 @@
         const district = document.getElementById('district').value || "Malda";
         
         document.getElementById('deceasedNameDisplay').innerText = deceasedName;
+        // Update the relation label dynamically (e.g., "S/O-", "W/O-", "D/O-")
+        document.getElementById('relationLabel').innerText = relation + "-";
         document.getElementById('fatherNameDisplay').innerText = fatherName;
         document.getElementById('villageDisplay').innerText = village;
         document.getElementById('postDisplay').innerText = postOffice;
