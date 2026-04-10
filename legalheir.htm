@@ -189,6 +189,12 @@
             background: #e8d5b5;
             font-weight: bold;
         }
+        .heirs-table th:nth-child(3) {
+            width: 100px;
+        }
+        .heirs-table td:nth-child(3) {
+            width: 100px;
+        }
         .heirs-table input, .heirs-table select {
             width: 100%;
             padding: 5px;
@@ -265,9 +271,27 @@
             font-size: 0.75rem;
             line-height: 1.5;
             text-align: justify;
-        }
-        .cert-body p {
             margin: 8px 0;
+        }
+        
+        /* Deceased Info - Left Aligned, No Table */
+        .deceased-info {
+            font-size: 0.75rem;
+            line-height: 1.6;
+            margin: 10px 0;
+            text-align: left;
+        }
+        .deceased-info .deceased-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .deceased-info .deceased-detail-line {
+            margin: 3px 0;
+        }
+        .deceased-info .label {
+            font-weight: 600;
+            display: inline-block;
+            min-width: 85px;
         }
         
         /* Heirs Table in Certificate */
@@ -286,11 +310,29 @@
             background: #f0f0f0;
             font-weight: bold;
         }
+        .cert-heirs-table th:nth-child(3) {
+            width: 90px;
+        }
+        .cert-heirs-table td:nth-child(3) {
+            width: 90px;
+        }
+        
+        /* Verification Statement */
+        .verification-statement {
+            font-size: 0.72rem;
+            line-height: 1.5;
+            margin: 15px 0 10px 0;
+            text-align: justify;
+        }
+        .verification-statement .underlined-name {
+            text-decoration: underline;
+            font-weight: 600;
+        }
         
         .signature-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 25px;
+            margin-top: 20px;
             padding-top: 15px;
         }
         .signature {
@@ -368,7 +410,7 @@
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
-            .cert-body, .cert-heirs-table, .signature-row {
+            .verification-statement {
                 break-inside: avoid;
             }
         }
@@ -410,8 +452,16 @@
                 <input type="text" id="postOffice" value="Arbara" placeholder="Post Office">
             </div>
             <div class="input-group">
-                <label><i class="fas fa-calendar-alt"></i> Date of Death (if applicable)</label>
+                <label><i class="fas fa-calendar-alt"></i> Date of Death</label>
                 <input type="text" id="deathDate" value="15/01/2025" placeholder="DD/MM/YYYY">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-shield-alt"></i> Police Station</label>
+                <input type="text" id="policeStation" value="Chanchal" placeholder="Police Station">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-map"></i> District</label>
+                <input type="text" id="district" value="Malda" placeholder="District">
             </div>
         </div>
         
@@ -424,13 +474,13 @@
             <div class="heirs-table-container">
                 <table class="heirs-table" id="heirsInputTable">
                     <thead>
-                        <tr><th>Sl. No.</th><th>Name of Legal Heir</th><th>Relation with Deceased</th><th>Age</th><th>Remarks</th><th style="width:50px">Action</th></tr>
+                        <tr><th>Sl. No.</th><th>Name of Legal Heir</th><th style="width:100px">Relation</th><th>Age</th><th>Remarks</th><th style="width:50px">Action</th></tr>
                     </thead>
                     <tbody id="heirsInputBody">
                         <tr>
                             <td>1</td>
                             <td><input type="text" class="heir-name" value="Bishwanath Mondal" placeholder="Name"></td>
-                            <td><select class="heir-relation"><option value="Son">Son</option><option value="Daughter">Daughter</option><option value="Wife">Wife</option><option value="Other">Other</option></select></td>
+                            <td><select class="heir-relation" style="width:100px"><option value="Son">Son</option><option value="Daughter">Daughter</option><option value="Wife">Wife</option><option value="Other">Other</option></select></td>
                             <td><input type="text" class="heir-age" value="58" placeholder="Age"></td>
                             <td><input type="text" class="heir-remark" placeholder="Remarks"></td>
                             <td><button class="btn-remove remove-heir"><i class="fas fa-trash"></i></button></td>
@@ -438,7 +488,7 @@
                         <tr>
                             <td>2</td>
                             <td><input type="text" class="heir-name" value="Lakshmi Mondal" placeholder="Name"></td>
-                            <td><select class="heir-relation"><option value="Son">Son</option><option value="Daughter">Daughter</option><option value="Wife" selected>Wife</option><option value="Other">Other</option></select></td>
+                            <td><select class="heir-relation" style="width:100px"><option value="Son">Son</option><option value="Daughter">Daughter</option><option value="Wife" selected>Wife</option><option value="Other">Other</option></select></td>
                             <td><input type="text" class="heir-age" value="55" placeholder="Age"></td>
                             <td><input type="text" class="heir-remark" placeholder="Remarks"></td>
                             <td><button class="btn-remove remove-heir"><i class="fas fa-trash"></i></button></td>
@@ -446,7 +496,7 @@
                         <tr>
                             <td>3</td>
                             <td><input type="text" class="heir-name" value="Gobinda Mondal" placeholder="Name"></td>
-                            <td><select class="heir-relation"><option value="Son" selected>Son</option><option value="Daughter">Daughter</option><option value="Wife">Wife</option><option value="Other">Other</option></select></td>
+                            <td><select class="heir-relation" style="width:100px"><option value="Son" selected>Son</option><option value="Daughter">Daughter</option><option value="Wife">Wife</option><option value="Other">Other</option></select></td>
                             <td><input type="text" class="heir-age" value="52" placeholder="Age"></td>
                             <td><input type="text" class="heir-remark" placeholder="Remarks"></td>
                             <td><button class="btn-remove remove-heir"><i class="fas fa-trash"></i></button></td>
@@ -475,7 +525,6 @@
                         <div class="panchayat-name">BHAGABANPUR GRAM PANCHAYAT</div>
                         <div class="samiti-name">CHANCHAL - I PANCHAYAT SAMITI</div>
                         <div class="address-line">P.O.- Arbara, Dist.- Malda (W.B.) - 732123</div>
-                        <!-- Double line across the page -->
                         <div class="double-line"></div>
                     </div>
                     
@@ -489,18 +538,37 @@
                     </div>
                     
                     <div class="cert-body">
-                        <p>This is to Certify that <strong id="certDeceasedName">_________</strong>, <strong id="certRelation">_________</strong> <strong id="certFatherName">_________</strong> of <strong id="certVillage">_________</strong>, P.O. <strong id="certPost">_________</strong>, P.S.- Chanchal, Dist- Malda was a permanent inhabitant under Bhagabanpur Gram Panchayat.</p>
-                        <p>He/She expired on <strong id="certDeathDate">_________</strong> intestate leaving behind him/her legal heirs which are noted as below :-</p>
+                        <p>This is to Certify that,</p>
+                    </div>
+                    
+                    <!-- Deceased Information - Left Aligned, No Table -->
+                    <div class="deceased-info" id="deceasedInfo">
+                        <div class="deceased-name"><strong id="deceasedNameDisplay">Late Shri Ram Chandra Mondal</strong></div>
+                        <div class="deceased-detail-line"><span class="label">S/O-</span> <span id="fatherNameDisplay">Late Shri Gopal Mondal</span></div>
+                        <div class="deceased-detail-line"><span class="label">Village-</span> <span id="villageDisplay">Arbara</span></div>
+                        <div class="deceased-detail-line"><span class="label">P.O-</span> <span id="postDisplay">Arbara</span></div>
+                        <div class="deceased-detail-line"><span class="label">P.S.-</span> <span id="psDisplay">Chanchal</span></div>
+                        <div class="deceased-detail-line"><span class="label">Dist-</span> <span id="districtDisplay">Malda</span></div>
+                        <div class="deceased-detail-line">was a permanent inhabitant under Bhagabanpur Gram Panchayat.</div>
+                    </div>
+                    
+                    <div class="cert-body">
+                        <p>He/She expired on <strong id="deathDateDisplay">15/01/2025</strong> intestate leaving behind him/her legal heirs which are noted as below :-</p>
                     </div>
                     
                     <table class="cert-heirs-table" id="certHeirsTable">
                         <thead>
-                            <tr><th>Sl. No.</th><th>Name of legal heirs</th><th>Relation with Deceased</th><th>Age</th><th>Remarks</th></tr>
+                            <tr><th>Sl. No.</th><th>Name of legal heirs</th><th style="width:90px">Relation</th><th>Age</th><th>Remarks</th></tr>
                         </thead>
                         <tbody id="certHeirsBody">
                             <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
                         </tbody>
                     </table>
+                    
+                    <!-- Verification Statement with dynamic count and underlined name -->
+                    <div class="verification-statement" id="verificationStatement">
+                        The above mentioned <span id="heirCountText">3</span>  legal heirs of <span class="underlined-name" id="underlinedDeceasedName">Lt. Ram Chandra Mondal</span> are true to the best of my Knowledge, Belief and informations.
+                    </div>
                     
                     <div class="signature-row">
                         <div class="signature">
@@ -531,7 +599,7 @@
         { name: "Gobinda Mondal", relation: "Son", age: "52", remark: "" }
     ];
     
-    const MAX_HEIRS = 10;
+    const MAX_HEIRS = 20;
     
     function updateHeirsTableInput() {
         const tbody = document.getElementById('heirsInputBody');
@@ -552,7 +620,7 @@
             const cell2 = row.insertCell(2);
             const relSelect = document.createElement('select');
             relSelect.className = 'heir-relation';
-            relSelect.style.width = '100%';
+            relSelect.style.width = '100px';
             const options = ['Son', 'Daughter', 'Wife', 'Other'];
             options.forEach(opt => {
                 const option = document.createElement('option');
@@ -617,6 +685,8 @@
         document.getElementById('village').value = "Arbara";
         document.getElementById('postOffice').value = "Arbara";
         document.getElementById('deathDate').value = "15/01/2025";
+        document.getElementById('policeStation').value = "Chanchal";
+        document.getElementById('district').value = "Malda";
         updateHeirsTableInput();
     }
     
@@ -625,21 +695,40 @@
         return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
     }
     
+    // Helper to get name with "Lt." prefix for verification statement
+    function getLtName(fullName) {
+        let name = fullName.replace(/^Late\s+Shri\s+/i, '');
+        name = name.replace(/^Late\s+/i, '');
+        name = name.replace(/^Shri\s+/i, '');
+        return `Lt. ${name.trim()}`;
+    }
+    
     function generateCertificate() {
         const deceasedName = document.getElementById('deceasedName').value || "_________";
-        const deceasedRelation = document.getElementById('deceasedRelation').value;
         const fatherName = document.getElementById('deceasedFatherName').value || "_________";
         const village = document.getElementById('village').value || "_________";
         const postOffice = document.getElementById('postOffice').value || "_________";
         const deathDate = document.getElementById('deathDate').value || "_________";
+        const policeStation = document.getElementById('policeStation').value || "Chanchal";
+        const district = document.getElementById('district').value || "Malda";
         
-        document.getElementById('certDeceasedName').innerText = deceasedName;
-        document.getElementById('certRelation').innerText = deceasedRelation;
-        document.getElementById('certFatherName').innerText = fatherName;
-        document.getElementById('certVillage').innerText = village;
-        document.getElementById('certPost').innerText = postOffice;
-        document.getElementById('certDeathDate').innerText = deathDate;
+        document.getElementById('deceasedNameDisplay').innerText = deceasedName;
+        document.getElementById('fatherNameDisplay').innerText = fatherName;
+        document.getElementById('villageDisplay').innerText = village;
+        document.getElementById('postDisplay').innerText = postOffice;
+        document.getElementById('psDisplay').innerText = policeStation;
+        document.getElementById('districtDisplay').innerText = district;
+        document.getElementById('deathDateDisplay').innerText = deathDate;
         document.getElementById('certDate').innerText = getTodayDate();
+        
+        // Set underlined deceased name in verification statement
+        const ltName = getLtName(deceasedName);
+        document.getElementById('underlinedDeceasedName').innerText = ltName;
+        
+        // Set heir count text
+        const heirCount = heirs.length;
+        const heirCountText = heirCount === 1 ? `${heirCount} no` : `${heirCount} nos`;
+        document.getElementById('heirCountText').innerHTML = heirCountText;
         
         const tbody = document.getElementById('certHeirsBody');
         tbody.innerHTML = '';
