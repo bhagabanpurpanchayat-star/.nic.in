@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RouteMaster Pro | A4 Landscape Print + Point-to-Point Distance Table</title>
+    <title>RouteMaster Pro | Satellite View + Working Places Search</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -129,6 +129,11 @@
             filter: brightness(1.05);
         }
         
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         .btn-primary {
             background: #3b82f6;
             color: white;
@@ -147,6 +152,11 @@
         .btn-print {
             background: #8b5cf6;
             color: white;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            color: #1e293b;
         }
         
         .locations-list {
@@ -222,10 +232,9 @@
         #map {
             width: 100%;
             height: 460px;
-            background: #1e293b;
+            background: #1a2a3a;
         }
         
-        /* Distance Table Styles - Shows at bottom of map */
         .distance-table-container {
             background: #111827;
             border-top: 1px solid #1f2937;
@@ -320,7 +329,29 @@
             font-size: 0.7rem;
         }
         
-        /* A4 Landscape Print Styles - Optimized */
+        .search-status {
+            font-size: 0.7rem;
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .search-status.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        
+        .search-status.success {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+        
+        .search-status.loading {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+        
         @media print {
             @page {
                 size: A4 landscape;
@@ -335,7 +366,7 @@
             
             .panel, .btn-group, button:not(.no-print), .app-header, .subtitle, 
             .info-note, .stats, .location-actions, .quick-buttons, #clearAllBtn, 
-            #addBtn, #searchBtn, #generateRouteBtn, #printMapBtn {
+            #addBtn, #searchBtn, #generateRouteBtn, #printMapBtn, .search-status {
                 display: none !important;
             }
             
@@ -393,7 +424,6 @@
                 color: #ca8a04;
             }
             
-            /* Ensure map tiles print */
             .gm-style, .gm-style-iw {
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
@@ -404,13 +434,13 @@
         ::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDg0inKOIHntaJAaUC_AReqWam-h59Xu8g&libraries=places,geocoding&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDg0inKOIHntaJAaUC_AReqWam-h59Xu8g&callback=initMap" async defer></script>
 </head>
 <body>
 <div class="container">
     <div class="app-header">
-        <h1>🗺️ RouteMaster Pro | A4 Landscape Print Ready</h1>
-        <p class="subtitle">Custom named waypoints • Point-to-Point Distance Table • Professional print layout</p>
+        <h1>🗺️ Map Master | Distance|Pointing|Summary</h1>
+        <p class="subtitle">Free geocoding (OpenStreetMap) • Custom waypoints • Point-to-Point Distance • A4 Print</p>
     </div>
     
     <div class="dashboard">
@@ -432,10 +462,11 @@
             </div>
             <div class="btn-group">
                 <button id="addBtn" class="btn-primary">+ Add Location</button>
-                <button id="searchBtn" style="background:#4b5563;">🔍 Geocode</button>
+                <button id="searchBtn" class="btn-warning">🔍 Search Any Place (Worldwide)</button>
             </div>
+            <div id="searchStatus" class="search-status"></div>
             <div class="info-note">
-                💡 <strong>Smart naming:</strong> Your custom name appears as "1.House", "2.Temple" on markers & distance table.
+                🌍 <strong>Search ANY place in the world!</strong> Examples: "Eiffel Tower, Paris", "Taj Mahal, Agra", "Times Square, NYC", "Sydney Opera House". Uses free OpenStreetMap geocoding - no API key needed!
             </div>
             
             <h2 style="margin-top: 20px;">📍 Route Sequence</h2>
@@ -452,24 +483,24 @@
             <div id="stats" class="stats"></div>
             
             <div class="info-note">
-                <strong>✨ Quick Examples:</strong>
+                <strong>✨ Quick Examples (India):</strong>
                 <div class="quick-buttons">
-                    <button id="addHouse" style="background:#2c3e66;">🏠 House (28.6139,77.2090)</button>
-                    <button id="addTemple" style="background:#2c3e66;">🛕 Temple (28.7041,77.1025)</button>
-                    <button id="addMasjid" style="background:#2c3e66;">🕌 Masjid (28.6500,77.2330)</button>
-                    <button id="addOffice" style="background:#2c3e66;">🏢 Office (28.5355,77.3910)</button>
+                    <button id="addDelhi" style="background:#2c3e66;">🏛️ Delhi (India Gate)</button>
+                    <button id="addAgra" style="background:#2c3e66;">🕌 Agra (Taj Mahal)</button>
+                    <button id="addJaipur" style="background:#2c3e66;">🏰 Jaipur (Hawa Mahal)</button>
+                    <button id="addMumbai" style="background:#2c3e66;">🌊 Mumbai (Gateway)</button>
+                    <button id="addKolkata" style="background:#2c3e66;">📚 Kolkata (Victoria Memorial)</button>
                 </div>
             </div>
         </div>
         
         <div class="map-panel" id="printableMapArea">
             <div class="map-header">
-                <h3>🗺️ Route Map with Segment Distances</h3>
+                <h3>🗺️ Satellite View Route Map with Segment Distances</h3>
                 <span style="color: #94a3b8;" id="routeStats">⚡ Add points to see distances</span>
             </div>
             <div id="map"></div>
             
-            <!-- Distance Table: Point to Point Breakdown -->
             <div id="distanceTableContainer" class="distance-table-container" style="display: none;">
                 <h4>📊 Point-to-Point Distance Summary</h4>
                 <table class="distance-table" id="distanceTable">
@@ -494,44 +525,102 @@
 </div>
 
 <script>
-    // Location objects: { name: "House", lat, lng }
     let locations = [];
     let map;
     let markers = [];
     let polyline = null;
-    let distanceLabels = []; // store distance label overlays on map
-    let geocoder;
-    let autocomplete;
-    let segmentDistances = []; // store calculated distances between points
+    let distanceLabels = [];
     
     function initMap() {
+        // SATELLITE VIEW - clear and readable text, no dark theme
         map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 28.6139, lng: 77.2090 },
-            zoom: 6,
-            mapId: 'DEMO_MAP_ID',
-            styles: [
-                { elementType: "geometry", stylers: [{ color: "#1a202c" }] },
-                { elementType: "labels.text.fill", stylers: [{ color: "#cbd5e1" }] },
-                { featureType: "road", elementType: "geometry", stylers: [{ color: "#2d3748" }] },
-                { featureType: "water", elementType: "geometry", stylers: [{ color: "#2b6cb0" }] }
-            ]
-        });
-        geocoder = new google.maps.Geocoder();
-        const input = document.getElementById('placeName');
-        autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (place.geometry) {
-                document.getElementById('latitude').value = place.geometry.location.lat();
-                document.getElementById('longitude').value = place.geometry.location.lng();
-                if (!document.getElementById('placeName').value.trim()) {
-                    document.getElementById('placeName').value = place.name || "Location";
-                }
+            center: { lat: 22.5726, lng: 88.3639 },
+            zoom: 5,
+            mapTypeId: 'satellite',  // Satellite view with clear imagery
+            tilt: 0,
+            mapTypeControl: true,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                position: google.maps.ControlPosition.TOP_RIGHT
             }
         });
+        console.log('Satellite map initialized successfully');
     }
     
-    // Get display label: "1.House"
+    // Free geocoding using OpenStreetMap Nominatim (no API key required)
+    async function searchPlaceWithOSM() {
+        const query = document.getElementById('placeName').value.trim();
+        if (!query) {
+            alert('Please enter a place name to search (e.g., Taj Mahal, Eiffel Tower, Statue of Liberty)');
+            return;
+        }
+        
+        const statusDiv = document.getElementById('searchStatus');
+        statusDiv.textContent = '🔍 Searching for "' + query + '" using OpenStreetMap...';
+        statusDiv.className = 'search-status loading';
+        
+        try {
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&addressdetails=1`;
+            
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': 'RouteMaster-App/1.0'
+                }
+            });
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                const result = data[0];
+                const lat = parseFloat(result.lat);
+                const lon = parseFloat(result.lon);
+                const displayName = result.display_name;
+                
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lon;
+                
+                let cleanName = query;
+                if (result.address) {
+                    cleanName = result.address.name || result.address.road || result.address.city || result.address.town || query;
+                }
+                document.getElementById('placeName').value = cleanName;
+                
+                statusDiv.innerHTML = `✅ Found: ${displayName.substring(0, 80)}...<br>📍 Lat: ${lat.toFixed(5)}, Lng: ${lon.toFixed(5)}`;
+                statusDiv.className = 'search-status success';
+                
+                const tempMarker = new google.maps.Marker({
+                    position: { lat: lat, lng: lon },
+                    map: map,
+                    icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: '#f59e0b', fillOpacity: 0.8, strokeColor: '#fff', strokeWeight: 2, scale: 12 },
+                    title: cleanName
+                });
+                setTimeout(() => tempMarker.setMap(null), 3000);
+                
+                map.setCenter({ lat: lat, lng: lon });
+                map.setZoom(15);
+                
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                    statusDiv.className = 'search-status';
+                }, 4000);
+            } else {
+                statusDiv.innerHTML = '❌ Location not found. Try a more specific name (e.g., "Taj Mahal, Agra, India")';
+                statusDiv.className = 'search-status error';
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                    statusDiv.className = 'search-status';
+                }, 4000);
+            }
+        } catch (error) {
+            console.error('Geocoding error:', error);
+            statusDiv.innerHTML = '❌ Search failed. Please check your internet connection and try again.';
+            statusDiv.className = 'search-status error';
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+                statusDiv.className = 'search-status';
+            }, 4000);
+        }
+    }
+    
     function getDisplayLabel(index, customName) {
         return `${index + 1}.${customName}`;
     }
@@ -542,11 +631,11 @@
         let lng = parseFloat(document.getElementById('longitude').value);
         
         if (isNaN(lat) || isNaN(lng)) {
-            alert('Please enter valid numeric latitude and longitude');
+            alert('❌ Please enter valid numeric latitude and longitude, or use Search to find a place');
             return;
         }
         if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-            alert('Coordinates out of bounds.');
+            alert('❌ Coordinates out of bounds. Latitude: -90 to 90, Longitude: -180 to 180');
             return;
         }
         if (!rawName) rawName = `Point${locations.length + 1}`;
@@ -560,28 +649,17 @@
         renderLocationsList();
         clearMapOverlays();
         updateStatsUI();
-        // Hide distance table until route generated
         document.getElementById('distanceTableContainer').style.display = 'none';
         if (locations.length >= 2) {
             document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points — click "Draw Route & Show Distances"`;
         }
-    }
-    
-    function searchPlace() {
-        const query = document.getElementById('placeName').value.trim();
-        if (!query) { alert('Enter a place name'); return; }
-        geocoder.geocode({ address: query }, (results, status) => {
-            if (status === 'OK' && results[0]) {
-                const loc = results[0].geometry.location;
-                document.getElementById('latitude').value = loc.lat();
-                document.getElementById('longitude').value = loc.lng();
-                const suggested = results[0].formatted_address.split(',')[0];
-                if (!document.getElementById('placeName').value.trim()) {
-                    document.getElementById('placeName').value = suggested;
-                }
-                alert(`✅ Found: ${loc.lat().toFixed(5)}, ${loc.lng().toFixed(5)}`);
-            } else { alert('Location not found'); }
-        });
+        
+        const statusDiv = document.getElementById('searchStatus');
+        statusDiv.innerHTML = `✅ Added: ${getDisplayLabel(locations.length-1, rawName)}`;
+        statusDiv.className = 'search-status success';
+        setTimeout(() => {
+            if (statusDiv.innerHTML.includes('Added')) statusDiv.innerHTML = '';
+        }, 2000);
     }
     
     function renderLocationsList() {
@@ -618,7 +696,7 @@
         clearMapOverlays();
         updateStatsUI();
         document.getElementById('distanceTableContainer').style.display = 'none';
-        if (locations.length >= 2) document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
+        document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
     }
     
     function moveDown(index) {
@@ -628,7 +706,7 @@
         clearMapOverlays();
         updateStatsUI();
         document.getElementById('distanceTableContainer').style.display = 'none';
-        if (locations.length >= 2) document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
+        document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
     }
     
     function deleteLocation(index) {
@@ -678,27 +756,20 @@
         return R * c;
     }
     
-    // Populate distance table in the bottom container
     function updateDistanceTable() {
         if (locations.length < 2) {
             document.getElementById('distanceTableContainer').style.display = 'none';
             return;
         }
         
-        segmentDistances = [];
-        for (let i = 0; i < locations.length - 1; i++) {
-            const dist = haversineDistance(locations[i].lat, locations[i].lng, locations[i+1].lat, locations[i+1].lng);
-            segmentDistances.push(dist);
-        }
-        
         const tbody = document.getElementById('distanceTableBody');
         tbody.innerHTML = '';
         let total = 0;
         
-        for (let i = 0; i < segmentDistances.length; i++) {
+        for (let i = 0; i < locations.length - 1; i++) {
             const fromLabel = getDisplayLabel(i, locations[i].name);
             const toLabel = getDisplayLabel(i+1, locations[i+1].name);
-            const dist = segmentDistances[i];
+            const dist = haversineDistance(locations[i].lat, locations[i].lng, locations[i+1].lat, locations[i+1].lng);
             total += dist;
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -709,7 +780,6 @@
             tbody.appendChild(row);
         }
         
-        // Add total row
         const totalRow = document.createElement('tr');
         totalRow.className = 'total-distance-row';
         totalRow.innerHTML = `
@@ -721,7 +791,6 @@
         document.getElementById('distanceTableContainer').style.display = 'block';
     }
     
-    // Generate route with markers, polyline, map distance labels AND update bottom table
     function generateRouteWithDistances() {
         if (locations.length < 2) {
             alert('Please add at least 2 locations to generate route with distances.');
@@ -732,7 +801,6 @@
         const bounds = new google.maps.LatLngBounds();
         const pathPoints = [];
         
-        // Create markers with custom label format: "1.House", "2.Temple"
         locations.forEach((loc, idx) => {
             const position = { lat: loc.lat, lng: loc.lng };
             pathPoints.push(position);
@@ -747,90 +815,43 @@
             const marker = new google.maps.Marker({
                 position: position,
                 map: map,
-                label: {
-                    text: displayLabel,
-                    color: '#ffffff',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                },
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    fillColor: markerColor,
-                    fillOpacity: 1,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 2.5,
-                    scale: 13
-                },
+                label: { text: displayLabel, color: '#ffffff', fontSize: '12px', fontWeight: 'bold' },
+                icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: markerColor, fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2.5, scale: 14 },
                 title: `${displayLabel}\n(${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)})`
             });
             
-            const infoContent = `
-                <div style="padding: 8px 12px; font-family: Inter; min-width: 160px;">
-                    <strong style="color:#1e293b;">📍 ${escapeHtml(displayLabel)}</strong><br>
-                    <span style="font-size:10px;">${loc.name} · ${loc.lat.toFixed(5)}°, ${loc.lng.toFixed(5)}°</span>
-                </div>
-            `;
+            const infoContent = `<div style="padding: 8px 12px; background: white; border-radius: 8px;"><strong>📍 ${escapeHtml(displayLabel)}</strong><br><span style="font-size:10px;">${loc.name} · ${loc.lat.toFixed(5)}°, ${loc.lng.toFixed(5)}°</span></div>`;
             const infoWindow = new google.maps.InfoWindow({ content: infoContent });
             marker.addListener('click', () => infoWindow.open(map, marker));
             markers.push(marker);
         });
         
-        // Draw polyline
         polyline = new google.maps.Polyline({
-            path: pathPoints,
-            geodesic: true,
-            strokeColor: '#06b6d4',
-            strokeOpacity: 0.9,
-            strokeWeight: 4,
-            icons: [{
-                icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 3, strokeColor: '#facc15', fillColor: '#facc15' },
-                offset: '50%',
-                repeat: '70px'
-            }]
+            path: pathPoints, geodesic: true, strokeColor: '#06b6d4', strokeOpacity: 0.9, strokeWeight: 4,
+            icons: [{ icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 3, strokeColor: '#facc15', fillColor: '#facc15' }, offset: '50%', repeat: '70px' }]
         });
         polyline.setMap(map);
         
-        // Add distance labels on map at midpoints
         for (let i = 0; i < locations.length - 1; i++) {
-            const p1 = locations[i];
-            const p2 = locations[i+1];
+            const p1 = locations[i], p2 = locations[i+1];
             const dist = haversineDistance(p1.lat, p1.lng, p2.lat, p2.lng);
-            const distText = dist.toFixed(2) + ' km';
-            const midLat = (p1.lat + p2.lat) / 2;
-            const midLng = (p1.lng + p2.lng) / 2;
-            
+            const midLat = (p1.lat + p2.lat) / 2, midLng = (p1.lng + p2.lng) / 2;
             const distanceMarker = new google.maps.Marker({
-                position: { lat: midLat, lng: midLng },
-                map: map,
+                position: { lat: midLat, lng: midLng }, map: map,
                 icon: { path: google.maps.SymbolPath.CIRCLE, scale: 0, fillOpacity: 0, strokeOpacity: 0 },
-                label: {
-                    text: `📏 ${distText}`,
-                    color: '#facc15',
-                    fontSize: '10px',
-                    fontWeight: '600',
-                },
-                zIndex: 100,
+                label: { text: `📏 ${dist.toFixed(2)} km`, color: '#000000', fontSize: '10px', fontWeight: '600', backgroundColor: 'rgba(255,255,255,0.8)' },
                 clickable: false
             });
             distanceLabels.push(distanceMarker);
         }
         
-        // Update the bottom distance table
         updateDistanceTable();
-        
         const totalDist = computeTotalDistance();
         document.getElementById('routeStats').innerHTML = `🔗 Route active | ${totalDist.toFixed(2)} km total | ${locations.length} waypoints`;
-        
         map.fitBounds(bounds);
-        if (locations.length > 1) {
-            google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
-                if (map.getZoom() > 13) map.setZoom(13);
-            });
-        }
         updateStatsUI();
     }
     
-    // Print with A4 landscape optimized
     function printMapContent() {
         if (locations.length === 0) {
             alert('Please add locations and generate route before printing.');
@@ -839,13 +860,10 @@
         if (!polyline && locations.length >= 2) {
             if (confirm('Route not drawn yet. Generate route before printing?')) {
                 generateRouteWithDistances();
-                setTimeout(() => {
-                    window.print();
-                }, 500);
+                setTimeout(() => window.print(), 500);
                 return;
             }
         }
-        // Ensure table is visible for print
         if (locations.length >= 2 && document.getElementById('distanceTableContainer').style.display !== 'block') {
             updateDistanceTable();
         }
@@ -860,7 +878,7 @@
             updateStatsUI();
             document.getElementById('routeStats').innerHTML = '🗺️ No route';
             document.getElementById('distanceTableContainer').style.display = 'none';
-            map.setCenter({ lat: 28.6139, lng: 77.2090 });
+            map.setCenter({ lat: 22.5726, lng: 88.3639 });
             map.setZoom(5);
         }
     }
@@ -878,25 +896,20 @@
     
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return str.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
     }
     
-    // Event listeners
     document.getElementById('addBtn').addEventListener('click', addLocation);
-    document.getElementById('searchBtn').addEventListener('click', searchPlace);
+    document.getElementById('searchBtn').addEventListener('click', searchPlaceWithOSM);
     document.getElementById('clearAllBtn').addEventListener('click', clearAll);
     document.getElementById('generateRouteBtn').addEventListener('click', generateRouteWithDistances);
     document.getElementById('printMapBtn').addEventListener('click', printMapContent);
     
-    document.getElementById('addHouse').addEventListener('click', () => addExample('House', 28.6139, 77.2090));
-    document.getElementById('addTemple').addEventListener('click', () => addExample('Temple', 28.7041, 77.1025));
-    document.getElementById('addMasjid').addEventListener('click', () => addExample('Masjid', 28.6500, 77.2330));
-    document.getElementById('addOffice').addEventListener('click', () => addExample('Office', 28.5355, 77.3910));
+    document.getElementById('addDelhi').addEventListener('click', () => addExample('India Gate, Delhi', 28.6129, 77.2295));
+    document.getElementById('addAgra').addEventListener('click', () => addExample('Taj Mahal, Agra', 27.1751, 78.0421));
+    document.getElementById('addJaipur').addEventListener('click', () => addExample('Hawa Mahal, Jaipur', 26.9239, 75.8267));
+    document.getElementById('addMumbai').addEventListener('click', () => addExample('Gateway of India, Mumbai', 18.9220, 72.8347));
+    document.getElementById('addKolkata').addEventListener('click', () => addExample('Victoria Memorial, Kolkata', 22.5448, 88.3426));
     
     window.moveUp = moveUp;
     window.moveDown = moveDown;
