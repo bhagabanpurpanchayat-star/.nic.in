@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RouteMaster Pro | Satellite View + Working Places Search</title>
+    <title>RouteMaster Pro | Satellite View + Fixed KML Export</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -107,6 +107,7 @@
             display: flex;
             gap: 12px;
             margin: 16px 0;
+            flex-wrap: wrap;
         }
         
         button {
@@ -159,9 +160,18 @@
             color: #1e293b;
         }
         
+        .btn-kml {
+            background: #34a853;
+            color: white;
+        }
+        
+        .btn-kml:hover {
+            background: #2d8e47;
+        }
+        
         .locations-list {
             margin-top: 20px;
-            max-height: 280px;
+            max-height: 240px;
             overflow-y: auto;
             padding-right: 4px;
         }
@@ -222,6 +232,8 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #1f2937;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .map-header h3 {
@@ -366,7 +378,7 @@
             
             .panel, .btn-group, button:not(.no-print), .app-header, .subtitle, 
             .info-note, .stats, .location-actions, .quick-buttons, #clearAllBtn, 
-            #addBtn, #searchBtn, #generateRouteBtn, #printMapBtn, .search-status {
+            #addBtn, #searchBtn, #generateRouteBtn, #printMapBtn, .search-status, .btn-kml {
                 display: none !important;
             }
             
@@ -439,8 +451,8 @@
 <body>
 <div class="container">
     <div class="app-header">
-        <h1>🗺️ Map Master | Distance|Pointing|Summary</h1>
-        <p class="subtitle">Free geocoding (OpenStreetMap) • Custom waypoints • Point-to-Point Distance • A4 Print</p>
+        <h1>🗺️ RouteMaster Pro | Satellite View + KML Export</h1>
+        <p class="subtitle">Free geocoding • Custom waypoints • Point-to-Point Distance • Export to KML • A4 Print</p>
     </div>
     
     <div class="dashboard">
@@ -462,11 +474,11 @@
             </div>
             <div class="btn-group">
                 <button id="addBtn" class="btn-primary">+ Add Location</button>
-                <button id="searchBtn" class="btn-warning">🔍 Search Any Place (Worldwide)</button>
+                <button id="searchBtn" class="btn-warning">🔍 Search Any Place</button>
             </div>
             <div id="searchStatus" class="search-status"></div>
             <div class="info-note">
-                🌍 <strong>Search ANY place in the world!</strong> Examples: "Eiffel Tower, Paris", "Taj Mahal, Agra", "Times Square, NYC", "Sydney Opera House". Uses free OpenStreetMap geocoding - no API key needed!
+                🌍 <strong>Search ANY place worldwide!</strong> Examples: "Eiffel Tower, Paris", "Taj Mahal, Agra"
             </div>
             
             <h2 style="margin-top: 20px;">📍 Route Sequence</h2>
@@ -476,27 +488,28 @@
             
             <div style="display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap;">
                 <button id="clearAllBtn" class="btn-danger">🗑️ Clear All</button>
-                <button id="generateRouteBtn" class="btn-success">🗺️ Draw Route & Show Distances</button>
-                <button id="printMapBtn" class="btn-print">🖨️ Print (A4 Landscape)</button>
+                <button id="generateRouteBtn" class="btn-success">🗺️ Draw Route</button>
+                <button id="exportKmlBtn" class="btn-kml">📁 Export KML File</button>
+                <button id="printMapBtn" class="btn-print">🖨️ Print Map</button>
             </div>
             
             <div id="stats" class="stats"></div>
             
             <div class="info-note">
-                <strong>✨ Quick Examples (India):</strong>
+                <strong>✨ Quick Examples:</strong>
                 <div class="quick-buttons">
-                    <button id="addDelhi" style="background:#2c3e66;">🏛️ Delhi (India Gate)</button>
-                    <button id="addAgra" style="background:#2c3e66;">🕌 Agra (Taj Mahal)</button>
-                    <button id="addJaipur" style="background:#2c3e66;">🏰 Jaipur (Hawa Mahal)</button>
-                    <button id="addMumbai" style="background:#2c3e66;">🌊 Mumbai (Gateway)</button>
-                    <button id="addKolkata" style="background:#2c3e66;">📚 Kolkata (Victoria Memorial)</button>
+                    <button id="addDelhi">🏛️ Delhi</button>
+                    <button id="addAgra">🕌 Agra</button>
+                    <button id="addJaipur">🏰 Jaipur</button>
+                    <button id="addMumbai">🌊 Mumbai</button>
+                    <button id="addKolkata">📚 Kolkata</button>
                 </div>
             </div>
         </div>
         
         <div class="map-panel" id="printableMapArea">
             <div class="map-header">
-                <h3>🗺️ Satellite View Route Map with Segment Distances</h3>
+                <h3>🗺️ Satellite View Route Map</h3>
                 <span style="color: #94a3b8;" id="routeStats">⚡ Add points to see distances</span>
             </div>
             <div id="map"></div>
@@ -504,21 +517,15 @@
             <div id="distanceTableContainer" class="distance-table-container" style="display: none;">
                 <h4>📊 Point-to-Point Distance Summary</h4>
                 <table class="distance-table" id="distanceTable">
-                    <thead>
-                        <tr><th>Segment</th><th>From → To</th><th>Distance (km)</th></tr>
-                    </thead>
-                    <tbody id="distanceTableBody">
-                        <tr><td colspan="3" style="text-align:center;">No route generated yet</td></tr>
-                    </tbody>
+                    <thead><tr><th>Segment</th><th>From → To</th><th>Distance (km)</th></tr></thead>
+                    <tbody id="distanceTableBody"><tr><td colspan="3">No route generated yet</td></tr></tbody>
                 </table>
             </div>
             
             <div class="legend">
-                <span>🟢 Start (1.Name)</span>
-                <span>🔴 End (N.Name)</span>
-                <span>🔵 Intermediate with custom label</span>
-                <span>📏 Cyan line + segment labels show distance</span>
-                <span>📋 Bottom table shows point-to-point breakdown</span>
+                <span>🟢 Start</span> <span>🔴 End</span> <span>🔵 Stops</span>
+                <span>📏 Cyan route</span> <span>📋 Distance table</span>
+                <span>📁 KML for Google Earth</span>
             </div>
         </div>
     </div>
@@ -532,11 +539,10 @@
     let distanceLabels = [];
     
     function initMap() {
-        // SATELLITE VIEW - clear and readable text, no dark theme
         map = new google.maps.Map(document.getElementById('map'), {
             center: { lat: 22.5726, lng: 88.3639 },
             zoom: 5,
-            mapTypeId: 'satellite',  // Satellite view with clear imagery
+            mapTypeId: 'satellite',
             tilt: 0,
             mapTypeControl: true,
             mapTypeControlOptions: {
@@ -544,80 +550,50 @@
                 position: google.maps.ControlPosition.TOP_RIGHT
             }
         });
-        console.log('Satellite map initialized successfully');
     }
     
-    // Free geocoding using OpenStreetMap Nominatim (no API key required)
     async function searchPlaceWithOSM() {
         const query = document.getElementById('placeName').value.trim();
-        if (!query) {
-            alert('Please enter a place name to search (e.g., Taj Mahal, Eiffel Tower, Statue of Liberty)');
-            return;
-        }
+        if (!query) { alert('Please enter a place name to search'); return; }
         
         const statusDiv = document.getElementById('searchStatus');
-        statusDiv.textContent = '🔍 Searching for "' + query + '" using OpenStreetMap...';
+        statusDiv.textContent = '🔍 Searching...';
         statusDiv.className = 'search-status loading';
         
         try {
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&addressdetails=1`;
-            
-            const response = await fetch(url, {
-                headers: {
-                    'User-Agent': 'RouteMaster-App/1.0'
-                }
-            });
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+            const response = await fetch(url, { headers: { 'User-Agent': 'RouteMaster-App/1.0' } });
             const data = await response.json();
             
             if (data && data.length > 0) {
                 const result = data[0];
                 const lat = parseFloat(result.lat);
                 const lon = parseFloat(result.lon);
-                const displayName = result.display_name;
                 
                 document.getElementById('latitude').value = lat;
                 document.getElementById('longitude').value = lon;
+                document.getElementById('placeName').value = result.display_name.split(',')[0];
                 
-                let cleanName = query;
-                if (result.address) {
-                    cleanName = result.address.name || result.address.road || result.address.city || result.address.town || query;
-                }
-                document.getElementById('placeName').value = cleanName;
-                
-                statusDiv.innerHTML = `✅ Found: ${displayName.substring(0, 80)}...<br>📍 Lat: ${lat.toFixed(5)}, Lng: ${lon.toFixed(5)}`;
+                statusDiv.innerHTML = `✅ Found: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
                 statusDiv.className = 'search-status success';
                 
                 const tempMarker = new google.maps.Marker({
-                    position: { lat: lat, lng: lon },
-                    map: map,
-                    icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: '#f59e0b', fillOpacity: 0.8, strokeColor: '#fff', strokeWeight: 2, scale: 12 },
-                    title: cleanName
+                    position: { lat: lat, lng: lon }, map: map,
+                    icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: '#f59e0b', fillOpacity: 0.8, strokeColor: '#fff', strokeWeight: 2, scale: 12 }
                 });
                 setTimeout(() => tempMarker.setMap(null), 3000);
-                
                 map.setCenter({ lat: lat, lng: lon });
-                map.setZoom(15);
-                
-                setTimeout(() => {
-                    statusDiv.innerHTML = '';
-                    statusDiv.className = 'search-status';
-                }, 4000);
+                map.setZoom(14);
+                setTimeout(() => { statusDiv.innerHTML = ''; statusDiv.className = 'search-status'; }, 3000);
             } else {
-                statusDiv.innerHTML = '❌ Location not found. Try a more specific name (e.g., "Taj Mahal, Agra, India")';
+                statusDiv.innerHTML = '❌ Not found. Try a more specific name.';
                 statusDiv.className = 'search-status error';
-                setTimeout(() => {
-                    statusDiv.innerHTML = '';
-                    statusDiv.className = 'search-status';
-                }, 4000);
+                setTimeout(() => { statusDiv.innerHTML = ''; statusDiv.className = 'search-status'; }, 3000);
             }
         } catch (error) {
-            console.error('Geocoding error:', error);
-            statusDiv.innerHTML = '❌ Search failed. Please check your internet connection and try again.';
+            statusDiv.innerHTML = '❌ Search failed. Check connection.';
             statusDiv.className = 'search-status error';
-            setTimeout(() => {
-                statusDiv.innerHTML = '';
-                statusDiv.className = 'search-status';
-            }, 4000);
+            setTimeout(() => { statusDiv.innerHTML = ''; statusDiv.className = 'search-status'; }, 3000);
         }
     }
     
@@ -631,11 +607,7 @@
         let lng = parseFloat(document.getElementById('longitude').value);
         
         if (isNaN(lat) || isNaN(lng)) {
-            alert('❌ Please enter valid numeric latitude and longitude, or use Search to find a place');
-            return;
-        }
-        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-            alert('❌ Coordinates out of bounds. Latitude: -90 to 90, Longitude: -180 to 180');
+            alert('Please enter valid latitude and longitude, or use Search');
             return;
         }
         if (!rawName) rawName = `Point${locations.length + 1}`;
@@ -651,40 +623,31 @@
         updateStatsUI();
         document.getElementById('distanceTableContainer').style.display = 'none';
         if (locations.length >= 2) {
-            document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points — click "Draw Route & Show Distances"`;
+            document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points — click Draw Route`;
         }
-        
-        const statusDiv = document.getElementById('searchStatus');
-        statusDiv.innerHTML = `✅ Added: ${getDisplayLabel(locations.length-1, rawName)}`;
-        statusDiv.className = 'search-status success';
-        setTimeout(() => {
-            if (statusDiv.innerHTML.includes('Added')) statusDiv.innerHTML = '';
-        }, 2000);
     }
     
     function renderLocationsList() {
         const container = document.getElementById('locationsList');
         if (locations.length === 0) {
-            container.innerHTML = '<div class="empty-msg">No waypoints added.<br>➕ Add with custom names like "House", "Temple".</div>';
+            container.innerHTML = '<div class="empty-msg">No waypoints added.</div>';
             return;
         }
         let html = '';
         locations.forEach((loc, idx) => {
             const displayTag = getDisplayLabel(idx, loc.name);
             const badge = idx === 0 ? ' 🟢 START' : (idx === locations.length - 1 ? ' 🔴 END' : '');
-            html += `
-                <div class="location-item">
-                    <div class="location-info">
-                        <h4>${escapeHtml(displayTag)}${badge}</h4>
-                        <p>${loc.lat.toFixed(6)}°, ${loc.lng.toFixed(6)}°</p>
-                    </div>
-                    <div class="location-actions">
-                        ${idx > 0 ? `<button onclick="moveUp(${idx})" style="background:#334155;">⬆️</button>` : ''}
-                        ${idx < locations.length - 1 ? `<button onclick="moveDown(${idx})" style="background:#334155;">⬇️</button>` : ''}
-                        <button onclick="deleteLocation(${idx})" style="background:#b91c1c;">✖️</button>
-                    </div>
+            html += `<div class="location-item">
+                <div class="location-info">
+                    <h4>${escapeHtml(displayTag)}${badge}</h4>
+                    <p>${loc.lat.toFixed(6)}°, ${loc.lng.toFixed(6)}°</p>
                 </div>
-            `;
+                <div class="location-actions">
+                    ${idx > 0 ? `<button onclick="moveUp(${idx})">⬆️</button>` : ''}
+                    ${idx < locations.length - 1 ? `<button onclick="moveDown(${idx})">⬇️</button>` : ''}
+                    <button onclick="deleteLocation(${idx})" style="background:#b91c1c;">✖️</button>
+                </div>
+            </div>`;
         });
         container.innerHTML = html;
     }
@@ -696,7 +659,6 @@
         clearMapOverlays();
         updateStatsUI();
         document.getElementById('distanceTableContainer').style.display = 'none';
-        document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
     }
     
     function moveDown(index) {
@@ -706,7 +668,6 @@
         clearMapOverlays();
         updateStatsUI();
         document.getElementById('distanceTableContainer').style.display = 'none';
-        document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
     }
     
     function deleteLocation(index) {
@@ -715,8 +676,6 @@
         clearMapOverlays();
         updateStatsUI();
         document.getElementById('distanceTableContainer').style.display = 'none';
-        if (locations.length < 2) document.getElementById('routeStats').innerHTML = `⚡ Add more points to see distances`;
-        else document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points — regenerate route`;
     }
     
     function clearMapOverlays() {
@@ -730,10 +689,10 @@
     function updateStatsUI() {
         const statsDiv = document.getElementById('stats');
         if (locations.length < 2) {
-            statsDiv.innerHTML = `📍 ${locations.length} waypoint(s). Add at least 2 locations with custom names.`;
+            statsDiv.innerHTML = `📍 ${locations.length} waypoint(s). Add at least 2 locations.`;
         } else {
             let totalDist = computeTotalDistance();
-            statsDiv.innerHTML = `✅ ${locations.length} waypoints | Total route distance: ${totalDist.toFixed(2)} km`;
+            statsDiv.innerHTML = `✅ ${locations.length} waypoints | Total: ${totalDist.toFixed(2)} km`;
         }
     }
     
@@ -772,20 +731,13 @@
             const dist = haversineDistance(locations[i].lat, locations[i].lng, locations[i+1].lat, locations[i+1].lng);
             total += dist;
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><strong>Segment ${i+1}</strong></td>
-                <td>${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}</td>
-                <td>${dist.toFixed(2)} km</td>
-            `;
+            row.innerHTML = `<td><strong>Segment ${i+1}</strong></td><td>${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}</td><td>${dist.toFixed(2)} km</td>`;
             tbody.appendChild(row);
         }
         
         const totalRow = document.createElement('tr');
         totalRow.className = 'total-distance-row';
-        totalRow.innerHTML = `
-            <td colspan="2"><strong>📏 TOTAL DISTANCE</strong></td>
-            <td><strong>${total.toFixed(2)} km</strong></td>
-        `;
+        totalRow.innerHTML = `<td colspan="2"><strong>📏 TOTAL DISTANCE</strong></td><td><strong>${total.toFixed(2)} km</strong></td>`;
         tbody.appendChild(totalRow);
         
         document.getElementById('distanceTableContainer').style.display = 'block';
@@ -793,7 +745,7 @@
     
     function generateRouteWithDistances() {
         if (locations.length < 2) {
-            alert('Please add at least 2 locations to generate route with distances.');
+            alert('Please add at least 2 locations');
             return;
         }
         
@@ -813,14 +765,12 @@
             const displayLabel = getDisplayLabel(idx, loc.name);
             
             const marker = new google.maps.Marker({
-                position: position,
-                map: map,
+                position: position, map: map,
                 label: { text: displayLabel, color: '#ffffff', fontSize: '12px', fontWeight: 'bold' },
-                icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: markerColor, fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2.5, scale: 14 },
-                title: `${displayLabel}\n(${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)})`
+                icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: markerColor, fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 2.5, scale: 14 }
             });
             
-            const infoContent = `<div style="padding: 8px 12px; background: white; border-radius: 8px;"><strong>📍 ${escapeHtml(displayLabel)}</strong><br><span style="font-size:10px;">${loc.name} · ${loc.lat.toFixed(5)}°, ${loc.lng.toFixed(5)}°</span></div>`;
+            const infoContent = `<div style="padding: 8px 12px; background: white; border-radius: 8px;"><strong>📍 ${escapeHtml(displayLabel)}</strong><br>${loc.name}<br>${loc.lat.toFixed(5)}°, ${loc.lng.toFixed(5)}°</div>`;
             const infoWindow = new google.maps.InfoWindow({ content: infoContent });
             marker.addListener('click', () => infoWindow.open(map, marker));
             markers.push(marker);
@@ -847,18 +797,99 @@
         
         updateDistanceTable();
         const totalDist = computeTotalDistance();
-        document.getElementById('routeStats').innerHTML = `🔗 Route active | ${totalDist.toFixed(2)} km total | ${locations.length} waypoints`;
+        document.getElementById('routeStats').innerHTML = `🔗 Route | ${totalDist.toFixed(2)} km total`;
         map.fitBounds(bounds);
         updateStatsUI();
     }
     
+    // FIXED KML Export - Proper XML structure
+    function exportToKML() {
+        if (locations.length === 0) {
+            alert('No locations to export. Please add at least one location.');
+            return;
+        }
+        
+        let kml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        kml += '<kml xmlns="http://www.opengis.net/kml/2.2">\n';
+        kml += '<Document>\n';
+        kml += '  <name>RouteMaster Pro Route</name>\n';
+        kml += `  <description>Route with ${locations.length} waypoints | Total distance: ${computeTotalDistance().toFixed(2)} km</description>\n`;
+        
+        // Styles
+        kml += '  <Style id="startStyle">\n';
+        kml += '    <IconStyle><scale>1.2</scale><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href></Icon></IconStyle>\n';
+        kml += '  </Style>\n';
+        kml += '  <Style id="endStyle">\n';
+        kml += '    <IconStyle><scale>1.2</scale><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png</href></Icon></IconStyle>\n';
+        kml += '  </Style>\n';
+        kml += '  <Style id="waypointStyle">\n';
+        kml += '    <IconStyle><scale>1.0</scale><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href></Icon></IconStyle>\n';
+        kml += '  </Style>\n';
+        kml += '  <Style id="routeStyle">\n';
+        kml += '    <LineStyle><color>FFD4B606</color><width>4</width></LineStyle>\n';
+        kml += '  </Style>\n';
+        
+        // Placemarks
+        locations.forEach((loc, idx) => {
+            const displayLabel = getDisplayLabel(idx, loc.name);
+            let style = '#waypointStyle';
+            if (idx === 0) style = '#startStyle';
+            if (idx === locations.length - 1) style = '#endStyle';
+            
+            kml += '  <Placemark>\n';
+            kml += `    <name>${escapeXml(displayLabel)}</name>\n`;
+            kml += `    <description>${escapeXml(loc.name)} - Lat: ${loc.lat.toFixed(6)}°, Lng: ${loc.lng.toFixed(6)}°</description>\n`;
+            kml += `    <styleUrl>${style}</styleUrl>\n`;
+            kml += '    <Point>\n';
+            kml += `      <coordinates>${loc.lng},${loc.lat},0</coordinates>\n`;
+            kml += '    </Point>\n';
+            kml += '  </Placemark>\n';
+        });
+        
+        // Route line
+        if (locations.length >= 2) {
+            kml += '  <Placemark>\n';
+            kml += '    <name>Route Path</name>\n';
+            kml += `    <description>Connecting route - Total distance: ${computeTotalDistance().toFixed(2)} km</description>\n`;
+            kml += '    <styleUrl>#routeStyle</styleUrl>\n';
+            kml += '    <LineString>\n';
+            kml += '      <tessellate>1</tessellate>\n';
+            kml += '      <coordinates>\n';
+            locations.forEach(loc => {
+                kml += `        ${loc.lng},${loc.lat},0\n`;
+            });
+            kml += '      </coordinates>\n';
+            kml += '    </LineString>\n';
+            kml += '  </Placemark>\n';
+        }
+        
+        kml += '</Document>\n';
+        kml += '</kml>';
+        
+        // Download
+        const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `route_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.kml`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        const statusDiv = document.getElementById('searchStatus');
+        statusDiv.innerHTML = `✅ KML exported! ${locations.length} locations saved.`;
+        statusDiv.className = 'search-status success';
+        setTimeout(() => { statusDiv.innerHTML = ''; statusDiv.className = 'search-status'; }, 3000);
+    }
+    
     function printMapContent() {
         if (locations.length === 0) {
-            alert('Please add locations and generate route before printing.');
+            alert('Please add locations first.');
             return;
         }
         if (!polyline && locations.length >= 2) {
-            if (confirm('Route not drawn yet. Generate route before printing?')) {
+            if (confirm('Generate route before printing?')) {
                 generateRouteWithDistances();
                 setTimeout(() => window.print(), 500);
                 return;
@@ -876,7 +907,7 @@
             renderLocationsList();
             clearMapOverlays();
             updateStatsUI();
-            document.getElementById('routeStats').innerHTML = '🗺️ No route';
+            document.getElementById('routeStats').innerHTML = '⚡ No route';
             document.getElementById('distanceTableContainer').style.display = 'none';
             map.setCenter({ lat: 22.5726, lng: 88.3639 });
             map.setZoom(5);
@@ -890,7 +921,7 @@
         updateStatsUI();
         document.getElementById('distanceTableContainer').style.display = 'none';
         if (locations.length >= 2) {
-            document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points. Click "Draw Route & Show Distances"`;
+            document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points. Click Draw Route`;
         }
     }
     
@@ -899,10 +930,16 @@
         return str.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
     }
     
+    function escapeXml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
     document.getElementById('addBtn').addEventListener('click', addLocation);
     document.getElementById('searchBtn').addEventListener('click', searchPlaceWithOSM);
     document.getElementById('clearAllBtn').addEventListener('click', clearAll);
     document.getElementById('generateRouteBtn').addEventListener('click', generateRouteWithDistances);
+    document.getElementById('exportKmlBtn').addEventListener('click', exportToKML);
     document.getElementById('printMapBtn').addEventListener('click', printMapContent);
     
     document.getElementById('addDelhi').addEventListener('click', () => addExample('India Gate, Delhi', 28.6129, 77.2295));
