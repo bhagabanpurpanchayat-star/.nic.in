@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RouteMaster Pro | A4 Landscape Print + Point-to-Point Distance Table</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0f1e;
+            padding: 24px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .app-header {
+            margin-bottom: 28px;
+            text-align: center;
+        }
+        
+        .app-header h1 {
+            background: linear-gradient(135deg, #ffffff 0%, #a0b3d9 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #7e8a9b;
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
+        
+        .dashboard {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .panel {
+            flex: 1;
+            min-width: 340px;
+            background: #111827;
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .panel h2 {
+            color: #60a5fa;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+        }
+        
+        .input-group {
+            margin-bottom: 18px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #9ca3af;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 16px;
+            color: #f3f4f6;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        
+        .inline-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        
+        button {
+            background: #1e293b;
+            color: #e2e8f0;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #8b5cf6;
+            color: white;
+        }
+        
+        .locations-list {
+            margin-top: 20px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        
+        .location-item {
+            background: #1e293b;
+            border-radius: 18px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .location-info h4 {
+            color: #f1f5f9;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .location-info p {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            font-family: monospace;
+            margin-top: 4px;
+        }
+        
+        .location-actions button {
+            padding: 6px 12px;
+            margin: 0 4px;
+            font-size: 0.7rem;
+            background: #0f172a;
+        }
+        
+        .empty-msg {
+            text-align: center;
+            color: #6b7280;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+        
+        .map-panel {
+            flex: 2;
+            min-width: 580px;
+            background: #0f172a;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .map-header {
+            padding: 16px 24px;
+            background: #111827;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+        }
+        
+        .map-header h3 {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+        
+        #map {
+            width: 100%;
+            height: 460px;
+            background: #1e293b;
+        }
+        
+        /* Distance Table Styles - Shows at bottom of map */
+        .distance-table-container {
+            background: #111827;
+            border-top: 1px solid #1f2937;
+            padding: 14px 20px;
+            font-size: 0.75rem;
+        }
+        
+        .distance-table-container h4 {
+            color: #facc15;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .distance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+        
+        .distance-table th, .distance-table td {
+            padding: 6px 10px;
+            text-align: left;
+            border-bottom: 1px solid #1f2937;
+            color: #cbd5e1;
+        }
+        
+        .distance-table th {
+            color: #60a5fa;
+            font-weight: 600;
+            background: #0f172a;
+        }
+        
+        .distance-table tr:hover {
+            background: #1e293b;
+        }
+        
+        .total-distance-row {
+            background: #1a2744;
+            font-weight: bold;
+        }
+        
+        .total-distance-row td {
+            color: #facc15;
+            font-weight: bold;
+        }
+        
+        .legend {
+            padding: 10px 20px;
+            background: #0f172a;
+            font-size: 0.65rem;
+            color: #9ca3af;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            border-top: 1px solid #1f2937;
+        }
+        
+        .info-note {
+            background: #1e293b;
+            padding: 12px;
+            border-radius: 20px;
+            margin-top: 18px;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            text-align: center;
+        }
+        
+        .stats {
+            text-align: center;
+            margin-top: 18px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 40px;
+            color: #34d399;
+        }
+        
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .quick-buttons button {
+            background: #2d3a5e;
+            padding: 6px 14px;
+            font-size: 0.7rem;
+        }
+        
+        /* A4 Landscape Print Styles - Optimized */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0.8cm;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .panel, .btn-group, button:not(.no-print), .app-header, .subtitle, 
+            .info-note, .stats, .location-actions, .quick-buttons, #clearAllBtn, 
+            #addBtn, #searchBtn, #generateRouteBtn, #printMapBtn {
+                display: none !important;
+            }
+            
+            .map-panel {
+                flex: 1;
+                min-width: 100%;
+                margin: 0;
+                padding: 0;
+                border-radius: 0;
+                box-shadow: none;
+                background: white;
+            }
+            
+            .map-header {
+                display: none;
+            }
+            
+            #map {
+                width: 100%;
+                height: 58vh;
+                border: 1px solid #ccc;
+                margin-bottom: 8px;
+            }
+            
+            .distance-table-container {
+                display: block !important;
+                background: white;
+                border: 1px solid #ddd;
+                margin-top: 10px;
+                page-break-inside: avoid;
+            }
+            
+            .distance-table-container h4 {
+                color: #1e293b;
+            }
+            
+            .distance-table th, .distance-table td {
+                color: #1e293b;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .distance-table th {
+                background: #f1f5f9;
+            }
+            
+            .legend {
+                display: flex;
+                border: 1px solid #ddd;
+                background: #f8fafc;
+                color: #334155;
+                margin-top: 8px;
+            }
+            
+            .total-distance-row td {
+                color: #ca8a04;
+            }
+            
+            /* Ensure map tiles print */
+            .gm-style, .gm-style-iw {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDg0inKOIHntaJAaUC_AReqWam-h59Xu8g&libraries=places,geocoding&callback=initMap" async defer></script>
+</head>
+<body>
+<div class="container">
+    <div class="app-header">
+        <h1>🗺️ RouteMaster Pro | A4 Landscape Print Ready</h1>
+        <p class="subtitle">Custom named waypoints • Point-to-Point Distance Table • Professional print layout</p>
+    </div>
+    
+    <div class="dashboard">
+        <div class="panel">
+            <h2>📍 Add Waypoint</h2>
+            <div class="input-group">
+                <label>🏷️ Point Name (e.g., House, Temple, Masjid)</label>
+                <input type="text" id="placeName" placeholder="e.g., My House, City Temple, Jama Masjid">
+            </div>
+            <div class="inline-group">
+                <div class="input-group">
+                    <label>🌐 Latitude</label>
+                    <input type="text" id="latitude" placeholder="28.6139">
+                </div>
+                <div class="input-group">
+                    <label>🌐 Longitude</label>
+                    <input type="text" id="longitude" placeholder="77.2090">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button id="addBtn" class="btn-primary">+ Add Location</button>
+                <button id="searchBtn" style="background:#4b5563;">🔍 Geocode</button>
+            </div>
+            <div class="info-note">
+                💡 <strong>Smart naming:</strong> Your custom name appears as "1.House", "2.Temple" on markers & distance table.
+            </div>
+            
+            <h2 style="margin-top: 20px;">📍 Route Sequence</h2>
+            <div id="locationsList" class="locations-list">
+                <div class="empty-msg">No waypoints added.<br>Add at least 2 points with custom names.</div>
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap;">
+                <button id="clearAllBtn" class="btn-danger">🗑️ Clear All</button>
+                <button id="generateRouteBtn" class="btn-success">🗺️ Draw Route & Show Distances</button>
+                <button id="printMapBtn" class="btn-print">🖨️ Print (A4 Landscape)</button>
+            </div>
+            
+            <div id="stats" class="stats"></div>
+            
+            <div class="info-note">
+                <strong>✨ Quick Examples:</strong>
+                <div class="quick-buttons">
+                    <button id="addHouse" style="background:#2c3e66;">🏠 House (28.6139,77.2090)</button>
+                    <button id="addTemple" style="background:#2c3e66;">🛕 Temple (28.7041,77.1025)</button>
+                    <button id="addMasjid" style="background:#2c3e66;">🕌 Masjid (28.6500,77.2330)</button>
+                    <button id="addOffice" style="background:#2c3e66;">🏢 Office (28.5355,77.3910)</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-panel" id="printableMapArea">
+            <div class="map-header">
+                <h3>🗺️ Route Map with Segment Distances</h3>
+                <span style="color: #94a3b8;" id="routeStats">⚡ Add points to see distances</span>
+            </div>
+            <div id="map"></div>
+            
+            <!-- Distance Table: Point to Point Breakdown -->
+            <div id="distanceTableContainer" class="distance-table-container" style="display: none;">
+                <h4>📊 Point-to-Point Distance Summary</h4>
+                <table class="distance-table" id="distanceTable">
+                    <thead>
+                        <tr><th>Segment</th><th>From → To</th><th>Distance (km)</th></tr>
+                    </thead>
+                    <tbody id="distanceTableBody">
+                        <tr><td colspan="3" style="text-align:center;">No route generated yet</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="legend">
+                <span>🟢 Start (1.Name)</span>
+                <span>🔴 End (N.Name)</span>
+                <span>🔵 Intermediate with custom label</span>
+                <span>📏 Cyan line + segment labels show distance</span>
+                <span>📋 Bottom table shows point-to-point breakdown</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Location objects: { name: "House", lat, lng }
+    let locations = [];
+    let map;
+    let markers = [];
+    let polyline = null;
+    let distanceLabels = []; // store distance label overlays on map
+    let geocoder;
+    let autocomplete;
+    let segmentDistances = []; // store calculated distances between points
+    
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: 28.6139, lng: 77.2090 },
+            zoom: 6,
+            mapId: 'DEMO_MAP_ID',
+            styles: [
+                { elementType: "geometry", stylers: [{ color: "#1a202c" }] },
+                { elementType: "labels.text.fill", stylers: [{ color: "#cbd5e1" }] },
+                { featureType: "road", elementType: "geometry", stylers: [{ color: "#2d3748" }] },
+                { featureType: "water", elementType: "geometry", stylers: [{ color: "#2b6cb0" }] }
+            ]
+        });
+        geocoder = new google.maps.Geocoder();
+        const input = document.getElementById('placeName');
+        autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (place.geometry) {
+                document.getElementById('latitude').value = place.geometry.location.lat();
+                document.getElementById('longitude').value = place.geometry.location.lng();
+                if (!document.getElementById('placeName').value.trim()) {
+                    document.getElementById('placeName').value = place.name || "Location";
+                }
+            }
+        });
+    }
+    
+    // Get display label: "1.House"
+    function getDisplayLabel(index, customName) {
+        return `${index + 1}.${customName}`;
+    }
+    
+    function addLocation() {
+        let rawName = document.getElementById('placeName').value.trim();
+        let lat = parseFloat(document.getElementById('latitude').value);
+        let lng = parseFloat(document.getElementById('longitude').value);
+        
+        if (isNaN(lat) || isNaN(lng)) {
+            alert('Please enter valid numeric latitude and longitude');
+            return;
+        }
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            alert('Coordinates out of bounds.');
+            return;
+        }
+        if (!rawName) rawName = `Point${locations.length + 1}`;
+        
+        locations.push({ name: rawName, lat: lat, lng: lng });
+        
+        document.getElementById('placeName').value = '';
+        document.getElementById('latitude').value = '';
+        document.getElementById('longitude').value = '';
+        
+        renderLocationsList();
+        clearMapOverlays();
+        updateStatsUI();
+        // Hide distance table until route generated
+        document.getElementById('distanceTableContainer').style.display = 'none';
+        if (locations.length >= 2) {
+            document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points — click "Draw Route & Show Distances"`;
+        }
+    }
+    
+    function searchPlace() {
+        const query = document.getElementById('placeName').value.trim();
+        if (!query) { alert('Enter a place name'); return; }
+        geocoder.geocode({ address: query }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+                const loc = results[0].geometry.location;
+                document.getElementById('latitude').value = loc.lat();
+                document.getElementById('longitude').value = loc.lng();
+                const suggested = results[0].formatted_address.split(',')[0];
+                if (!document.getElementById('placeName').value.trim()) {
+                    document.getElementById('placeName').value = suggested;
+                }
+                alert(`✅ Found: ${loc.lat().toFixed(5)}, ${loc.lng().toFixed(5)}`);
+            } else { alert('Location not found'); }
+        });
+    }
+    
+    function renderLocationsList() {
+        const container = document.getElementById('locationsList');
+        if (locations.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No waypoints added.<br>➕ Add with custom names like "House", "Temple".</div>';
+            return;
+        }
+        let html = '';
+        locations.forEach((loc, idx) => {
+            const displayTag = getDisplayLabel(idx, loc.name);
+            const badge = idx === 0 ? ' 🟢 START' : (idx === locations.length - 1 ? ' 🔴 END' : '');
+            html += `
+                <div class="location-item">
+                    <div class="location-info">
+                        <h4>${escapeHtml(displayTag)}${badge}</h4>
+                        <p>${loc.lat.toFixed(6)}°, ${loc.lng.toFixed(6)}°</p>
+                    </div>
+                    <div class="location-actions">
+                        ${idx > 0 ? `<button onclick="moveUp(${idx})" style="background:#334155;">⬆️</button>` : ''}
+                        ${idx < locations.length - 1 ? `<button onclick="moveDown(${idx})" style="background:#334155;">⬇️</button>` : ''}
+                        <button onclick="deleteLocation(${idx})" style="background:#b91c1c;">✖️</button>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    function moveUp(index) {
+        if (index <= 0) return;
+        [locations[index - 1], locations[index]] = [locations[index], locations[index - 1]];
+        renderLocationsList();
+        clearMapOverlays();
+        updateStatsUI();
+        document.getElementById('distanceTableContainer').style.display = 'none';
+        if (locations.length >= 2) document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
+    }
+    
+    function moveDown(index) {
+        if (index >= locations.length - 1) return;
+        [locations[index + 1], locations[index]] = [locations[index], locations[index + 1]];
+        renderLocationsList();
+        clearMapOverlays();
+        updateStatsUI();
+        document.getElementById('distanceTableContainer').style.display = 'none';
+        if (locations.length >= 2) document.getElementById('routeStats').innerHTML = `⏳ Sequence changed, regenerate route`;
+    }
+    
+    function deleteLocation(index) {
+        locations.splice(index, 1);
+        renderLocationsList();
+        clearMapOverlays();
+        updateStatsUI();
+        document.getElementById('distanceTableContainer').style.display = 'none';
+        if (locations.length < 2) document.getElementById('routeStats').innerHTML = `⚡ Add more points to see distances`;
+        else document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points — regenerate route`;
+    }
+    
+    function clearMapOverlays() {
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+        if (polyline) { polyline.setMap(null); polyline = null; }
+        distanceLabels.forEach(label => label.setMap(null));
+        distanceLabels = [];
+    }
+    
+    function updateStatsUI() {
+        const statsDiv = document.getElementById('stats');
+        if (locations.length < 2) {
+            statsDiv.innerHTML = `📍 ${locations.length} waypoint(s). Add at least 2 locations with custom names.`;
+        } else {
+            let totalDist = computeTotalDistance();
+            statsDiv.innerHTML = `✅ ${locations.length} waypoints | Total route distance: ${totalDist.toFixed(2)} km`;
+        }
+    }
+    
+    function computeTotalDistance() {
+        let total = 0;
+        for (let i = 0; i < locations.length - 1; i++) {
+            total += haversineDistance(locations[i].lat, locations[i].lng, locations[i+1].lat, locations[i+1].lng);
+        }
+        return total;
+    }
+    
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+    
+    // Populate distance table in the bottom container
+    function updateDistanceTable() {
+        if (locations.length < 2) {
+            document.getElementById('distanceTableContainer').style.display = 'none';
+            return;
+        }
+        
+        segmentDistances = [];
+        for (let i = 0; i < locations.length - 1; i++) {
+            const dist = haversineDistance(locations[i].lat, locations[i].lng, locations[i+1].lat, locations[i+1].lng);
+            segmentDistances.push(dist);
+        }
+        
+        const tbody = document.getElementById('distanceTableBody');
+        tbody.innerHTML = '';
+        let total = 0;
+        
+        for (let i = 0; i < segmentDistances.length; i++) {
+            const fromLabel = getDisplayLabel(i, locations[i].name);
+            const toLabel = getDisplayLabel(i+1, locations[i+1].name);
+            const dist = segmentDistances[i];
+            total += dist;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>Segment ${i+1}</strong></td>
+                <td>${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}</td>
+                <td>${dist.toFixed(2)} km</td>
+            `;
+            tbody.appendChild(row);
+        }
+        
+        // Add total row
+        const totalRow = document.createElement('tr');
+        totalRow.className = 'total-distance-row';
+        totalRow.innerHTML = `
+            <td colspan="2"><strong>📏 TOTAL DISTANCE</strong></td>
+            <td><strong>${total.toFixed(2)} km</strong></td>
+        `;
+        tbody.appendChild(totalRow);
+        
+        document.getElementById('distanceTableContainer').style.display = 'block';
+    }
+    
+    // Generate route with markers, polyline, map distance labels AND update bottom table
+    function generateRouteWithDistances() {
+        if (locations.length < 2) {
+            alert('Please add at least 2 locations to generate route with distances.');
+            return;
+        }
+        
+        clearMapOverlays();
+        const bounds = new google.maps.LatLngBounds();
+        const pathPoints = [];
+        
+        // Create markers with custom label format: "1.House", "2.Temple"
+        locations.forEach((loc, idx) => {
+            const position = { lat: loc.lat, lng: loc.lng };
+            pathPoints.push(position);
+            bounds.extend(position);
+            
+            let markerColor = '#3b82f6';
+            if (idx === 0) markerColor = '#10b981';
+            if (idx === locations.length - 1) markerColor = '#ef4444';
+            
+            const displayLabel = getDisplayLabel(idx, loc.name);
+            
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                label: {
+                    text: displayLabel,
+                    color: '#ffffff',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: markerColor,
+                    fillOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 2.5,
+                    scale: 13
+                },
+                title: `${displayLabel}\n(${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)})`
+            });
+            
+            const infoContent = `
+                <div style="padding: 8px 12px; font-family: Inter; min-width: 160px;">
+                    <strong style="color:#1e293b;">📍 ${escapeHtml(displayLabel)}</strong><br>
+                    <span style="font-size:10px;">${loc.name} · ${loc.lat.toFixed(5)}°, ${loc.lng.toFixed(5)}°</span>
+                </div>
+            `;
+            const infoWindow = new google.maps.InfoWindow({ content: infoContent });
+            marker.addListener('click', () => infoWindow.open(map, marker));
+            markers.push(marker);
+        });
+        
+        // Draw polyline
+        polyline = new google.maps.Polyline({
+            path: pathPoints,
+            geodesic: true,
+            strokeColor: '#06b6d4',
+            strokeOpacity: 0.9,
+            strokeWeight: 4,
+            icons: [{
+                icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 3, strokeColor: '#facc15', fillColor: '#facc15' },
+                offset: '50%',
+                repeat: '70px'
+            }]
+        });
+        polyline.setMap(map);
+        
+        // Add distance labels on map at midpoints
+        for (let i = 0; i < locations.length - 1; i++) {
+            const p1 = locations[i];
+            const p2 = locations[i+1];
+            const dist = haversineDistance(p1.lat, p1.lng, p2.lat, p2.lng);
+            const distText = dist.toFixed(2) + ' km';
+            const midLat = (p1.lat + p2.lat) / 2;
+            const midLng = (p1.lng + p2.lng) / 2;
+            
+            const distanceMarker = new google.maps.Marker({
+                position: { lat: midLat, lng: midLng },
+                map: map,
+                icon: { path: google.maps.SymbolPath.CIRCLE, scale: 0, fillOpacity: 0, strokeOpacity: 0 },
+                label: {
+                    text: `📏 ${distText}`,
+                    color: '#facc15',
+                    fontSize: '10px',
+                    fontWeight: '600',
+                },
+                zIndex: 100,
+                clickable: false
+            });
+            distanceLabels.push(distanceMarker);
+        }
+        
+        // Update the bottom distance table
+        updateDistanceTable();
+        
+        const totalDist = computeTotalDistance();
+        document.getElementById('routeStats').innerHTML = `🔗 Route active | ${totalDist.toFixed(2)} km total | ${locations.length} waypoints`;
+        
+        map.fitBounds(bounds);
+        if (locations.length > 1) {
+            google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+                if (map.getZoom() > 13) map.setZoom(13);
+            });
+        }
+        updateStatsUI();
+    }
+    
+    // Print with A4 landscape optimized
+    function printMapContent() {
+        if (locations.length === 0) {
+            alert('Please add locations and generate route before printing.');
+            return;
+        }
+        if (!polyline && locations.length >= 2) {
+            if (confirm('Route not drawn yet. Generate route before printing?')) {
+                generateRouteWithDistances();
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+                return;
+            }
+        }
+        // Ensure table is visible for print
+        if (locations.length >= 2 && document.getElementById('distanceTableContainer').style.display !== 'block') {
+            updateDistanceTable();
+        }
+        window.print();
+    }
+    
+    function clearAll() {
+        if (locations.length > 0 && confirm('Remove all waypoints?')) {
+            locations = [];
+            renderLocationsList();
+            clearMapOverlays();
+            updateStatsUI();
+            document.getElementById('routeStats').innerHTML = '🗺️ No route';
+            document.getElementById('distanceTableContainer').style.display = 'none';
+            map.setCenter({ lat: 28.6139, lng: 77.2090 });
+            map.setZoom(5);
+        }
+    }
+    
+    function addExample(name, lat, lng) {
+        locations.push({ name: name, lat: lat, lng: lng });
+        renderLocationsList();
+        clearMapOverlays();
+        updateStatsUI();
+        document.getElementById('distanceTableContainer').style.display = 'none';
+        if (locations.length >= 2) {
+            document.getElementById('routeStats').innerHTML = `📌 ${locations.length} points. Click "Draw Route & Show Distances"`;
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Event listeners
+    document.getElementById('addBtn').addEventListener('click', addLocation);
+    document.getElementById('searchBtn').addEventListener('click', searchPlace);
+    document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+    document.getElementById('generateRouteBtn').addEventListener('click', generateRouteWithDistances);
+    document.getElementById('printMapBtn').addEventListener('click', printMapContent);
+    
+    document.getElementById('addHouse').addEventListener('click', () => addExample('House', 28.6139, 77.2090));
+    document.getElementById('addTemple').addEventListener('click', () => addExample('Temple', 28.7041, 77.1025));
+    document.getElementById('addMasjid').addEventListener('click', () => addExample('Masjid', 28.6500, 77.2330));
+    document.getElementById('addOffice').addEventListener('click', () => addExample('Office', 28.5355, 77.3910));
+    
+    window.moveUp = moveUp;
+    window.moveDown = moveDown;
+    window.deleteLocation = deleteLocation;
+    window.initMap = initMap;
+    
+    updateStatsUI();
+</script>
+</body>
+</html>
