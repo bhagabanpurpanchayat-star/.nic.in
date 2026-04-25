@@ -31,7 +31,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Header with Dual Color Gradient */
+/* Header */
 header {
   background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-accent) 100%);
   color: white;
@@ -48,7 +48,6 @@ header {
   padding: 0.6rem 2rem;
 }
 
-/* Top Section - Logo and Right Controls in Same Line */
 .top-header {
   display: flex;
   justify-content: space-between;
@@ -57,7 +56,6 @@ header {
   margin-bottom: 0.8rem;
 }
 
-/* Left Section: Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -73,8 +71,7 @@ header {
   font-size: 1.8rem;
   color: var(--highlight-gold);
   cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  transition: transform 0.2s;
 }
 
 .logo i:hover {
@@ -85,7 +82,6 @@ header {
 .logo h1 {
   font-size: 1.1rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
   background: linear-gradient(135deg, #FFFFFF, #FFE6C7);
   background-clip: text;
   -webkit-background-clip: text;
@@ -99,7 +95,6 @@ header {
   display: block;
 }
 
-/* Right Side Controls - User Section + Clock + Sign Out */
 .right-controls {
   display: flex;
   align-items: center;
@@ -116,7 +111,6 @@ header {
   padding: 4px 16px 4px 8px;
   border-radius: 50px;
   border: 1px solid rgba(230, 177, 126, 0.4);
-  transition: all 0.2s ease;
   cursor: default;
 }
 
@@ -145,11 +139,6 @@ header {
   font-size: 0.85rem;
   font-weight: 700;
   color: white;
-  letter-spacing: 0.3px;
-  max-width: 140px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .user-role {
@@ -157,7 +146,6 @@ header {
   font-weight: 500;
   color: var(--highlight-gold);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .digital-clock {
@@ -165,13 +153,11 @@ header {
   backdrop-filter: blur(6px);
   padding: 7px 18px;
   border-radius: 40px;
-  font-family: 'Fira Mono', 'Courier New', monospace;
+  font-family: monospace;
   font-weight: 700;
   font-size: 1rem;
-  letter-spacing: 1px;
   color: #FFF5E6;
   border: 1px solid rgba(230, 177, 126, 0.6);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.2);
   white-space: nowrap;
 }
 
@@ -180,7 +166,6 @@ header {
   font-family: 'Segoe UI', sans-serif;
   font-weight: 500;
   color: var(--highlight-gold);
-  margin-top: 2px;
   text-align: center;
 }
 
@@ -193,22 +178,19 @@ header {
   border-radius: 40px;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.25s ease;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 5px 0 #7A2E2E, 0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255,255,240,0.5);
-  white-space: nowrap;
+  box-shadow: 0 5px 0 #7A2E2E;
+  transition: 0.2s;
 }
 
 .signout-btn:hover {
   transform: translateY(-2px);
   background: linear-gradient(145deg, #E68383, #C45A5A);
-  box-shadow: 0 7px 0 #7A2E2E, 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* Navigation - Keep Original Menu Styles */
+/* Navigation */
 .nav-wrapper {
   width: 100%;
   margin-top: 0.5rem;
@@ -230,31 +212,20 @@ nav > ul > li > a {
   text-decoration: none;
   color: white;
   padding: 10px 24px;
-  min-width: 130px;
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
   text-align: center;
-  letter-spacing: 0.4px;
   cursor: pointer;
   background: linear-gradient(145deg, var(--primary-accent), var(--primary-dark));
   border-radius: 12px;
-  box-shadow: 0 5px 0 #08212e, 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 0 #08212e;
   transition: all 0.08s linear;
-  position: relative;
-  top: 0;
-}
-
-nav > ul > li > a:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #08212e, 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 nav > ul > li > a:hover {
   background: linear-gradient(145deg, #2D7A8F, var(--primary-accent));
-  box-shadow: 0 6px 0 #08212e, 0 6px 14px rgba(0, 0, 0, 0.35);
   transform: translateY(-1px);
-  color: #FFEEDD;
 }
 
 .submenu {
@@ -292,8 +263,6 @@ nav > ul > li > a:hover {
   background: var(--highlight-gold);
   color: var(--primary-dark);
   transform: translateX(6px);
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 nav li:hover > .submenu {
@@ -301,42 +270,15 @@ nav li:hover > .submenu {
   animation: fadeDrop 0.2s ease;
 }
 
-.submenu .submenu {
-  top: 0;
-  left: 100%;
-  margin-left: 5px;
-  background: #0F3B4A;
-}
-
-@keyframes fadeDrop {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .has-submenu::after {
   content: " ▼";
   font-size: 0.65rem;
-  font-weight: normal;
 }
 
-.has-submenu-right::after {
-  content: " ▶";
-  font-size: 0.65rem;
-}
-
-/* Iframe Section */
 .iframe-container {
   width: 100%;
   height: calc(100vh - 115px);
-  background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
-  padding: 0;
-  margin: 0;
+  background: linear-gradient(145deg, #EFF2F7, #E8EDF4);
   overflow: hidden;
 }
 
@@ -344,8 +286,6 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
-  background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
-  display: block;
 }
 
 footer {
@@ -366,24 +306,18 @@ footer {
   padding: 12px 24px;
   border-radius: 40px;
   font-weight: 600;
-  font-size: 0.9rem;
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   border-left: 5px solid var(--highlight-gold);
   z-index: 2100;
-  display: flex;
-  align-items: center;
-  gap: 12px;
   backdrop-filter: blur(8px);
   transform: translateX(400px);
   transition: transform 0.3s ease;
-  pointer-events: none;
 }
 
 .toast-notification.show {
   transform: translateX(0);
 }
 
-/* Session Toast Styles */
 .session-toast {
   position: fixed;
   top: 20px;
@@ -404,17 +338,11 @@ footer {
 }
 
 @keyframes slideInRight {
-  from {
-    transform: translateX(400px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
-/* Modal Styles - Keep Original */
+/* MODAL */
 .control-manager-modal {
   position: fixed;
   top: 0;
@@ -438,8 +366,8 @@ footer {
 }
 
 .modal-card {
-  width: 750px;
-  max-width: 90vw;
+  width: 950px;
+  max-width: 92vw;
   max-height: 85vh;
   background: linear-gradient(145deg, #1A2F3A, #0F2A35);
   border-radius: 1.5rem;
@@ -510,7 +438,6 @@ footer {
 .tab-btn.active {
   background: var(--highlight-gold);
   color: var(--primary-dark);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .tab-panel {
@@ -532,7 +459,6 @@ footer {
   display: block;
   color: #CCE6F0;
   font-size: 0.8rem;
-  font-weight: 500;
   margin-bottom: 0.4rem;
 }
 
@@ -547,7 +473,7 @@ footer {
   outline: none;
 }
 
-.form-group input:focus, .form-group select:focus {
+.form-group input:focus {
   border-color: var(--highlight-gold);
 }
 
@@ -570,14 +496,6 @@ footer {
   background: linear-gradient(98deg, #2D7A8F, #1E5A6B);
 }
 
-.delete-btn {
-  background: linear-gradient(98deg, #B34A4A, #8B3A3A);
-}
-
-.delete-btn:hover {
-  background: linear-gradient(98deg, #D96C6C, #B34A4A);
-}
-
 .users-table {
   width: 100%;
   border-collapse: collapse;
@@ -585,11 +503,12 @@ footer {
 }
 
 .users-table th, .users-table td {
-  padding: 10px 8px;
+  padding: 12px 8px;
   text-align: left;
   border-bottom: 1px solid rgba(230, 177, 126, 0.2);
   color: #E6F0F5;
   font-size: 0.85rem;
+  vertical-align: middle;
 }
 
 .users-table th {
@@ -599,10 +518,11 @@ footer {
 
 .permission-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 4px 12px;
+  border-radius: 30px;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
+  text-align: center;
 }
 
 .permission-allowed {
@@ -615,25 +535,83 @@ footer {
   color: white;
 }
 
-.user-actions {
-  display: flex;
-  gap: 8px;
+/* TOGGLE SWITCH STYLES */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 54px;
+  height: 28px;
 }
 
-.user-actions button {
-  background: rgba(230, 177, 126, 0.2);
-  border: none;
-  padding: 5px 10px;
-  border-radius: 20px;
-  color: var(--highlight-gold);
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
   cursor: pointer;
-  font-size: 0.7rem;
-  transition: 0.2s;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #B34A4A;
+  transition: 0.3s;
+  border-radius: 34px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
 }
 
-.user-actions button:hover {
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2E7D64;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.permission-switch-cell {
+  text-align: center;
+  min-width: 80px;
+}
+
+.role-select {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--highlight-gold);
+  padding: 6px 10px;
+  border-radius: 24px;
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.update-role-btn {
   background: var(--highlight-gold);
-  color: var(--primary-dark);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-weight: bold;
+  color: #0B2B40;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.7rem;
+  margin-left: 6px;
+}
+
+.update-role-btn:hover {
+  background: #ffcd94;
 }
 
 .search-box {
@@ -667,22 +645,14 @@ footer {
   animation: spin 0.6s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Responsive */
 @media (max-width: 768px) {
   .iframe-container { height: calc(100vh - 180px); }
-  .modal-card { width: 95vw; }
-  .users-table { font-size: 0.7rem; }
-  .user-actions button { padding: 3px 6px; }
-  .session-toast {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    max-width: none;
-  }
+  .users-table th, .users-table td { font-size: 0.7rem; padding: 8px 4px; }
+  .switch { width: 44px; height: 24px; }
+  .slider:before { height: 18px; width: 18px; }
+  input:checked + .slider:before { transform: translateX(20px); }
 }
 </style>
 </head>
@@ -691,792 +661,65 @@ footer {
 <header>
   <div class="header-container">
     <div class="top-header">
-      <div class="logo">
-        <i class="fas fa-home" onclick="loadPage('home1')"></i>
-        <div>
-          <h1>Bhagabanpur Gram Panchayat</h1>
-          <span>ভগবানপুর গ্রাম পঞ্চায়েত | মালদহ</span>
-        </div>
-      </div>
-      <div class="right-controls">
-        <div class="user-profile-badge" id="userProfileBadge">
-          <div class="user-avatar" id="userAvatar">👤</div>
-          <div class="user-info">
-            <div class="user-name" id="userDisplayName">Admin</div>
-            <div class="user-role" id="userRoleDisplay">Administrator</div>
-          </div>
-        </div>
-        <div class="digital-clock">
-          <div id="liveTime">--:--:--</div>
-          <div id="liveDate" class="clock-date">---</div>
-        </div>
-        <button class="signout-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
-      </div>
+      <div class="logo"><i class="fas fa-home" onclick="loadPage('home1')"></i><div><h1>Bhagabanpur Gram Panchayat</h1><span>ভগবানপুর গ্রাম পঞ্চায়েত | মালদহ</span></div></div>
+      <div class="right-controls"><div class="user-profile-badge" id="userProfileBadge"><div class="user-avatar" id="userAvatar">👤</div><div class="user-info"><div class="user-name" id="userDisplayName">Admin</div><div class="user-role" id="userRoleDisplay">Administrator</div></div></div><div class="digital-clock"><div id="liveTime">--:--:--</div><div id="liveDate" class="clock-date">---</div></div><button class="signout-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button></div>
     </div>
-    <div class="nav-wrapper">
-      <nav>
-        <ul>
-          <li>
-            <a class="has-submenu">Profile</a>
-            <ul class="submenu">
-              <li><a onclick="loadPage('basicdetails')">Basic Details</a></li>
-              <li><a onclick="loadPage('sansad')">Sansad</a></li>
-              <li><a onclick="loadPage('villages')">Villages</a></li>
-              <li><a onclick="loadPage('mouja')">Mouja</a></li>
-              <li><a onclick="loadPage('school')">School</a></li>
-              <li><a onclick="loadPage('polling')">Polling Stations</a></li>
-              <li><a onclick="loadPage('clubs')">Clubs</a></li>
-              <li><a onclick="loadPage('playgrounds')">Play Grounds</a></li>
-              <li><a onclick="loadPage('waterbodies')">Waterbodies</a></li>
-            </ul>
-          </li>
-          <li>
-            <a class="has-submenu">PRI Details</a>
-            <ul class="submenu">
-              <li><a onclick="loadPage('gp_member')">Gram Panchayat Member</a></li>
-              <li><a onclick="loadPage('ps_member')">Panchayat Samity Member</a></li>
-              <li>
-                <a class="has-submenu-right">Upasamity</a>
-                <ul class="submenu">
-                  <li><a onclick="loadPage('krishi')">কৃষি ও প্রানি সম্পদ বিকাশ</a></li>
-                  <li><a onclick="loadPage('shilpa')">শিল্প ও পরিকাঠামো উপসমিতি</a></li>
-                  <li><a onclick="loadPage('nari')">নারী শিশু উন্নয়ন ও সমাজ কল্যাণ</a></li>
-                  <li><a onclick="loadPage('shiksha')">শিক্ষা ও জন স্বাস্থ্য উপসমিতি</a></li>
-                  <li><a onclick="loadPage('arthik')">অর্থ ও পরিকল্পনা উপসমিতি</a></li>
-                </ul>
-              </li>
-              <li><a onclick="loadPage('staffs')">Gram Panchayat Staffs</a></li>
-              <li><a onclick="loadPage('vrp')">VRP</a></li>
-              <li><a onclick="loadPage('cf')">CF</a></li>
-              <li><a onclick="loadPage('nregs')">NREGS Supervisor</a></li>
-            </ul>
-          </li>
-          <li>
-            <a class="has-submenu">Funds</a>
-            <ul class="submenu">
-              <li><a onclick="loadPage('15fc')">15th FC</a></li>
-              <li><a onclick="loadPage('beup')">BEUP</a></li>
-              <li><a onclick="loadPage('vwsc')">VWSC</a></li>
-              <li><a onclick="loadPage('mgnregs')">MGNREGS</a></li>
-              <li><a onclick="loadPage('mplad')">MPLAD</a></li>
-              <li><a onclick="loadPage('ibrd')">IBRD</a></li>
-              <li><a onclick="loadPage('5sfc')">5th SFC</a></li>
-            </ul>
-          </li>
-          <li>
-            <a class="has-submenu">Our Services</a>
-            <ul class="submenu">
-             <li><a onclick="loadPage('deathbirth')">Death & Birth Registration</a></li>
-              <li><a onclick="loadPage('variousletter')">Various Letters</a></li>
-              <li><a onclick="loadPage('laxmirbhandar')">Laxmir Bhandar</a></li>
-            </ul>
-          </li>
-          <li>
-            <a class="has-submenu">Bill Print</a>
-            <ul class="submenu">
-              <li><a onclick="loadPage('najim')">Najim Ali</a></li>
-              <li><a onclick="loadPage('rehan')">Rehan Ali</a></li>
-              <li><a onclick="loadPage('vrpcf')">VRP and CF Working Certificate</a></li>
-              <li><a onclick="loadPage('teashop')">Tea Shop Bill</a></li>
-            </ul>
-          </li>
-          <li>
-            <a class="has-submenu">Forms</a>
-            <ul class="submenu">
-              <li><a onclick="loadPage('samabyathi')">Samabyathi</a></li>
-              <li><a onclick="loadPage('income')">Income</a></li>
-              <li><a onclick="loadPage('domicile')">Domicile</a></li>
-            </ul>
-          </li>
-          <li>
-            <a class="has-submenu">Office Zone</a>
-            <ul class="submenu">
-              <li><a onclick="loadPage('tender')">📜Tender Management</a></li>
-              <li><a onclick="loadPage('sansad')">🏛️Sansad Meeting Scheduler</a></li>
-              <li><a onclick="loadPage('meeting')"> 📅Meeting Management</a></li>
-              <li><a onclick="loadPage('googlemap')">📌Prepare Google Map</a></li>
-            </ul>
-          </li>
-          <!-- Control Manager Menu Item - Kept Original -->
-          <li>
-            <a class="has-submenu" id="controlManagerTrigger"><i class="fas fa-users-cog"></i> Control Manager</a>
-            <ul class="submenu">
-              <li><a onclick="openControlManager('add')"><i class="fas fa-user-plus"></i> Add User</a></li>
-              <li><a onclick="openControlManager('view')"><i class="fas fa-eye"></i> View Users</a></li>
-              <li><a onclick="openControlManager('delete')"><i class="fas fa-trash-alt"></i> Delete User</a></li>
-              <li><a onclick="openControlManager('permission')"><i class="fas fa-shield-alt"></i> Permission</a></li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <div class="nav-wrapper"><nav><ul><li><a class="has-submenu">Profile</a><ul class="submenu"><li><a onclick="loadPage('basicdetails')">Basic Details</a></li><li><a onclick="loadPage('sansad')">Sansad</a></li><li><a onclick="loadPage('villages')">Villages</a></li><li><a onclick="loadPage('mouja')">Mouja</a></li><li><a onclick="loadPage('school')">School</a></li><li><a onclick="loadPage('polling')">Polling Stations</a></li><li><a onclick="loadPage('clubs')">Clubs</a></li><li><a onclick="loadPage('playgrounds')">Play Grounds</a></li><li><a onclick="loadPage('waterbodies')">Waterbodies</a></li></ul></li><li><a class="has-submenu">PRI Details</a><ul class="submenu"><li><a onclick="loadPage('gp_member')">Gram Panchayat Member</a></li><li><a onclick="loadPage('ps_member')">Panchayat Samity Member</a></li><li><a class="has-submenu-right">Upasamity</a><ul class="submenu"><li><a onclick="loadPage('krishi')">কৃষি ও প্রানি সম্পদ বিকাশ</a></li><li><a onclick="loadPage('shilpa')">শিল্প ও পরিকাঠামো উপসমিতি</a></li><li><a onclick="loadPage('nari')">নারী শিশু উন্নয়ন ও সমাজ কল্যাণ</a></li><li><a onclick="loadPage('shiksha')">শিক্ষা ও জন স্বাস্থ্য উপসমিতি</a></li><li><a onclick="loadPage('arthik')">অর্থ ও পরিকল্পনা উপসমিতি</a></li></ul></li><li><a onclick="loadPage('staffs')">Gram Panchayat Staffs</a></li><li><a onclick="loadPage('vrp')">VRP</a></li><li><a onclick="loadPage('cf')">CF</a></li><li><a onclick="loadPage('nregs')">NREGS Supervisor</a></li></ul></li><li><a class="has-submenu">Funds</a><ul class="submenu"><li><a onclick="loadPage('15fc')">15th FC</a></li><li><a onclick="loadPage('beup')">BEUP</a></li><li><a onclick="loadPage('vwsc')">VWSC</a></li><li><a onclick="loadPage('mgnregs')">MGNREGS</a></li><li><a onclick="loadPage('mplad')">MPLAD</a></li><li><a onclick="loadPage('ibrd')">IBRD</a></li><li><a onclick="loadPage('5sfc')">5th SFC</a></li></ul></li><li><a class="has-submenu">Our Services</a><ul class="submenu"><li><a onclick="loadPage('deathbirth')">Death & Birth Registration</a></li><li><a onclick="loadPage('variousletter')">Various Letters</a></li><li><a onclick="loadPage('laxmirbhandar')">Laxmir Bhandar</a></li></ul></li><li><a class="has-submenu">Bill Print</a><ul class="submenu"><li><a onclick="loadPage('najim')">Najim Ali</a></li><li><a onclick="loadPage('rehan')">Rehan Ali</a></li><li><a onclick="loadPage('vrpcf')">VRP and CF Working Certificate</a></li><li><a onclick="loadPage('teashop')">Tea Shop Bill</a></li></ul></li><li><a class="has-submenu">Forms</a><ul class="submenu"><li><a onclick="loadPage('samabyathi')">Samabyathi</a></li><li><a onclick="loadPage('income')">Income</a></li><li><a onclick="loadPage('domicile')">Domicile</a></li></ul></li><li><a class="has-submenu">Office Zone</a><ul class="submenu"><li><a onclick="loadPage('tender')">📜Tender Management</a></li><li><a onclick="loadPage('sansad')">🏛️Sansad Meeting Scheduler</a></li><li><a onclick="loadPage('meeting')">📅Meeting Management</a></li><li><a onclick="loadPage('googlemap')">📌Prepare Google Map</a></li></ul></li><li><a class="has-submenu" id="controlManagerTrigger"><i class="fas fa-users-cog"></i> Control Manager</a><ul class="submenu"><li><a onclick="openControlManager('add')"><i class="fas fa-user-plus"></i> Add User</a></li><li><a onclick="openControlManager('view')"><i class="fas fa-eye"></i> View Users</a></li><li><a onclick="openControlManager('delete')"><i class="fas fa-trash-alt"></i> Delete User</a></li><li><a onclick="openControlManager('permission')"><i class="fas fa-shield-alt"></i> Permission</a></li></ul></li></ul></nav></div>
   </div>
 </header>
 
-<div class="iframe-container">
-  <iframe id="frameContent" src="home1.htm" title="Gram Panchayat Portal"></iframe>
-</div>
+<div class="iframe-container"><iframe id="frameContent" src="home1.htm"></iframe></div>
+<footer><p>© 2025 Bhagabanpur Gram Panchayat, Malda | Citizen First | e-Governance Initiative</p></footer>
+<div id="signoutToast" class="toast-notification"><i class="fas fa-check-circle"></i><span>Successfully signed out. Redirecting...</span></div>
 
-<footer>
-  <p>© 2025 Bhagabanpur Gram Panchayat, Malda | Citizen First | e-Governance Initiative | Digital India</p>
-</footer>
-
-<div id="signoutToast" class="toast-notification">
-  <i class="fas fa-check-circle"></i>
-  <span>Successfully signed out. Redirecting to login page...</span>
-</div>
-
-<!-- CONTROL MANAGER MODAL -->
 <div id="controlManagerModal" class="control-manager-modal">
   <div class="modal-card">
-    <div class="modal-header">
-      <h3><i class="fas fa-users-cog"></i> Control Manager</h3>
-      <button id="closeControlModal"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-tabs" id="modalTabs">
-      <button class="tab-btn" data-tab="add"><i class="fas fa-user-plus"></i> Add User</button>
-      <button class="tab-btn" data-tab="view"><i class="fas fa-eye"></i> View Users</button>
-      <button class="tab-btn" data-tab="delete"><i class="fas fa-trash-alt"></i> Delete User</button>
-      <button class="tab-btn" data-tab="permission"><i class="fas fa-shield-alt"></i> Permission</button>
-    </div>
-    
-    <!-- Add User Panel -->
-    <div id="addPanel" class="tab-panel">
-      <form id="addUserForm">
-        <div class="form-group"><label>Full Name</label><input type="text" id="addFullName" placeholder="Enter full name" required></div>
-        <div class="form-group"><label>Email / Username</label><input type="email" id="addEmail" placeholder="user@example.com" required></div>
-        <div class="form-group"><label>Password</label><input type="password" id="addPassword" placeholder="Min. 4 characters" required></div>
-        <div class="form-group"><label>Role</label><select id="addRole"><option value="User">User</option><option value="Admin">Admin</option><option value="Office">Office</option></select></div>
-        <div class="form-group"><label>Initial Permission</label><select id="addPermission"><option value="Denied">Pending Approval</option><option value="Allowed">Allowed</option></select></div>
-        <button type="submit" class="action-btn"><i class="fas fa-save"></i> Create User</button>
-      </form>
-      <div id="addUserMsg" style="margin-top: 1rem; color: var(--highlight-gold); font-size: 0.8rem;"></div>
-    </div>
-    
-    <!-- View Users Panel -->
-    <div id="viewPanel" class="tab-panel">
-      <div class="search-box"><input type="text" id="searchUsers" placeholder="Search by name or email..."><button class="action-btn" style="padding: 0.6rem 1.2rem;" onclick="loadUsersFromSheet()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-      <div id="usersListContainer"><div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading users...</div></div>
-    </div>
-    
-    <!-- Delete User Panel -->
-    <div id="deletePanel" class="tab-panel">
-      <div class="search-box"><input type="text" id="deleteSearch" placeholder="Search user to delete..."></div>
-      <div id="deleteUsersList"></div>
-      <div id="deleteMsg" style="margin-top: 1rem; color: #ffaa88;"></div>
-    </div>
-    
-    <!-- Permission Panel -->
-    <div id="permissionPanel" class="tab-panel">
-      <div class="search-box"><input type="text" id="permSearch" placeholder="Search user..."></div>
-      <div id="permissionUsersList"></div>
-      <div id="permMsg" style="margin-top: 1rem;"></div>
-    </div>
+    <div class="modal-header"><h3><i class="fas fa-users-cog"></i> Control Manager</h3><button id="closeControlModal"><i class="fas fa-times"></i></button></div>
+    <div class="modal-tabs"><button class="tab-btn" data-tab="add"><i class="fas fa-user-plus"></i> Add User</button><button class="tab-btn" data-tab="view"><i class="fas fa-eye"></i> View Users</button><button class="tab-btn" data-tab="delete"><i class="fas fa-trash-alt"></i> Delete User</button><button class="tab-btn" data-tab="permission"><i class="fas fa-shield-alt"></i> Permission</button></div>
+    <div id="addPanel" class="tab-panel"><form id="addUserForm"><div class="form-group"><label>Full Name</label><input type="text" id="addFullName" placeholder="Enter full name" required></div><div class="form-group"><label>Email / Username</label><input type="email" id="addEmail" placeholder="user@example.com" required></div><div class="form-group"><label>Password</label><input type="password" id="addPassword" placeholder="Min. 4 characters" required></div><div class="form-group"><label>Role</label><select id="addRole"><option value="User">User</option><option value="Admin">Admin</option><option value="Office">Office</option></select></div><div class="form-group"><label>Initial Permission</label><select id="addPermission"><option value="Denied">Pending Approval</option><option value="Allowed">Allowed</option></select></div><button type="submit" class="action-btn"><i class="fas fa-save"></i> Create User</button></form><div id="addUserMsg" style="margin-top:1rem;color:var(--highlight-gold);"></div></div>
+    <div id="viewPanel" class="tab-panel"><div class="search-box"><input type="text" id="searchUsers" placeholder="Search by username..."><button class="action-btn" style="padding:0.6rem 1.2rem;" onclick="loadUsersFromSheet()"><i class="fas fa-sync-alt"></i> Refresh</button></div><div id="usersListContainer"><div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading users...</div></div></div>
+    <div id="deletePanel" class="tab-panel"><div class="search-box"><input type="text" id="deleteSearch" placeholder="Search user..."></div><div id="deleteUsersList"></div><div id="deleteMsg" style="margin-top:1rem;"></div></div>
+    <div id="permissionPanel" class="tab-panel"><div class="search-box"><input type="text" id="permSearch" placeholder="Search by username..."></div><div id="permissionUsersList"></div><div id="permMsg" style="margin-top:1rem;"></div></div>
   </div>
 </div>
 
 <script>
-  // =====================================================
-  // GOOGLE APPS SCRIPT WEB APP URL
-  // =====================================================
   const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8TuO2JCiZVMkTBt5I7aFoab7HlRxFqXYTFtBotBJglVy-zKYVZ7QWsbmkYchHqpHptg/exec';
-  
-  // ========== REAL-TIME ADMIN SESSION VALIDATION ==========
-  const VALIDATION_INTERVAL = 30000; // Check every 30 seconds
   let validationInterval = null;
+  function getAdminSession() { const s = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session'); return s ? JSON.parse(s) : null; }
+  function showSessionToast(msg, isErr=true) { const t = document.createElement('div'); t.className='session-toast'; t.innerHTML=`<i class="fas ${isErr?'fa-exclamation-triangle':'fa-check-circle'}"></i><div><strong>${isErr?'Session Update':'Notification'}</strong><br>${msg}</div><i class="fas fa-spinner fa-pulse"></i>`; document.body.appendChild(t); setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(400px)';setTimeout(()=>t.remove(),500);},5000); }
+  async function validateCurrentSession() { const session=getAdminSession(); if(!session) return false; try{ const res=await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({action:'validateSession',username:session.username})}); const result=await res.json(); if(!result.success||!result.data?.isValid){ localStorage.removeItem('gp_user_session'); sessionStorage.removeItem('gp_user_session'); showSessionToast(result.message||'Admin access revoked. Login again.',true); setTimeout(()=>window.location.href='index.htm',3000); return false; } if(result.data&&result.data.role!=='Admin'){ const up={...session,role:result.data.role,permission:result.data.permission,name:result.data.name}; if(localStorage.getItem('gp_user_session')) localStorage.setItem('gp_user_session',JSON.stringify(up)); else sessionStorage.setItem('gp_user_session',JSON.stringify(up)); showSessionToast(`Role changed to ${result.data.role}. Redirecting...`,false); setTimeout(()=>window.location.href=result.data.role==='Office'?'index2.htm':'index.htm',1500); return false; } return true; }catch(e){ return true; } }
+  function startSessionValidation(){ if(validationInterval) clearInterval(validationInterval); validationInterval=setInterval(validateCurrentSession,30000); }
+  function stopSessionValidation(){ if(validationInterval){ clearInterval(validationInterval); validationInterval=null; } }
+  function validateAdminSession(){ const u=getAdminSession(); if(!u){ window.location.href='index.htm'; return false; } if(u.role!=='Admin'){ window.location.href='index2.htm'; return false; } return true; }
+  function updateAdminProfile(){ const u=getAdminSession(); if(u){ document.getElementById('userDisplayName').textContent=u.name||u.username.split('@')[0]; document.getElementById('userRoleDisplay').textContent='Administrator'; document.getElementById('userAvatar').textContent=(u.name||u.username).substring(0,2).toUpperCase(); } }
+  async function callGoogleScript(action,data={}){ try{ const res=await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({action,...data})}); return await res.json(); }catch(e){ return {success:false,message:'Network error'}; } }
   
-  function getAdminSession() {
-    const session = localStorage.getItem('gp_user_session') || sessionStorage.getItem('gp_user_session');
-    if (session) {
-      try {
-        return JSON.parse(session);
-      } catch(e) {
-        return null;
-      }
-    }
-    return null;
-  }
+  async function loadUsersFromSheet(){ const container=document.getElementById('usersListContainer'); if(!container) return; container.innerHTML='<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>'; const res=await callGoogleScript('getUsers'); if(res.success && res.data?.users){ displayViewWithToggle(res.data.users, container); }else{ container.innerHTML='<div class="empty-state">Failed to load</div>'; } }
+  function displayViewWithToggle(users, container){ if(!users.length){ container.innerHTML='<div class="empty-state">No users</div>'; return; } let html='<table class="users-table"><thead><tr><th>#</th><th>Username</th><th>Role</th><th>Permission</th><th>Allow/Disallow</th></tr></thead><tbody>'; users.forEach((u,idx)=>{ const roleColor=u.role==='Admin'?'#C44545':(u.role==='Office'?'#2E7D64':'#1E5A6B'); html+=`<tr><td>${idx+1}</td><td>${escapeHtml(u.username)}</td><td><span class="permission-badge" style="background:${roleColor}">${u.role}</span></td><td><span class="permission-badge ${u.permission==='Allowed'?'permission-allowed':'permission-denied'}">${u.permission}</span></td><td class="permission-switch-cell"><label class="switch"><input type="checkbox" class="perm-slider" data-id="${u.id}" data-username="${escapeHtml(u.username)}" ${u.permission==='Allowed'?'checked':''}><span class="slider"></span></label></td></tr>`; }); html+='</tbody></table>'; container.innerHTML=html; document.querySelectorAll('.perm-slider').forEach(slider=>{ slider.addEventListener('change',async(e)=>{ const userId=slider.dataset.id; const username=slider.dataset.username; const newPerm=slider.checked?'Allowed':'Denied'; const result=await callGoogleScript('updatePermission',{userId,permission:newPerm}); if(result.success){ showSessionToast(`Permission for "${username}" → ${newPerm}`,false); await loadUsersFromSheet(); await loadPermissionPanel(); if(newPerm==='Denied') showSessionToast(`${username} access will be blocked soon`,false); }else{ slider.checked=!slider.checked; alert('Error: '+result.message); } }); }); }
   
-  function showSessionToast(message, isError = true) {
-    // Remove existing toast
-    const existingToast = document.getElementById('sessionToast');
-    if (existingToast) existingToast.remove();
-    
-    const toast = document.createElement('div');
-    toast.id = 'sessionToast';
-    toast.className = 'session-toast';
-    toast.innerHTML = `
-      <i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
-      <div style="flex: 1;">
-        <strong>${isError ? 'Session Update' : 'Notification'}</strong><br>
-        ${message}
-      </div>
-      <i class="fas fa-spinner fa-pulse"></i>
-    `;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(400px)';
-      setTimeout(() => toast.remove(), 500);
-    }, 5000);
-  }
+  async function loadPermissionPanel(){ const container=document.getElementById('permissionUsersList'); if(!container) return; container.innerHTML='<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>'; const res=await callGoogleScript('getUsers'); if(res.success && res.data?.users){ const searchTerm=document.getElementById('permSearch')?.value.toLowerCase()||''; const filtered=res.data.users.filter(u=>u.username.toLowerCase().includes(searchTerm)); displayPermissionPanel(filtered, container); }else{ container.innerHTML='<div class="empty-state">Failed to load</div>'; } }
+  function displayPermissionPanel(users, container){ if(!users.length){ container.innerHTML='<div class="empty-state">No users match</div>'; return; } let html='<table class="users-table"><thead><tr><th>Username</th><th>Role</th><th>Current Permission</th><th>Change Permission (Slider)</th><th>Change Role</th></tr></thead><tbody>'; users.forEach(user=>{ html+=`<tr><td>${escapeHtml(user.username)}</td><td><select class="role-select" data-id="${user.id}"><option value="User" ${user.role==='User'?'selected':''}>User</option><option value="Office" ${user.role==='Office'?'selected':''}>Office</option><option value="Admin" ${user.role==='Admin'?'selected':''}>Admin</option></select></td><td><span class="permission-badge ${user.permission==='Allowed'?'permission-allowed':'permission-denied'}">${user.permission}</span></td><td class="permission-switch-cell"><label class="switch"><input type="checkbox" class="perm-toggle-main" data-id="${user.id}" data-username="${escapeHtml(user.username)}" ${user.permission==='Allowed'?'checked':''}><span class="slider"></span></label></td><td><button class="update-role-btn" data-id="${user.id}" data-username="${escapeHtml(user.username)}">Save Role</button></td></tr>`; }); html+='</tbody></table>'; container.innerHTML=html; document.querySelectorAll('.perm-toggle-main').forEach(toggle=>{ toggle.addEventListener('change',async(e)=>{ const userId=toggle.dataset.id; const username=toggle.dataset.username; const newPerm=toggle.checked?'Allowed':'Denied'; const result=await callGoogleScript('updatePermission',{userId,permission:newPerm}); const msgDiv=document.getElementById('permMsg'); if(result.success){ msgDiv.innerHTML=`✅ Permission for ${username} updated to ${newPerm}`; msgDiv.style.color='#a5d6a5'; loadPermissionPanel(); loadUsersFromSheet(); if(newPerm==='Denied') showSessionToast(`${username} permission revoked`,false); }else{ toggle.checked=!toggle.checked; msgDiv.innerHTML='❌ '+result.message; msgDiv.style.color='#ffaa88'; } setTimeout(()=>msgDiv.innerHTML='',2500); }); }); document.querySelectorAll('.update-role-btn').forEach(btn=>{ btn.addEventListener('click',async()=>{ const userId=btn.dataset.id; const username=btn.dataset.username; const select=document.querySelector(`.role-select[data-id="${userId}"]`); const newRole=select.value; const res=await callGoogleScript('updatePermission',{userId,role:newRole}); const msgDiv=document.getElementById('permMsg'); if(res.success){ msgDiv.innerHTML=`✅ Role for ${username} → ${newRole}`; msgDiv.style.color='#a5d6a5'; loadPermissionPanel(); loadUsersFromSheet(); showSessionToast(`Role changed to ${newRole} for ${username}`,false); }else{ msgDiv.innerHTML='❌ '+res.message; msgDiv.style.color='#ffaa88'; } setTimeout(()=>msgDiv.innerHTML='',2500); }); }); }
   
-  async function validateCurrentSession() {
-    const session = getAdminSession();
-    
-    if (!session) {
-      return false;
-    }
-    
-    try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ 
-          action: 'validateSession', 
-          username: session.username 
-        })
-      });
-      
-      const result = await response.json();
-      
-      if (!result.success || !result.data?.isValid) {
-        console.log('Admin session validation failed:', result.message);
-        localStorage.removeItem('gp_user_session');
-        sessionStorage.removeItem('gp_user_session');
-        
-        showSessionToast(result.message || 'Your admin access has been revoked. Please login again.', true);
-        
-        setTimeout(() => {
-          window.location.href = 'index.htm';
-        }, 3000);
-        
-        return false;
-      }
-      
-      // Check if admin role was changed
-      if (result.data && result.data.role !== 'Admin') {
-        console.log('Admin role changed to', result.data.role);
-        
-        const updatedSession = { 
-          ...session, 
-          role: result.data.role, 
-          permission: result.data.permission,
-          name: result.data.name,
-          lastValidated: new Date().toISOString() 
-        };
-        
-        if (localStorage.getItem('gp_user_session')) {
-          localStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
-        } else {
-          sessionStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
-        }
-        
-        showSessionToast(`Your role has been updated to ${result.data.role}. Redirecting...`, false);
-        
-        setTimeout(() => {
-          if (result.data.role === 'Office') {
-            window.location.href = 'index2.htm';
-          } else {
-            window.location.href = 'index.htm';
-          }
-        }, 1500);
-        
-        return false;
-      }
-      
-      // Update last validated timestamp
-      const updatedSession = { ...session, lastValidated: new Date().toISOString() };
-      if (localStorage.getItem('gp_user_session')) {
-        localStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
-      } else {
-        sessionStorage.setItem('gp_user_session', JSON.stringify(updatedSession));
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Session validation error:', error);
-      return true; // Don't logout on network error
-    }
-  }
+  async function loadDeletePanel(){ const container=document.getElementById('deleteUsersList'); if(!container) return; container.innerHTML='<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>'; const res=await callGoogleScript('getUsers'); if(res.success && res.data?.users){ const search=document.getElementById('deleteSearch')?.value.toLowerCase()||''; const filtered=res.data.users.filter(u=>u.username.toLowerCase().includes(search)); displayDeleteList(filtered,container); }else{ container.innerHTML='<div class="empty-state">Failed</div>'; } }
+  function displayDeleteList(users,container){ if(!users.length){ container.innerHTML='<div class="empty-state">No users</div>'; return; } let html='<table class="users-table"><thead><tr><th>Username</th><th>Role</th><th>Permission</th><th>Action</th></tr></thead><tbody>'; users.forEach(user=>{ html+=`<tr><td>${escapeHtml(user.username)}</td><td>${user.role}</td><td><span class="permission-badge ${user.permission==='Allowed'?'permission-allowed':'permission-denied'}">${user.permission}</span></td><td><button class="del-user-btn" data-id="${user.id}" data-username="${escapeHtml(user.username)}" style="background:#B34A4A;border:none;padding:6px 12px;border-radius:30px;color:white;cursor:pointer;"><i class="fas fa-trash"></i> Delete</button></td></tr>`; }); html+='</tbody></table>'; container.innerHTML=html; document.querySelectorAll('.del-user-btn').forEach(btn=>{ btn.addEventListener('click',async()=>{ if(confirm(`Delete "${btn.dataset.username}" permanently?`)){ const res=await callGoogleScript('deleteUser',{userId:btn.dataset.id}); const msgDiv=document.getElementById('deleteMsg'); if(res.success){ msgDiv.innerHTML=`✅ Deleted ${btn.dataset.username}`; msgDiv.style.color='#a5d6a5'; loadDeletePanel(); loadUsersFromSheet(); loadPermissionPanel(); showSessionToast(`User ${btn.dataset.username} deleted`,false); }else{ msgDiv.innerHTML='❌ '+res.message; } setTimeout(()=>msgDiv.innerHTML='',3000); } }); }); }
   
-  function startSessionValidation() {
-    if (validationInterval) clearInterval(validationInterval);
-    validationInterval = setInterval(validateCurrentSession, VALIDATION_INTERVAL);
-    console.log('✅ Admin session validation started (every 30 seconds)');
-    
-    document.addEventListener('visibilitychange', async () => {
-      if (!document.hidden) {
-        await validateCurrentSession();
-      }
-    });
-  }
+  document.getElementById('addUserForm')?.addEventListener('submit',async(e)=>{ e.preventDefault(); const name=document.getElementById('addFullName').value.trim(); const email=document.getElementById('addEmail').value.trim().toLowerCase(); const pwd=document.getElementById('addPassword').value; const role=document.getElementById('addRole').value; const perm=document.getElementById('addPermission').value; const msgDiv=document.getElementById('addUserMsg'); if(!name||!email||!pwd){ msgDiv.innerHTML='❌ All required'; setTimeout(()=>msgDiv.innerHTML='',3000); return; } const btn=e.target.querySelector('button'); const orig=btn.innerHTML; btn.innerHTML='<div class="loading-spinner"></div> Creating...'; btn.disabled=true; const result=await callGoogleScript('addUser',{name,email,password:pwd,role,permission:perm}); if(result.success){ msgDiv.innerHTML='✅ User created'; document.getElementById('addUserForm').reset(); loadUsersFromSheet(); loadPermissionPanel(); }else{ msgDiv.innerHTML='❌ '+result.message; } setTimeout(()=>msgDiv.innerHTML='',3000); btn.innerHTML=orig; btn.disabled=false; });
   
-  function stopSessionValidation() {
-    if (validationInterval) {
-      clearInterval(validationInterval);
-      validationInterval = null;
-      console.log('🛑 Admin session validation stopped');
-    }
-  }
-  
-  function validateAdminSession() {
-    const userData = getAdminSession();
-    
-    if (!userData) {
-      console.log('No session found. Redirecting to login...');
-      window.location.href = 'index.htm';
-      return false;
-    }
-    
-    if (userData.role !== 'Admin') {
-      console.log('Non-admin user detected. Redirecting to office portal...');
-      window.location.href = 'index2.htm';
-      return false;
-    }
-    
-    console.log('✅ Admin session validated:', userData.name);
-    return true;
-  }
-  
-  // Update profile display
-  function updateAdminProfile() {
-    const userData = getAdminSession();
-    if (userData) {
-      document.getElementById('userDisplayName').textContent = userData.name || userData.username.split('@')[0];
-      document.getElementById('userRoleDisplay').textContent = 'Administrator';
-      const avatar = document.getElementById('userAvatar');
-      const initials = (userData.name || userData.username).substring(0, 2).toUpperCase();
-      avatar.textContent = initials;
-      avatar.style.background = "linear-gradient(135deg, #E6B17E, #C48445)";
-    }
-  }
-  
-  // ========== GOOGLE SHEET API FUNCTIONS ==========
-  async function callGoogleScript(action, data = {}) {
-    try {
-      const formData = new URLSearchParams({ action, ...data });
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData
-      });
-      return await response.json();
-    } catch (error) {
-      console.error('API Error:', error);
-      return { success: false, message: 'Network error: ' + error.message };
-    }
-  }
-  
-  // Load all users from Google Sheet
-  async function loadUsersFromSheet() {
-    const container = document.getElementById('usersListContainer');
-    if (!container) return;
-    
-    container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading users from database...</div>';
-    
-    try {
-      const result = await callGoogleScript('getUsers');
-      
-      if (result.success && result.data && result.data.users) {
-        const users = result.data.users;
-        displayUsersList(users, container);
-      } else {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Failed to load users. Check connection.</div>';
-      }
-    } catch (error) {
-      console.error('Load users error:', error);
-      container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error loading users. Please try again.</div>';
-    }
-  }
-  
-  function displayUsersList(users, container) {
-    if (!users || users.length === 0) {
-      container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i> No users found</div>';
-      return;
-    }
-    
-    let html = '<table class="users-table"><thead><tr><th>#</th><th>Username</th><th>Role</th><th>Permission</th><th>Actions</th></tr></thead><tbody>';
-    users.forEach((user, index) => {
-      const roleClass = user.role === 'Admin' ? '#C44545' : (user.role === 'Office' ? '#2E7D64' : '#1E5A6B');
-      html += `<tr>
-        <td>${index + 1}</td>
-        <td>${escapeHtml(user.username)}</td>
-        <td><span class="permission-badge" style="background: ${roleClass}">${user.role}</span></td>
-        <td><span class="permission-badge ${user.permission === 'Allowed' ? 'permission-allowed' : 'permission-denied'}">${user.permission}</span></td>
-        <td><button class="action-btn" style="padding: 4px 12px; font-size: 0.7rem;" onclick="quickTogglePermission(${user.id}, '${user.permission}')">Toggle Permission</button></td>
-      </tr>`;
-    });
-    html += '</tbody></table>';
-    container.innerHTML = html;
-  }
-  
-  // Load users for permission panel
-  async function loadPermissionPanel() {
-    const container = document.getElementById('permissionUsersList');
-    if (!container) return;
-    
-    container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading users...</div>';
-    
-    try {
-      const result = await callGoogleScript('getUsers');
-      
-      if (result.success && result.data && result.data.users) {
-        const users = result.data.users;
-        const searchTerm = document.getElementById('permSearch')?.value.toLowerCase() || '';
-        const filtered = users.filter(u => u.username.toLowerCase().includes(searchTerm));
-        
-        displayPermissionList(filtered, container);
-      } else {
-        container.innerHTML = '<div class="empty-state">Failed to load users</div>';
-      }
-    } catch (error) {
-      container.innerHTML = '<div class="empty-state">Error loading users</div>';
-    }
-  }
-  
-  function displayPermissionList(users, container) {
-    if (!users || users.length === 0) {
-      container.innerHTML = '<div class="empty-state">No users found</div>';
-      return;
-    }
-    
-    let html = '<table class="users-table"><thead><tr><th>Username</th><th>Role</th><th>Current Permission</th><th>Change Permission</th><th>Change Role</th></tr></thead><tbody>';
-    users.forEach(user => {
-      html += `<tr>
-        <td>${escapeHtml(user.username)}</td>
-        <td>
-          <select class="role-select" data-id="${user.id}">
-            <option value="User" ${user.role === 'User' ? 'selected' : ''}>User</option>
-            <option value="Office" ${user.role === 'Office' ? 'selected' : ''}>Office</option>
-            <option value="Admin" ${user.role === 'Admin' ? 'selected' : ''}>Admin</option>
-          </select>
-        </td>
-        <td><span class="permission-badge ${user.permission === 'Allowed' ? 'permission-allowed' : 'permission-denied'}">${user.permission}</span></td>
-        <td>
-          <select class="perm-select" data-id="${user.id}">
-            <option value="Allowed" ${user.permission === 'Allowed' ? 'selected' : ''}>Allowed</option>
-            <option value="Denied" ${user.permission === 'Denied' ? 'selected' : ''}>Denied</option>
-          </select>
-          <button class="update-perm-btn" data-id="${user.id}" style="margin-left: 8px; padding: 4px 12px; border-radius: 20px; background: var(--highlight-gold); border: none; cursor: pointer;">Update</button>
-        </td>
-        <td><button class="update-role-btn" data-id="${user.id}" data-username="${escapeHtml(user.username)}" style="padding: 4px 12px; border-radius: 20px; background: #1E5A6B; border: none; color: white; cursor: pointer;">Save Role</button></td>
-      </tr>`;
-    });
-    html += '</tbody></table>';
-    container.innerHTML = html;
-    
-    // Attach permission update handlers
-    document.querySelectorAll('.update-perm-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const userId = btn.dataset.id;
-        const select = document.querySelector(`.perm-select[data-id="${userId}"]`);
-        const newPerm = select.value;
-        
-        const result = await callGoogleScript('updatePermission', { userId: userId, permission: newPerm });
-        const msgDiv = document.getElementById('permMsg');
-        if (result.success) {
-          msgDiv.innerHTML = '✅ Permission updated successfully';
-          msgDiv.style.color = '#a5d6a5';
-          loadPermissionPanel();
-          loadUsersFromSheet();
-          
-          // Show notification that user might be logged out if permission revoked
-          if (newPerm === 'Denied') {
-            showSessionToast('⚠️ User permission revoked. They will be logged out on next validation.', false);
-          }
-        } else {
-          msgDiv.innerHTML = '❌ ' + (result.message || 'Update failed');
-          msgDiv.style.color = '#ffaa88';
-        }
-        setTimeout(() => msgDiv.innerHTML = '', 3000);
-      });
-    });
-    
-    // Attach role update handlers
-    document.querySelectorAll('.update-role-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const userId = btn.dataset.id;
-        const username = btn.dataset.username;
-        const select = document.querySelector(`.role-select[data-id="${userId}"]`);
-        const newRole = select.value;
-        
-        const result = await callGoogleScript('updatePermission', { userId: userId, role: newRole });
-        const msgDiv = document.getElementById('permMsg');
-        if (result.success) {
-          msgDiv.innerHTML = `✅ Role for ${username} updated to ${newRole}`;
-          msgDiv.style.color = '#a5d6a5';
-          loadPermissionPanel();
-          loadUsersFromSheet();
-          
-          // Show notification about role change
-          showSessionToast(`⚠️ User ${username} role changed to ${newRole}. They will be redirected on next validation.`, false);
-        } else {
-          msgDiv.innerHTML = '❌ ' + (result.message || 'Update failed');
-          msgDiv.style.color = '#ffaa88';
-        }
-        setTimeout(() => msgDiv.innerHTML = '', 3000);
-      });
-    });
-  }
-  
-  // Load users for delete panel
-  async function loadDeletePanel() {
-    const container = document.getElementById('deleteUsersList');
-    if (!container) return;
-    
-    container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading users...</div>';
-    
-    try {
-      const result = await callGoogleScript('getUsers');
-      
-      if (result.success && result.data && result.data.users) {
-        const users = result.data.users;
-        const searchTerm = document.getElementById('deleteSearch')?.value.toLowerCase() || '';
-        const filtered = users.filter(u => u.username.toLowerCase().includes(searchTerm));
-        
-        displayDeleteList(filtered, container);
-      } else {
-        container.innerHTML = '<div class="empty-state">Failed to load users</div>';
-      }
-    } catch (error) {
-      container.innerHTML = '<div class="empty-state">Error loading users</div>';
-    }
-  }
-  
-  function displayDeleteList(users, container) {
-    if (!users || users.length === 0) {
-      container.innerHTML = '<div class="empty-state">No users found</div>';
-      return;
-    }
-    
-    let html = '<table class="users-table"><thead><tr><th>Username</th><th>Role</th><th>Permission</th><th>Action</th></tr></thead><tbody>';
-    users.forEach(user => {
-      html += `<tr>
-        <td>${escapeHtml(user.username)}</td>
-        <td>${user.role}</td>
-        <td><span class="permission-badge ${user.permission === 'Allowed' ? 'permission-allowed' : 'permission-denied'}">${user.permission}</span></td>
-        <td><button class="delete-user-btn" data-id="${user.id}" data-username="${escapeHtml(user.username)}" style="background: #B34A4A; border: none; padding: 6px 12px; border-radius: 20px; color: white; cursor: pointer;"><i class="fas fa-trash"></i> Delete</button></td>
-      </tr>`;
-    });
-    html += '</tbody></table>';
-    container.innerHTML = html;
-    
-    document.querySelectorAll('.delete-user-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const userId = btn.dataset.id;
-        const username = btn.dataset.username;
-        
-        if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
-          const result = await callGoogleScript('deleteUser', { userId: userId });
-          const msgDiv = document.getElementById('deleteMsg');
-          if (result.success) {
-            msgDiv.innerHTML = `✅ User "${username}" deleted successfully`;
-            msgDiv.style.color = '#a5d6a5';
-            loadDeletePanel();
-            loadUsersFromSheet();
-            loadPermissionPanel();
-            
-            showSessionToast(`⚠️ User ${username} has been deleted. They will be logged out.`, false);
-          } else {
-            msgDiv.innerHTML = '❌ ' + (result.message || 'Delete failed');
-            msgDiv.style.color = '#ffaa88';
-          }
-          setTimeout(() => msgDiv.innerHTML = '', 3000);
-        }
-      });
-    });
-  }
-  
-  // Add User
-  document.getElementById('addUserForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('addFullName').value.trim();
-    const email = document.getElementById('addEmail').value.trim().toLowerCase();
-    const password = document.getElementById('addPassword').value;
-    const role = document.getElementById('addRole').value;
-    const permission = document.getElementById('addPermission').value;
-    const msgDiv = document.getElementById('addUserMsg');
-    const btn = e.target.querySelector('button');
-    const originalHtml = btn.innerHTML;
-    
-    if (!name || !email || !password) {
-      msgDiv.innerHTML = '❌ All fields required';
-      msgDiv.style.color = '#ffaa88';
-      setTimeout(() => msgDiv.innerHTML = '', 3000);
-      return;
-    }
-    
-    btn.innerHTML = '<div class="loading-spinner"></div> Creating...';
-    btn.disabled = true;
-    
-    const result = await callGoogleScript('addUser', { name, email, password, role, permission });
-    
-    if (result.success) {
-      msgDiv.innerHTML = '✅ ' + (result.message || 'User created successfully');
-      msgDiv.style.color = '#a5d6a5';
-      document.getElementById('addUserForm').reset();
-      loadUsersFromSheet();
-      loadPermissionPanel();
-    } else {
-      msgDiv.innerHTML = '❌ ' + (result.message || 'Creation failed');
-      msgDiv.style.color = '#ffaa88';
-    }
-    
-    setTimeout(() => msgDiv.innerHTML = '', 3000);
-    btn.innerHTML = originalHtml;
-    btn.disabled = false;
-  });
-  
-  // Quick toggle permission
-  window.quickTogglePermission = async (userId, currentPerm) => {
-    const newPerm = currentPerm === 'Allowed' ? 'Denied' : 'Allowed';
-    const result = await callGoogleScript('updatePermission', { userId: userId, permission: newPerm });
-    if (result.success) {
-      loadUsersFromSheet();
-      loadPermissionPanel();
-      
-      if (newPerm === 'Denied') {
-        showSessionToast('⚠️ User permission revoked. They will be logged out on next validation.', false);
-      }
-    }
-  };
-  
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
-  }
-  
-  // Modal Control
-  const controlModal = document.getElementById('controlManagerModal');
-  const closeControlBtn = document.getElementById('closeControlModal');
-  
-  function openControlManager(tab = 'add') {
-    controlModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    switchTab(tab);
-    if (tab === 'view') loadUsersFromSheet();
-    if (tab === 'permission') loadPermissionPanel();
-    if (tab === 'delete') loadDeletePanel();
-  }
-  
-  function closeControlManager() {
-    controlModal.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-  
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active-panel'));
-    document.getElementById(`${tabId}Panel`)?.classList.add('active-panel');
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.tab-btn[data-tab="${tabId}"]`)?.classList.add('active');
-  }
-  
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tab = btn.dataset.tab;
-      switchTab(tab);
-      if (tab === 'view') loadUsersFromSheet();
-      if (tab === 'permission') loadPermissionPanel();
-      if (tab === 'delete') loadDeletePanel();
-    });
-  });
-  
-  closeControlBtn?.addEventListener('click', closeControlManager);
-  controlModal?.addEventListener('click', (e) => { if (e.target === controlModal) closeControlManager(); });
-  
-  document.getElementById('deleteSearch')?.addEventListener('input', () => loadDeletePanel());
-  document.getElementById('permSearch')?.addEventListener('input', () => loadPermissionPanel());
-  document.getElementById('searchUsers')?.addEventListener('input', () => loadUsersFromSheet());
-  
-  window.openControlManager = openControlManager;
-  window.loadUsersFromSheet = loadUsersFromSheet;
-  
-  // ========== CLOCK & UTILITIES ==========
-  function updateClock() {
-    const now = new Date();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    let seconds = now.getSeconds();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12;
-    const timeStr = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')} ${ampm}`;
-    document.getElementById('liveTime').innerText = timeStr;
-    document.getElementById('liveDate').innerText = now.toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-  }
-  updateClock();
-  setInterval(updateClock, 1000);
-  
-  function loadPage(page) {
-    document.getElementById("frameContent").src = page + ".htm";
-  }
-  window.loadPage = loadPage;
-  
-  // Sign Out
-  function performSignOut() {
-    stopSessionValidation(); // Stop validation before signing out
-    localStorage.removeItem('gp_user_session');
-    sessionStorage.removeItem('gp_user_session');
-    
-    const toast = document.getElementById('signoutToast');
-    if (toast) {
-      toast.classList.add('show');
-      setTimeout(() => { window.location.href = 'index.htm'; }, 800);
-    } else {
-      setTimeout(() => { window.location.href = 'index.htm'; }, 800);
-    }
-  }
-  document.getElementById('signOutBtn')?.addEventListener('click', performSignOut);
-  
-  // Initialize
-  if (validateAdminSession()) {
-    updateAdminProfile();
-    startSessionValidation(); // Start real-time session validation
-    
-    // Also validate immediately on page load
-    setTimeout(() => {
-      validateCurrentSession();
-    }, 1000);
-  }
-  
-  // Listen for storage changes (in case of multiple tabs)
-  window.addEventListener('storage', function(e) {
-    if (e.key === 'gp_user_session') {
-      validateAdminSession();
-      updateAdminProfile();
-      validateCurrentSession(); // Validate immediately
-    }
-  });
-  
-  // Re-validate when page becomes visible
-  document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-      validateAdminSession();
-      updateAdminProfile();
-      validateCurrentSession();
-    }
-  });
-  
-  // Before page unload, stop validation
-  window.addEventListener('beforeunload', () => {
-    stopSessionValidation();
-  });
-  
-  console.log('✅ Admin Portal Loaded - Real-time session validation active');
-  console.log('🔐 Session validation every 30 seconds');
-  console.log('📋 Admin Access Rules:');
-  console.log('   - No Session → index.htm (Public Portal)');
-  console.log('   - Non-Admin Role → index2.htm (Office Portal)');
-  console.log('   - Admin Role → index3.htm (This Portal)');
-  console.log('   - Permission/role change detection: Every 30 seconds');
+  function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+  const modal=document.getElementById('controlManagerModal'), closeModalBtn=document.getElementById('closeControlModal');
+  window.openControlManager=(tab='add')=>{ modal.classList.add('active'); document.body.style.overflow='hidden'; document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active-panel')); document.getElementById(`${tab}Panel`).classList.add('active-panel'); document.querySelectorAll('.tab-btn').forEach(btn=>btn.classList.remove('active')); document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active'); if(tab==='view') loadUsersFromSheet(); if(tab==='permission') loadPermissionPanel(); if(tab==='delete') loadDeletePanel(); };
+  function closeControlManager(){ modal.classList.remove('active'); document.body.style.overflow=''; }
+  closeModalBtn?.addEventListener('click',closeControlManager); modal?.addEventListener('click',(e)=>{ if(e.target===modal) closeControlManager(); });
+  document.querySelectorAll('.tab-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ const t=btn.dataset.tab; window.openControlManager(t); }); });
+  document.getElementById('deleteSearch')?.addEventListener('input',()=>loadDeletePanel()); document.getElementById('permSearch')?.addEventListener('input',()=>loadPermissionPanel()); document.getElementById('searchUsers')?.addEventListener('input',()=>loadUsersFromSheet());
+  function updateClock(){ const now=new Date(); let h=now.getHours(); let m=now.getMinutes(); let s=now.getSeconds(); const ap=h>=12?'PM':'AM'; h=h%12||12; document.getElementById('liveTime').innerText=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')} ${ap}`; document.getElementById('liveDate').innerText=now.toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'short',day:'numeric'}); } updateClock(); setInterval(updateClock,1000);
+  window.loadPage=(page)=>{ document.getElementById("frameContent").src=page+".htm"; };
+  document.getElementById('signOutBtn')?.addEventListener('click',()=>{ stopSessionValidation(); localStorage.removeItem('gp_user_session'); sessionStorage.removeItem('gp_user_session'); const toast=document.getElementById('signoutToast'); toast.classList.add('show'); setTimeout(()=>window.location.href='index.htm',800); });
+  if(validateAdminSession()){ updateAdminProfile(); startSessionValidation(); setTimeout(()=>validateCurrentSession(),1000); }
+  window.addEventListener('storage',()=>{ validateAdminSession(); updateAdminProfile(); validateCurrentSession(); });
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ validateAdminSession(); updateAdminProfile(); validateCurrentSession(); } });
+  window.addEventListener('beforeunload',()=>stopSessionValidation());
 </script>
 </body>
 </html>
